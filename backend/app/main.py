@@ -11,7 +11,16 @@ from app.config import get_settings
 from app.db.engine import dispose_engine
 from app.db.init import init_db
 from app.logging_conf import setup_logging
-from app.routes import admin, auth, dicomweb_qido, dicomweb_wado, health, library, uploads
+from app.routes import (
+    account,
+    admin,
+    auth,
+    dicomweb_qido,
+    dicomweb_wado,
+    health,
+    library,
+    uploads,
+)
 from app.services import jobs
 
 log = logging.getLogger(__name__)
@@ -39,6 +48,7 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(account.router)
 app.include_router(admin.router)
 app.include_router(uploads.router)
 app.include_router(library.router)

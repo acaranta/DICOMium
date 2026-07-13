@@ -33,6 +33,18 @@ directory tree you can read with `ls`.
 **Accounts** — self-registration; the first account created becomes the administrator.
 Each user sees only their own exams, and every API path is scoped to them.
 
+**Sign-in** — password, plus two optional factors you enable per account from `/account`:
+
+- **Passkeys.** Fingerprint, face or device PIN — and that's the whole sign-in. No email,
+  no password, no code. A passkey is *already* two factors (the device you hold, and the
+  biometric that unlocks it), so it deliberately does not then ask for a TOTP code as well.
+- **Authenticator app (TOTP).** A 6-digit code after your password, with **10 one-time
+  recovery codes** for when your phone isn't to hand.
+
+> Browsers only permit passkeys in a secure context: **HTTPS, or `localhost`**. They will
+> not work over plain HTTP on a LAN address — the UI says so rather than failing silently.
+> Password and TOTP work everywhere.
+
 ## Quick start
 
 ```bash
@@ -83,6 +95,20 @@ default.
 | `MAX_EXTRACT_MB` | `20480` | Zip-bomb guard |
 | `DICOMWEB_TRANSCODE` | `auto` | `auto` streams compressed frames straight to the browser |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | — | Optional: pre-create an admin instead of self-registering |
+| `TOTP_ISSUER` | `webdicom` | The label your authenticator app shows |
+| `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN` | — | Optional: pin the passkey domain. Derived from the request otherwise |
+
+### Locked out?
+
+Recovery codes are the normal way back in. If a sole administrator loses their
+authenticator *and* their recovery codes, clear their factors from inside the container:
+
+```bash
+docker compose exec webdicom python -m app.cli list-users
+docker compose exec webdicom python -m app.cli reset-mfa you@example.com
+```
+
+They can then sign in with their password alone, and re-enrol.
 
 ## Architecture
 
@@ -145,6 +171,13 @@ buried:
   multipart parser is a hand-rolled byte scanner, not a MIME parser: no preamble, a real
   `Content-Type` header line per part, CRLF before the closing boundary. "Tidying" any of
   those silently feeds the browser garbage pixels.
+- `test_mfa_login.py` — while a user owes a second factor they must hold **no session at
+  all**, so the tests try to reach a protected route from that half-authenticated state and
+  assert 401. A "pending" flag on the real session would fail open the first time a route
+  forgot to check it; a separate short-lived cookie cannot.
+- `test_totp.py` — a code cannot be replayed inside its own 30-second window. Verifying a
+  code is the easy half; recording which step it consumed is the half that gets skipped,
+  and skipping it turns a second factor back into a single one.
 
 ## Not a medical device
 

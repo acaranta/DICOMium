@@ -12,6 +12,7 @@ from app.db.engine import get_engine, get_sessionmaker
 from app.models import User  # noqa: F401 - registers every table on Base.metadata
 from app.services.auth import hash_password, sweep_expired_sessions
 from app.services.slug import user_slug
+from app.services.webauthn import sweep_challenges
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +31,10 @@ async def init_db() -> None:
         removed = await sweep_expired_sessions(db)
         if removed:
             log.info("swept %d expired session(s)", removed)
+
+        stale = await sweep_challenges(db)
+        if stale:
+            log.info("swept %d expired WebAuthn challenge(s)", stale)
 
         if settings.admin_email and settings.admin_password:
             await _bootstrap_admin(db, settings.admin_email, settings.admin_password)

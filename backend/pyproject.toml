@@ -13,6 +13,11 @@ dependencies = [
     "aiosqlite>=0.20",
     "bcrypt>=4.2",
     "anyio>=4.7",
+    # MFA: WebAuthn passkeys, TOTP, and Fernet for encrypting TOTP secrets at rest.
+    "webauthn>=3.0",
+    "pyotp>=2.10",
+    "qrcode>=8.0",
+    "cryptography>=44.0",
     "pydicom>=3.0.1",
     "pylibjpeg>=2.1",
     "pylibjpeg-libjpeg>=2.3",

@@ -27,6 +27,23 @@ services:
       # ADMIN_EMAIL: you@example.com
       # ADMIN_PASSWORD: change-me-at-least-12-chars
 
+      # --- Multi-factor authentication ---
+      # Users opt in per account from /account: a passkey (which signs them in on its own,
+      # with no password) and/or an authenticator app with recovery codes.
+      #
+      # The label an authenticator app shows next to the code.
+      TOTP_ISSUER: webdicom
+      #
+      # Passkeys are bound to a domain (the WebAuthn "Relying Party ID"). Left unset, it is
+      # derived from the request, so passkeys work at localhost:8080 and behind a reverse
+      # proxy on any domain with no configuration. Pin them if you want to be explicit:
+      # WEBAUTHN_RP_ID: webdicom.example.com
+      # WEBAUTHN_ORIGIN: https://webdicom.example.com
+      #
+      # NOTE: browsers only allow passkeys in a secure context — HTTPS, or localhost. They
+      # will NOT work over plain HTTP on a LAN address (http://192.168.x.x:8080), whatever
+      # you set above. Password + authenticator app work everywhere.
+
       # --- Ingest limits ---
       # A burned exam DVD is typically 300-700 MB compressed.
       MAX_UPLOAD_MB: "8192"

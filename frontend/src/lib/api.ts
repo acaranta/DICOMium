@@ -96,6 +96,40 @@ export interface AuthConfig {
   min_password_length: number
 }
 
+/** The answer to a sign-in attempt: either you're in, or you owe a second factor. */
+export interface LoginResult {
+  mfa_required: boolean
+  user: User | null
+  methods: string[]
+}
+
+export interface Passkey {
+  id: number
+  nickname: string
+  backed_up: boolean
+  transports: string[]
+  created_at: string
+  last_used_at: string | null
+}
+
+export interface SecurityStatus {
+  totp_enabled: boolean
+  passkeys: Passkey[]
+  recovery_codes_remaining: number
+  passkeys_supported: boolean
+  passkeys_unsupported_reason: string
+}
+
+export interface TotpBegin {
+  secret: string
+  uri: string
+  qr_data_url: string
+}
+
+export interface RecoveryCodes {
+  codes: string[]
+}
+
 export interface Series {
   series_instance_uid: string
   series_number: number | null

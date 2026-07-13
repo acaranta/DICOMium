@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import LibraryPage from './pages/Library'
 import ViewerPage from './pages/Viewer'
 import AdminPage from './pages/Admin'
+import AccountPage from './pages/Account'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,14 @@ export default function App() {
               element={
                 <Protected>
                   <ViewerPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <Protected>
+                  <AccountPage />
                 </Protected>
               }
             />

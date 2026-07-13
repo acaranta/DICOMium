@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { IconLogout } from '../ui/Icons'
 
+
 export default function AppShell({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -32,7 +33,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </Link>
         )}
 
-        <span className="font-mono text-2xs text-ink-faint">{user?.email}</span>
+        <Link
+          to="/account"
+          className="font-mono text-2xs text-ink-faint transition-colors hover:text-ink"
+          title="Account & security"
+        >
+          {user?.email}
+        </Link>
 
         <button
           type="button"

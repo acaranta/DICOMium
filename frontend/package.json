@@ -17,6 +17,7 @@
     "@cornerstonejs/tools": "5.5.0",
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@simplewebauthn/browser": "^13.3.0",
     "@tanstack/react-query": "^5.62.0",
     "dicom-parser": "1.8.21",
     "react": "^18.3.1",

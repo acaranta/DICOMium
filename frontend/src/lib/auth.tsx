@@ -1,12 +1,17 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { api, ApiError, type User } from './api'
+import { api, ApiError, type LoginResult, type User } from './api'
 
 interface AuthState {
   user: User | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  /** Resolves to the raw result: the caller must handle `mfa_required`. */
+  login: (email: string, password: string) => Promise<LoginResult>
+  verifyMfa: (code: string) => Promise<LoginResult>
   register: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  /** Adopt a user after a passkey sign-in, which bypasses the password entirely. */
+  adopt: (user: User) => void
+  refresh: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -29,15 +34,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthState = {
     user,
     loading,
+
     login: async (email, password) => {
-      setUser(await api.post<User>('/api/auth/login', { email, password }))
+      const result = await api.post<LoginResult>('/api/auth/login', { email, password })
+      // Only adopt the user when the sign-in actually completed. When MFA is owed the
+      // server has issued no session, so setting a user here would show the app to
+      // someone who is not yet authenticated.
+      if (result.user) setUser(result.user)
+      return result
     },
+
+    verifyMfa: async (code) => {
+      const result = await api.post<LoginResult>('/api/auth/login/mfa', { code })
+      if (result.user) setUser(result.user)
+      return result
+    },
+
     register: async (email, password) => {
       setUser(await api.post<User>('/api/auth/register', { email, password }))
     },
+
     logout: async () => {
       await api.post('/api/auth/logout')
       setUser(null)
+    },
+
+    adopt: setUser,
+
+    refresh: async () => {
+      setUser(await api.get<User>('/api/auth/me'))
     },
   }
 

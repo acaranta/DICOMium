@@ -220,6 +220,49 @@ export const IconBack = (p: Props) => (
   </Svg>
 )
 
+/** Passkey: a key. The near-universal glyph for WebAuthn. */
+export const IconKey = (p: Props) => (
+  <Svg {...p}>
+    <circle cx="7.5" cy="15.5" r="3.5" />
+    <path d="m10 13 8-8M15.5 7.5l2 2M18 5l2.5 2.5" />
+  </Svg>
+)
+
+/** TOTP: a phone with a code on it. */
+export const IconAuthApp = (p: Props) => (
+  <Svg {...p}>
+    <rect x="6" y="2.5" width="12" height="19" rx="2" />
+    <path d="M9.5 9h5M9.5 12.5h5M11 18h2" />
+  </Svg>
+)
+
+export const IconShield = (p: Props) => (
+  <Svg {...p}>
+    <path d="M12 3 4.5 6v6c0 4.2 3 8 7.5 9.5 4.5-1.5 7.5-5.3 7.5-9.5V6L12 3Z" />
+    <path d="m9 12 2.2 2.2L15.5 10" />
+  </Svg>
+)
+
+export const IconCopy = (p: Props) => (
+  <Svg {...p}>
+    <rect x="9" y="9" width="11" height="11" rx="1.5" />
+    <path d="M15 9V5.5A1.5 1.5 0 0 0 13.5 4h-8A1.5 1.5 0 0 0 4 5.5v8A1.5 1.5 0 0 0 5.5 15H9" />
+  </Svg>
+)
+
+export const IconDownload = (p: Props) => (
+  <Svg {...p}>
+    <path d="M12 4v12M12 16l-4.5-4.5M12 16l4.5-4.5" />
+    <path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" />
+  </Svg>
+)
+
+export const IconCloud = (p: Props) => (
+  <Svg {...p}>
+    <path d="M7 18a4 4 0 0 1-.6-7.95 5.5 5.5 0 0 1 10.7-1.6A3.75 3.75 0 0 1 17.5 18H7Z" />
+  </Svg>
+)
+
 export const IconSpinner = ({ className }: Props) => (
   <svg
     className={`${className ?? base} animate-spin`}

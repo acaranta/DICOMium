@@ -26,6 +26,25 @@ class Settings(BaseSettings):
     admin_email: str = ""
     admin_password: str = ""
 
+    # bcrypt cost. 12 is the sane production default. The test suite lowers it, because
+    # issuing 10 recovery codes means 10 deliberately-slow hashes per enrolment.
+    bcrypt_rounds: int = 12
+
+    # MFA
+    #
+    # WebAuthn binds a credential to a domain (the Relying Party ID). Left unset, both are
+    # derived from the request's Origin header, so passkeys work at localhost:8080 and
+    # behind a reverse proxy on any domain with zero configuration. Set them to pin the
+    # RP explicitly.
+    #
+    # Note: browsers only permit WebAuthn in a secure context — HTTPS, or localhost. It
+    # will not work over plain HTTP on a LAN address, whatever these are set to.
+    webauthn_rp_id: str = ""
+    webauthn_origin: str = ""
+    webauthn_rp_name: str = "webdicom"
+    # The label an authenticator app shows next to the code.
+    totp_issuer: str = "webdicom"
+
     # Upload / ingest limits
     max_upload_mb: int = 8192
     max_extract_mb: int = 20480
