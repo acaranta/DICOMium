@@ -186,4 +186,15 @@ use, and nothing here should be relied on for clinical decisions.
 
 ## Licence
 
-MIT
+Copyright © 2026 Arthur Caranta.
+
+**GNU Affero General Public License v3.0 or later** — see [LICENSE](LICENSE).
+
+The AGPL is the GPL plus one extra obligation, and it is the one that matters for a
+self-hosted web app: under **section 13**, if you run a *modified* version of webdicom as a
+network service, you must offer its source code to the people using it over the network.
+Running it unmodified — for yourself, your family, your clinic — obliges you nothing beyond
+the usual GPL terms.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
