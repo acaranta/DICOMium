@@ -14,8 +14,20 @@
 </p>
 
 <p align="center">
+  <img src="https://drone.minixer.cloud/api/badges/GithubMirrors/DICOMium/status.svg" alt="Build status" />
+  <a href="https://hub.docker.com/r/acaranta/dicomium">
+    <img src="https://img.shields.io/docker/image-size/acaranta/dicomium/latest?color=2d3c53&label=image" alt="Image size" />
+  </a>
+  <img src="https://img.shields.io/badge/arch-amd64%20%7C%20arm64-2d3c53" alt="amd64 and arm64" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/licence-AGPL--3.0-2d3c53" alt="AGPL-3.0" />
+  </a>
+</p>
+
+<p align="center">
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-it-does">Features</a> ·
+  <a href="#roadmap">Roadmap</a> ·
   <a href="#architecture">Architecture</a> ·
   <a href="LICENSE">AGPL-3.0</a>
 </p>
@@ -66,7 +78,8 @@ directory tree you can read with `ls`.
   On CT these read in **Hounsfield units** — an ROI over air reads about −1000 HU.
 - Viewport grids from 1×1 to 3×3; drag any series into any cell
 - **MPR**: reconstruct a volume into linked axial / sagittal / coronal planes with crosshairs
-- Cine playback for multi-frame series, DICOM tag inspector, PNG export
+- Multi-frame series (ultrasound and angiography loops) load frame-by-frame and scroll
+- Searchable DICOM tag inspector, and PNG export with the measurements drawn on
 
 **Ingest** — built for the mess that real burned discs actually contain.
 
@@ -95,18 +108,118 @@ Each user sees only their own exams, and every API path is scoped to them.
 > not work over plain HTTP on a LAN address — the UI says so rather than failing silently.
 > Password and TOTP work everywhere.
 
+## Roadmap
+
+Nothing below is promised on a date. It is an honest list of what is missing, roughly in the
+order it is likely to be worth doing. Contributions and opinions on the ordering are welcome.
+
+### Next up
+
+Small, visible gaps you notice within a few minutes of using it.
+
+- **Translations.** Every string is currently hardcoded English. French first, since that is
+  what the discs around here are printed in.
+- **Cine playback.** Multi-frame loops already load and scroll; they just have no play button
+  yet.
+- **Touch and a responsive layout.** Today it assumes a mouse and a wide screen. Tablets are
+  the obvious place to read a scan on the sofa.
+- **Window presets beyond CT.** The presets are Hounsfield windows, which only mean anything
+  on CT — so MR and ultrasound get a greyed-out button and nothing else.
+- **Pagination in the study list.** The API already supports it; the interface does not, so a
+  large library quietly stops at 100 studies.
+
+### Getting your data back out
+
+Right now DICOMium is a one-way door: exams go in and can be read, but they cannot come back
+out. For something whose whole promise is *your data stays yours*, that is the wrong shape.
+
+- **Export a study** — download it back as a plain zip of DICOM files.
+- **De-identified export**, for handing a scan to a doctor, a second opinion, or a researcher
+  without handing over the patient with it.
+- **STOW-RS**, so other tools can push studies in over the standard rather than through the
+  browser. (The DICOMweb API is read-only today: query and retrieve, no store.)
+- **DIMSE** — receive studies directly from a modality or another archive.
+
+### More of the DICOM standard
+
+Several object types are already ingested, indexed and listed — they simply have no renderer,
+so they sit greyed out in the series panel.
+
+- **Structured reports and dose reports**, **encapsulated PDF**, and **ECG waveforms**. Your
+  disc almost certainly contains at least one of these.
+- **Segmentation overlays.**
+- **MIP and 3D volume rendering.** MPR is done; these are the natural next step from it.
+
+### Persistence, sharing, deployment
+
+- **Measurements that survive a reload.** They currently live only in the browser: close the
+  tab and they are gone. They should be saved against the study.
+- **Sharing** — with another user of the same instance, or via an expiring read-only link.
+  Studies are strictly private today, with no way to share at all.
+- **OIDC / forward-auth**, so DICOMium can sit behind an SSO you already run.
+- **A Prometheus `/metrics` endpoint**, for anyone who monitors their own boxes.
+
+### Non-goals
+
+Deliberately out of scope, so nobody waits for them:
+
+- **It is not a certified diagnostic device**, and will not seek to become one. Read your own
+  scans with it; do not make clinical decisions on it.
+- **It is not a full PACS.** No worklist, no scheduling, no reporting workflow.
+- **It is not multi-tenant SaaS.** It is built to be run by one person or one household, on
+  their own machine.
+
 ## Quick start
 
+The image is published on Docker Hub as
+[`acaranta/dicomium`](https://hub.docker.com/r/acaranta/dicomium), built for **amd64 and
+arm64** — so it runs on a normal server, an Apple Silicon Mac, or a Raspberry Pi.
+
 ```bash
-git clone <this repo> && cd dicomium
-docker compose up --build
+curl -O https://raw.githubusercontent.com/acaranta/DICOMium/main/docker-compose.yml
+docker compose up -d
 ```
 
-Open <http://localhost:8080>, create an account (the first one is the admin), and drag
-an exam onto the drop zone.
+Open <http://localhost:8080>, create an account (**the first one becomes the administrator**),
+and drag an exam onto the drop zone.
+
+Or without compose at all:
+
+```bash
+docker run -d --name dicomium -p 8080:8080 \
+  -v ./data:/data \
+  -v ./dicomfiles:/dicomfiles \
+  acaranta/dicomium:latest
+```
+
+Two volumes, and that is the whole story:
+
+| | |
+|---|---|
+| `/dicomfiles` | your DICOM files, in a plain browsable tree. Point this at a real disk — one exam DVD is ~600 MB. |
+| `/data` | the SQLite index, thumbnails, and the session secret. Rebuildable from `/dicomfiles`; the images are the source of truth. |
 
 All configuration lives in the `environment:` block of `docker-compose.yml` — there is no
 separate `.env` file, so there is exactly one place to look.
+
+To update:
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+### Building it yourself
+
+If you would rather build from source than trust a prebuilt image — entirely reasonable for
+something you are pointing at your medical records:
+
+```bash
+git clone https://github.com/acaranta/DICOMium.git && cd DICOMium
+docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+```
+
+That reuses the same ports, volumes and environment from `docker-compose.yml`, and simply
+builds the image locally instead of pulling it.
 
 ## Storage layout
 
@@ -233,6 +346,22 @@ buried:
 
 This is a personal tool for reading your own exams. It is not certified for diagnostic
 use, and nothing here should be relied on for clinical decisions.
+
+## Who actually wrote this
+
+Most of the code here was written by an AI, closely supervised by a bearded nerd who read
+the diffs, pushed back on plenty of them, and refused to believe any of it worked until it
+had been run against real burned exam DVDs — the messy kind, with no file extensions and a
+Windows viewer bundled on the disc.
+
+That bearded nerd is a systems engineer. **He is not a doctor**, not a radiologist, and not
+anything within shouting distance of either. DICOMium exists because opening the DVD a
+hospital hands you should not require installing someone's desktop software — *not* because
+anyone involved is qualified to tell you what is in the pictures.
+
+So: the software will happily show you your scan and measure it in real Hounsfield units.
+Interpreting it is a job for someone who went to medical school. Please see
+[Not a medical device](#not-a-medical-device), and take it literally.
 
 ## Licence
 

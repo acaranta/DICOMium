@@ -38,6 +38,8 @@ COPY --from=frontend /build/dist /app/frontend/dist
 COPY backend/ /app/backend/
 COPY nginx.conf /etc/nginx/sites-available/default
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # nginx must run unprivileged: give it a writable pid/temp home and drop the stock
 # master-process user directive.
@@ -56,12 +58,17 @@ ENV PATH="/app/.venv/bin:$PATH" \
     # multi-GB upload fills the container's writable layer and dies with ENOSPC.
     TMPDIR=/dicomfiles/.tmp
 
-USER dicomium
+# Deliberately NOT `USER dicomium`. Docker creates bind-mount targets owned by ROOT, so a
+# container that started unprivileged could not write to a freshly-mounted /data and would die
+# on boot with PermissionError. Instead the entrypoint starts as root purely to chown the
+# volumes, and supervisor then drops BOTH programs to uid 1000 (see supervisord.conf) — so
+# nothing that serves a request ever runs as root.
 WORKDIR /app
 
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
     CMD curl -fsS http://127.0.0.1:8080/api/health || exit 1
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

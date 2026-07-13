@@ -1,7 +1,11 @@
 services:
   dicomium:
-    build: .
-    image: dicomium:latest
+    # The published multi-arch image (amd64 + arm64), so `docker compose up -d` just pulls
+    # and runs — no build toolchain, no Node, no Python needed on the host.
+    #
+    # To build from source instead (for development, or to run a local change):
+    #     docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+    image: acaranta/dicomium:latest
     container_name: dicomium
     ports:
       - "8080:8080"
