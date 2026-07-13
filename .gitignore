@@ -1,0 +1,38 @@
+# Patient data. NEVER commit these — the archives here are real medical records, and
+# /dicomfiles is the live store.
+dicomdata/
+dicomfiles/
+
+# Runtime state: the SQLite index, thumbnails, the session secret.
+data/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+.vite/
+npm-debug.log*
+yarn-error.log*
+
+# Config lives in docker-compose.yml's environment block, not in a .env file. This is
+# only here to catch a stray one.
+.env
+.env.*
+
+# Browser-automation artifacts (screenshots, console logs) from verification runs.
+.playwright-mcp/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

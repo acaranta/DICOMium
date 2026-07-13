@@ -1,0 +1,36 @@
+[project]
+name = "webdicom"
+version = "0.1.0"
+description = "Web-based DICOM viewer with per-user exam storage"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "python-multipart>=0.0.20",
+    "pydantic[email]>=2.10",
+    "pydantic-settings>=2.7",
+    "sqlalchemy>=2.0.36",
+    "aiosqlite>=0.20",
+    "bcrypt>=4.2",
+    "anyio>=4.7",
+    "pydicom>=3.0.1",
+    "pylibjpeg>=2.1",
+    "pylibjpeg-libjpeg>=2.3",
+    "pylibjpeg-openjpeg>=2.4",
+    "pillow>=11.0",
+    "numpy>=2.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "httpx>=0.28",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["app/tests"]
+
+[tool.uv]
+package = false

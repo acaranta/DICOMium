@@ -1,0 +1,43 @@
+services:
+  webdicom:
+    build: .
+    image: webdicom:latest
+    container_name: webdicom
+    ports:
+      - "8080:8080"
+    volumes:
+      # The SQLite index, thumbnails and the session secret.
+      - ./data:/data
+      # The DICOM store. Point this at a real disk: one exam DVD is ~600 MB.
+      - ./dicomfiles:/dicomfiles
+    environment:
+      TZ: Europe/Paris
+      LOG_LEVEL: INFO
+
+      # --- Accounts ---
+      # The first account to register becomes the administrator. Flip this to "false"
+      # once your users exist to close the instance to new signups. A zero-user instance
+      # stays claimable regardless, so this cannot brick a fresh deployment.
+      REGISTRATION_ENABLED: "true"
+      SESSION_TTL_HOURS: "168"
+      # Set to "true" when serving over HTTPS, so the session cookie is marked Secure.
+      COOKIE_SECURE: "false"
+
+      # Optional: pre-create an admin instead of self-registering.
+      # ADMIN_EMAIL: you@example.com
+      # ADMIN_PASSWORD: change-me-at-least-12-chars
+
+      # --- Ingest limits ---
+      # A burned exam DVD is typically 300-700 MB compressed.
+      MAX_UPLOAD_MB: "8192"
+      # Zip-bomb guard: the most a single archive may expand to.
+      MAX_EXTRACT_MB: "20480"
+
+      # --- DICOMweb ---
+      # auto   pass compressed frames (JPEG, JPEG-LS, JPEG 2000, HTJ2K, RLE) straight to
+      #        the browser's wasm decoders — zero server CPU. Decode server-side only for
+      #        the syntaxes the browser cannot handle.
+      # always always decode server-side.
+      # never  never decode; unsupported syntaxes fail instead of burning CPU.
+      DICOMWEB_TRANSCODE: auto
+    restart: unless-stopped

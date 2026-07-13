@@ -1,0 +1,38 @@
+{
+  "name": "webdicom-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "comment": "The @cornerstonejs family peer-depends on EXACT versions of itself (see npm view @cornerstonejs/dicom-image-loader peerDependencies). Caret ranges hoist two copies of core and the metadata providers silently fail to register. Pin all five literally, and bump them together.",
+  "dependencies": {
+    "@cornerstonejs/core": "5.5.0",
+    "@cornerstonejs/dicom-image-loader": "5.5.0",
+    "@cornerstonejs/metadata": "5.5.0",
+    "@cornerstonejs/tools": "5.5.0",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@tanstack/react-query": "^5.62.0",
+    "dicom-parser": "1.8.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

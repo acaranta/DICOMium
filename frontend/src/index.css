@@ -1,0 +1,129 @@
+/* Bundled, so the container never reaches out to a font CDN. */
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-base text-ink font-sans text-sm antialiased;
+    /* A workstation does not bounce-scroll. */
+    overscroll-behavior: none;
+  }
+
+  /* Every number in this app is a measurement. Tabular figures stop values from
+     shifting horizontally as they tick — critical when scrubbing a stack. */
+  .num {
+    @apply font-mono tabular-nums;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-line-bright rounded-sm;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-faint;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-1 ring-accent ring-offset-0;
+  }
+}
+
+@layer components {
+  /* Toolbar / tool buttons ------------------------------------------------- */
+  .tool-btn {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded
+           text-ink-dim transition-colors duration-75
+           hover:bg-hover hover:text-ink
+           disabled:pointer-events-none disabled:text-ink-faint disabled:opacity-40;
+  }
+  .tool-btn[data-active='true'] {
+    /* The active tool is the one thing on screen allowed to glow. */
+    @apply bg-accent-dim/25 text-accent;
+    box-shadow: inset 0 0 0 1px theme('colors.accent / 40%');
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded border border-line
+           bg-raised px-3 py-1.5 text-xs font-medium text-ink
+           transition-colors duration-75
+           hover:border-line-bright hover:bg-hover
+           disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply border-accent-dim bg-accent-dim/25 text-accent hover:bg-accent-dim/40;
+  }
+  .btn-danger {
+    @apply border-danger/40 text-danger hover:bg-danger/10;
+  }
+
+  .input {
+    @apply w-full rounded border border-line bg-void px-2.5 py-1.5 text-sm text-ink
+           placeholder:text-ink-faint
+           focus:border-accent focus:outline-none;
+  }
+
+  .label {
+    @apply mb-1 block text-2xs font-medium uppercase tracking-wider text-ink-dim;
+  }
+
+  /* Panels ----------------------------------------------------------------- */
+  .panel {
+    @apply border-line bg-panel;
+  }
+  .panel-title {
+    @apply flex h-8 shrink-0 items-center gap-2 border-b border-line px-3
+           text-2xs font-semibold uppercase tracking-wider text-ink-dim;
+  }
+
+  /* A hairline separator between toolbar groups. */
+  .divider {
+    @apply mx-1 h-5 w-px shrink-0 bg-line;
+  }
+
+  /* Viewport --------------------------------------------------------------- */
+  .viewport-cell {
+    @apply relative overflow-hidden bg-void;
+    /* 1px inset outline rather than a border, so the canvas is never nudged off-pixel. */
+    box-shadow: inset 0 0 0 1px theme('colors.line');
+  }
+  .viewport-cell[data-active='true'] {
+    box-shadow: inset 0 0 0 1px theme('colors.accent / 70%');
+  }
+
+  /* Corner annotations burned over the image. Pointer-events off: the whole cell is a
+     drag target for the tools underneath. */
+  .vp-overlay {
+    @apply pointer-events-none absolute z-10 select-none text-2xs leading-tight;
+    color: #b8c4cf;
+    /* No panel behind the text — a solid box would occlude anatomy. A shadow keeps it
+       legible over both bright bone and black air. */
+    text-shadow: 0 0 3px #000, 0 0 2px #000;
+  }
+}
+
+/* Cornerstone injects its canvas and an SVG annotation layer into the enabled element.
+   Both must fill it exactly, or measurements land offset from the pixels they mark. */
+.cs-element canvas {
+  display: block;
+}
+.cs-element > svg {
+  pointer-events: none;
+}

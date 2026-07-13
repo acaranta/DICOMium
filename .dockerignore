@@ -1,0 +1,35 @@
+# Patient data must never enter the build context — it would be baked into an image
+# layer even if a later step deleted it.
+dicomdata/
+dicomfiles/
+data/
+
+# Build outputs and deps: the image builds these from source in its own stages.
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.venv/
+backend/.venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Git history is large and useless inside the image.
+.git/
+.gitignore
+
+# Local config and editor state
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+.playwright-mcp/
+
+# Docs and compose files are not needed at build time.
+README.md
+docker-compose*.yml

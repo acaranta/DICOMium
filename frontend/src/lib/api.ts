@@ -1,0 +1,175 @@
+// Typed fetch client. Every request carries the session cookie; the SPA and the API are
+// same-origin (nginx in prod, the Vite proxy in dev), so nothing else is needed.
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(path, {
+    credentials: 'include',
+    headers: {
+      ...(init?.body && !(init.body instanceof FormData)
+        ? { 'Content-Type': 'application/json' }
+        : {}),
+      ...init?.headers,
+    },
+    ...init,
+  })
+
+  if (!res.ok) {
+    let detail = res.statusText
+    try {
+      const body = await res.json()
+      if (typeof body?.detail === 'string') detail = body.detail
+      // FastAPI validation errors arrive as a list of {loc, msg}.
+      else if (Array.isArray(body?.detail)) detail = body.detail.map((d: any) => d.msg).join(', ')
+    } catch {
+      /* not JSON; keep the status text */
+    }
+    throw new ApiError(res.status, detail)
+  }
+
+  if (res.status === 204) return undefined as T
+  return res.json() as Promise<T>
+}
+
+export const api = {
+  get: <T>(path: string) => request<T>(path),
+  post: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: 'POST', body: body === undefined ? undefined : JSON.stringify(body) }),
+  patch: <T>(path: string, body: unknown) =>
+    request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
+  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+
+  upload: <T>(path: string, files: File[], onProgress?: (fraction: number) => void) =>
+    // XHR rather than fetch: fetch still cannot report upload progress, and a 600 MB DVD
+    // needs a progress bar.
+    new Promise<T>((resolve, reject) => {
+      const form = new FormData()
+      files.forEach((f) => form.append('files', f, f.name))
+
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', path, true)
+      xhr.withCredentials = true
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total)
+      }
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(JSON.parse(xhr.responseText) as T)
+        } else {
+          let detail = xhr.statusText
+          try {
+            detail = JSON.parse(xhr.responseText).detail ?? detail
+          } catch {
+            /* keep status text */
+          }
+          reject(new ApiError(xhr.status, detail))
+        }
+      }
+      xhr.onerror = () => reject(new ApiError(0, 'Network error'))
+      xhr.send(form)
+    }),
+}
+
+// ---- types -------------------------------------------------------------------
+
+export interface User {
+  id: number
+  email: string
+  slug: string
+  is_admin: boolean
+  is_active: boolean
+}
+
+export interface AuthConfig {
+  registration_enabled: boolean
+  has_users: boolean
+  min_password_length: number
+}
+
+export interface Series {
+  series_instance_uid: string
+  series_number: number | null
+  series_description: string | null
+  modality: string
+  body_part_examined: string | null
+  num_instances: number
+  num_frames_total: number
+  rows: number | null
+  columns: number | null
+  is_multiframe: boolean
+  is_viewable: boolean
+  is_reconstructable: boolean
+  mpr_instance_count: number
+  slice_spacing: number | null
+  has_thumbnail: boolean
+}
+
+export interface Study {
+  study_instance_uid: string
+  patient_name: string
+  patient_id: string
+  patient_birth_date: string | null
+  patient_sex: string | null
+  study_date: string | null
+  study_time: string | null
+  study_description: string | null
+  accession_number: string | null
+  modalities: string[]
+  num_series: number
+  num_instances: number
+  created_at: string
+}
+
+export interface StudyDetail extends Study {
+  series: Series[]
+}
+
+export interface UploadError {
+  path: string
+  stage: string
+  error_type: string
+  message: string
+}
+
+export interface UploadJob {
+  id: string
+  status: string
+  message: string
+  is_terminal: boolean
+  progress: number
+  total_files: number
+  processed_files: number
+  imported_count: number
+  duplicate_count: number
+  skipped_count: number
+  error_count: number
+  source_names: string[]
+  errors: UploadError[]
+  study_uids: string[]
+  created_at: string
+  finished_at: string | null
+}
+
+export interface DicomTag {
+  tag: string
+  keyword: string
+  vr: string
+  value: string
+}
+
+export interface InstanceRef {
+  sop_instance_uid: string
+  instance_number: number | null
+  number_of_frames: number
+  in_mpr_volume: boolean
+}
