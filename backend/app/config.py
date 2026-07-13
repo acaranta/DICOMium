@@ -41,9 +41,9 @@ class Settings(BaseSettings):
     # will not work over plain HTTP on a LAN address, whatever these are set to.
     webauthn_rp_id: str = ""
     webauthn_origin: str = ""
-    webauthn_rp_name: str = "webdicom"
+    webauthn_rp_name: str = "DICOMium"
     # The label an authenticator app shows next to the code.
-    totp_issuer: str = "webdicom"
+    totp_issuer: str = "DICOMium"
 
     # Upload / ingest limits
     max_upload_mb: int = 8192

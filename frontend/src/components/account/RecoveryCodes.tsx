@@ -32,7 +32,7 @@ export default function RecoveryCodes({
   function download() {
     const blob = new Blob(
       [
-        'webdicom recovery codes\n',
+        'DICOMium recovery codes\n',
         '\n',
         'Each code works once. Keep them somewhere safe and offline —\n',
         'they are the only way back in if you lose your authenticator.\n',
@@ -45,7 +45,7 @@ export default function RecoveryCodes({
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'webdicom-recovery-codes.txt'
+    link.download = 'dicomium-recovery-codes.txt'
     link.click()
     URL.revokeObjectURL(url)
   }

@@ -35,7 +35,7 @@ import {
   CrosshairsTool,
 } from '@cornerstonejs/tools'
 
-export const RENDERING_ENGINE_ID = 'webdicom-engine'
+export const RENDERING_ENGINE_ID = 'dicomium-engine'
 
 // A 512x512x400 16-bit CT is ~200 MB as a typed array, and the streaming loader holds
 // both the per-frame image cache and the assembled volume. Cap it so a few large studies

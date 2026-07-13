@@ -20,7 +20,7 @@ export const MPR_ORIENTATIONS = {
   'mpr-coronal': OrientationAxis.CORONAL,
 } as const
 
-const SLAB_SYNC_ID = 'webdicom-slab-sync'
+const SLAB_SYNC_ID = 'dicomium-slab-sync'
 
 export function volumeIdFor(seriesUid: string): string {
   return `cornerstoneStreamingImageVolume:${seriesUid}`

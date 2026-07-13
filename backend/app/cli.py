@@ -1,7 +1,7 @@
 """Emergency CLI. Run inside the container:
 
-    docker compose exec webdicom python -m app.cli reset-mfa you@example.com
-    docker compose exec webdicom python -m app.cli list-users
+    docker compose exec dicomium python -m app.cli reset-mfa you@example.com
+    docker compose exec dicomium python -m app.cli list-users
 
 Recovery codes are the normal way back in. This exists for the case they do not cover: a
 sole administrator who loses their authenticator AND their recovery codes, and so has

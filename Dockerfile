@@ -31,7 +31,7 @@ FROM python:3.13-slim-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
         nginx supervisor curl \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --uid 1000 --create-home --shell /bin/bash webdicom
+    && useradd --uid 1000 --create-home --shell /bin/bash dicomium
 
 COPY --from=backend /app/.venv /app/.venv
 COPY --from=frontend /build/dist /app/frontend/dist
@@ -44,7 +44,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN sed -i 's|^pid .*|pid /tmp/nginx.pid;|' /etc/nginx/nginx.conf \
     && sed -i '/^user /d' /etc/nginx/nginx.conf \
     && mkdir -p /tmp/nginx-body /tmp/nginx-proxy /data /dicomfiles /var/lib/nginx \
-    && chown -R webdicom:webdicom /tmp/nginx-body /tmp/nginx-proxy /data /dicomfiles \
+    && chown -R dicomium:dicomium /tmp/nginx-body /tmp/nginx-proxy /data /dicomfiles \
                                    /var/lib/nginx /var/log/nginx /app
 
 ENV PATH="/app/.venv/bin:$PATH" \
@@ -56,7 +56,7 @@ ENV PATH="/app/.venv/bin:$PATH" \
     # multi-GB upload fills the container's writable layer and dies with ENOSPC.
     TMPDIR=/dicomfiles/.tmp
 
-USER webdicom
+USER dicomium
 WORKDIR /app
 
 EXPOSE 8080

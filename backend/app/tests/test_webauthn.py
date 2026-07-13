@@ -41,10 +41,10 @@ class TestEffectiveOrigin:
 
     def test_origin_header_wins_when_present(self):
         request = FakeRequest(
-            headers={"origin": "https://webdicom.example.com", "host": "internal:8080"},
+            headers={"origin": "https://dicomium.example.com", "host": "internal:8080"},
             url=FakeUrl("http"),
         )
-        assert effective_origin(request) == "https://webdicom.example.com"
+        assert effective_origin(request) == "https://dicomium.example.com"
 
     def test_falls_back_to_host_on_a_get_with_no_origin(self):
         request = FakeRequest(headers={"host": "localhost:8080"}, url=FakeUrl("http"))
@@ -55,17 +55,17 @@ class TestEffectiveOrigin:
         # "http" even when the browser is on HTTPS. Trusting it would break passkeys behind
         # every reverse proxy.
         request = FakeRequest(
-            headers={"host": "webdicom.example.com", "x-forwarded-proto": "https"},
+            headers={"host": "dicomium.example.com", "x-forwarded-proto": "https"},
             url=FakeUrl("http"),
         )
-        assert effective_origin(request) == "https://webdicom.example.com"
+        assert effective_origin(request) == "https://dicomium.example.com"
 
     def test_takes_the_first_hop_from_a_forwarded_chain(self):
         request = FakeRequest(
-            headers={"host": "webdicom.example.com", "x-forwarded-proto": "https, http"},
+            headers={"host": "dicomium.example.com", "x-forwarded-proto": "https, http"},
             url=FakeUrl("http"),
         )
-        assert effective_origin(request) == "https://webdicom.example.com"
+        assert effective_origin(request) == "https://dicomium.example.com"
 
     def test_no_host_at_all(self):
         assert effective_origin(FakeRequest(headers={}, url=FakeUrl("http"))) is None
@@ -86,15 +86,15 @@ class TestAutoDerivation:
         assert rp.origin == "http://localhost:8080"
 
     def test_https_domain(self):
-        rp = resolve_rp("https://webdicom.example.com")
+        rp = resolve_rp("https://dicomium.example.com")
         # The RP ID is the bare host: no scheme, no port.
-        assert rp.rp_id == "webdicom.example.com"
-        assert rp.origin == "https://webdicom.example.com"
+        assert rp.rp_id == "dicomium.example.com"
+        assert rp.origin == "https://dicomium.example.com"
 
     def test_https_with_a_port_keeps_the_port_in_the_origin_only(self):
-        rp = resolve_rp("https://webdicom.example.com:8443")
-        assert rp.rp_id == "webdicom.example.com"
-        assert rp.origin == "https://webdicom.example.com:8443"
+        rp = resolve_rp("https://dicomium.example.com:8443")
+        assert rp.rp_id == "dicomium.example.com"
+        assert rp.origin == "https://dicomium.example.com:8443"
 
     def test_plain_http_on_a_lan_address_is_refused_with_an_explanation(self):
         # The browser would refuse this anyway. Failing here, with a sentence the user can
@@ -128,17 +128,17 @@ class TestEnvOverride:
     def test_override_bypasses_the_secure_context_check(self, monkeypatch):
         # Pinning is an explicit act by an operator who knows their topology (e.g. TLS
         # terminating upstream). We do not second-guess it.
-        monkeypatch.setenv("WEBAUTHN_RP_ID", "webdicom.internal")
-        monkeypatch.setenv("WEBAUTHN_ORIGIN", "https://webdicom.internal")
+        monkeypatch.setenv("WEBAUTHN_RP_ID", "dicomium.internal")
+        monkeypatch.setenv("WEBAUTHN_ORIGIN", "https://dicomium.internal")
         get_settings.cache_clear()
 
         rp = resolve_rp("http://192.168.1.50:8080")
-        assert rp.rp_id == "webdicom.internal"
+        assert rp.rp_id == "dicomium.internal"
 
     def test_trailing_slash_is_stripped(self, monkeypatch):
-        monkeypatch.setenv("WEBAUTHN_RP_ID", "webdicom.internal")
-        monkeypatch.setenv("WEBAUTHN_ORIGIN", "https://webdicom.internal/")
+        monkeypatch.setenv("WEBAUTHN_RP_ID", "dicomium.internal")
+        monkeypatch.setenv("WEBAUTHN_ORIGIN", "https://dicomium.internal/")
         get_settings.cache_clear()
 
         # An origin with a trailing slash never matches what the browser sends.
-        assert resolve_rp(None).origin == "https://webdicom.internal"
+        assert resolve_rp(None).origin == "https://dicomium.internal"

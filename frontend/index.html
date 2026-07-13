@@ -4,7 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
-    <title>webdicom</title>
+
+    <title>DICOMium</title>
+    <meta
+      name="description"
+      content="A private, self-hosted medical imaging viewer for the web."
+    />
+
+    <!-- Browser tabs. The .ico carries 16/32/48 for older browsers and Windows
+         shortcuts; the PNGs are what modern browsers actually pick. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- iOS home screen. Flattened onto the icon's own background, because iOS
+         renders transparency as black and applies its own rounding. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="DICOMium" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Android / desktop PWA: the maskable icon and install metadata. -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Tints the browser chrome on mobile. Sampled from the icon, not guessed. -->
+    <meta name="theme-color" content="#2d3c53" />
   </head>
   <body>
     <div id="root"></div>

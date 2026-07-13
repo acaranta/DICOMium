@@ -1,11 +1,61 @@
-# webdicom
+<p align="center">
+  <img src="assets/icon.png" alt="DICOMium" width="140" />
+</p>
 
-A self-hosted, web-based DICOM viewer. Upload the CD or DVD a radiology department
-handed you, and read it in a browser — no desktop viewer to install, no data leaving
-your machine.
+<h1 align="center">DICOMium</h1>
+
+<p align="center">
+  <strong>A private, self-hosted medical imaging viewer for the web.</strong>
+</p>
+
+<p align="center">
+  Upload the CD or DVD handed to you by a radiology department and explore it directly in
+  your browser — no desktop software, cloud account, or data leaving your machine.
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#what-it-does">Features</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="LICENSE">AGPL-3.0</a>
+</p>
+
+---
 
 Runs as a single Docker container. Files are stored on a plain mounted volume, in a
 directory tree you can read with `ls`.
+
+## Screenshots
+
+<p align="center">
+  <img src="assets/screenshots/viewer.png" alt="The viewer: an abdominal CT slice with an ellipse ROI reading in Hounsfield units" width="900" />
+  <br />
+  <em>The viewer. On CT, ROI statistics read in real Hounsfield units.</em>
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/mpr.png" alt="MPR: linked axial, sagittal and coronal planes through one volume" width="900" />
+  <br />
+  <em>MPR — one volume, three linked planes, crosshairs in the radiology convention.</em>
+</p>
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="assets/screenshots/library.png" alt="The study library with the upload drop zone" />
+      <br />
+      <em>Your library. Drop a DVD on it and it sorts itself out.</em>
+    </td>
+    <td width="50%" valign="top">
+      <img src="assets/screenshots/account.png" alt="Account security: passkeys, authenticator app, recovery codes" />
+      <br />
+      <em>Passkeys, an authenticator app, and recovery codes.</em>
+    </td>
+  </tr>
+</table>
+
+> The exams pictured are real scans whose identifying tags were rewritten before they were
+> loaded. **The patients shown are fictional.**
 
 ## What it does
 
@@ -48,7 +98,7 @@ Each user sees only their own exams, and every API path is scoped to them.
 ## Quick start
 
 ```bash
-git clone <this repo> && cd webdicom
+git clone <this repo> && cd dicomium
 docker compose up --build
 ```
 
@@ -70,7 +120,7 @@ DICOM files land on the `/dicomfiles` volume in a human-browsable tree:
 for example:
 
 ```
-/dicomfiles/arthur/CARANTA_ARTHUR__E10000740190/20210315_ABDO_PELVIS_f9d6120c/
+/dicomfiles/jane/DOE_JANE__ANON-00417/20240115_ABDO_PELVIS_f9d6120c/
     002_AP_Sans_IV_ff4531df/1.2.840.113619.2.5.166636469.65900.1615815612.746.dcm
 ```
 
@@ -95,7 +145,7 @@ default.
 | `MAX_EXTRACT_MB` | `20480` | Zip-bomb guard |
 | `DICOMWEB_TRANSCODE` | `auto` | `auto` streams compressed frames straight to the browser |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | — | Optional: pre-create an admin instead of self-registering |
-| `TOTP_ISSUER` | `webdicom` | The label your authenticator app shows |
+| `TOTP_ISSUER` | `DICOMium` | The label your authenticator app shows |
 | `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN` | — | Optional: pin the passkey domain. Derived from the request otherwise |
 
 ### Locked out?
@@ -104,8 +154,8 @@ Recovery codes are the normal way back in. If a sole administrator loses their
 authenticator *and* their recovery codes, clear their factors from inside the container:
 
 ```bash
-docker compose exec webdicom python -m app.cli list-users
-docker compose exec webdicom python -m app.cli reset-mfa you@example.com
+docker compose exec dicomium python -m app.cli list-users
+docker compose exec dicomium python -m app.cli reset-mfa you@example.com
 ```
 
 They can then sign in with their password alone, and re-enrol.
@@ -191,7 +241,7 @@ Copyright © 2026 Arthur Caranta.
 **GNU Affero General Public License v3.0 or later** — see [LICENSE](LICENSE).
 
 The AGPL is the GPL plus one extra obligation, and it is the one that matters for a
-self-hosted web app: under **section 13**, if you run a *modified* version of webdicom as a
+self-hosted web app: under **section 13**, if you run a *modified* version of dicomium as a
 network service, you must offer its source code to the people using it over the network.
 Running it unmodified — for yourself, your family, your clinic — obliges you nothing beyond
 the usual GPL terms.

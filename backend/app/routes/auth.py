@@ -152,10 +152,10 @@ async def login_mfa(
     request: Request,
     response: Response,
     db: DbSession,
-    webdicom_mfa: Annotated[str | None, Cookie(alias=MFA_COOKIE)] = None,
+    dicomium_mfa: Annotated[str | None, Cookie(alias=MFA_COOKIE)] = None,
 ):
     """The second factor. Accepts a TOTP code or a recovery code."""
-    pending = await resolve_pending_login(db, webdicom_mfa)
+    pending = await resolve_pending_login(db, dicomium_mfa)
     if pending is None:
         response.delete_cookie(MFA_COOKIE, path="/")
         raise HTTPException(
@@ -164,12 +164,12 @@ async def login_mfa(
 
     user = await db.get(User, pending.user_id)
     if user is None or not user.is_active:
-        await destroy_pending_login(db, webdicom_mfa)
+        await destroy_pending_login(db, dicomium_mfa)
         raise HTTPException(status.HTTP_403_FORBIDDEN, "This account is disabled")
 
     credential = await _totp_row(db, user.id)
     if credential is None:
-        await destroy_pending_login(db, webdicom_mfa)
+        await destroy_pending_login(db, dicomium_mfa)
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "No second factor is enrolled")
 
     code = body.code.strip()
@@ -183,12 +183,12 @@ async def login_mfa(
             # Burn the counter, or the code stays replayable for the rest of its window.
             credential.last_counter = outcome.counter
             await db.commit()
-            await destroy_pending_login(db, webdicom_mfa)
+            await destroy_pending_login(db, dicomium_mfa)
             return LoginResult(user=await _sign_in(db, user, request, response))
         reason = outcome.reason
     else:
         if await recovery.consume(db, user, code):
-            await destroy_pending_login(db, webdicom_mfa)
+            await destroy_pending_login(db, dicomium_mfa)
             log.info("%s signed in with a recovery code", user.email)
             return LoginResult(user=await _sign_in(db, user, request, response))
         reason = "Incorrect code"
@@ -217,11 +217,11 @@ async def _totp_row(db: DbSession, user_id: int) -> TotpCredential | None:
 async def logout(
     response: Response,
     db: DbSession,
-    webdicom_session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
-    webdicom_mfa: Annotated[str | None, Cookie(alias=MFA_COOKIE)] = None,
+    dicomium_session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
+    dicomium_mfa: Annotated[str | None, Cookie(alias=MFA_COOKIE)] = None,
 ) -> None:
-    await destroy_session(db, webdicom_session)
-    await destroy_pending_login(db, webdicom_mfa)
+    await destroy_session(db, dicomium_session)
+    await destroy_pending_login(db, dicomium_mfa)
     response.delete_cookie(SESSION_COOKIE, path="/")
     response.delete_cookie(MFA_COOKIE, path="/")
 

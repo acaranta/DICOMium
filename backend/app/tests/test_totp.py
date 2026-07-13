@@ -94,7 +94,7 @@ class TestEnrolment:
 
         assert enrolment.secret == secret
         assert enrolment.uri.startswith("otpauth://totp/")
-        assert "issuer=webdicom" in enrolment.uri
+        assert "issuer=DICOMium" in enrolment.uri
         assert enrolment.qr_data_url.startswith("data:image/png;base64,")
 
         # An authenticator app must be able to parse it back.

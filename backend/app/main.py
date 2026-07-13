@@ -30,16 +30,16 @@ log = logging.getLogger(__name__)
 async def lifespan(_app: FastAPI):
     settings = get_settings()
     setup_logging(settings.log_level)
-    log.info("webdicom starting (dicom_root=%s, data_dir=%s)", settings.dicom_root, settings.data_dir)
+    log.info("DICOMium starting (dicom_root=%s, data_dir=%s)", settings.dicom_root, settings.data_dir)
     await init_db()
     yield
     await jobs.shutdown()
     await dispose_engine()
-    log.info("webdicom stopped")
+    log.info("DICOMium stopped")
 
 
 app = FastAPI(
-    title="webdicom",
+    title="DICOMium",
     version="0.1.0",
     lifespan=lifespan,
     docs_url="/api/docs",

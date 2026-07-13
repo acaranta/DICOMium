@@ -24,7 +24,7 @@ from app.db.base import Base, TimestampMixin
 # The half-authenticated cookie, set after a correct password when TOTP is enabled.
 # Deliberately NOT the session cookie: until MFA passes, no session exists at all, so a
 # route that forgets to check cannot leak anything.
-MFA_COOKIE = "webdicom_mfa"
+MFA_COOKIE = "dicomium_mfa"
 
 PENDING_LOGIN_TTL_MINUTES = 5
 CHALLENGE_TTL_MINUTES = 5

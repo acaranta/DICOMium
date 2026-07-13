@@ -1,8 +1,8 @@
 services:
-  webdicom:
+  dicomium:
     build: .
-    image: webdicom:latest
-    container_name: webdicom
+    image: dicomium:latest
+    container_name: dicomium
     ports:
       - "8080:8080"
     volumes:
@@ -32,13 +32,13 @@ services:
       # with no password) and/or an authenticator app with recovery codes.
       #
       # The label an authenticator app shows next to the code.
-      TOTP_ISSUER: webdicom
+      TOTP_ISSUER: DICOMium
       #
       # Passkeys are bound to a domain (the WebAuthn "Relying Party ID"). Left unset, it is
       # derived from the request, so passkeys work at localhost:8080 and behind a reverse
       # proxy on any domain with no configuration. Pin them if you want to be explicit:
-      # WEBAUTHN_RP_ID: webdicom.example.com
-      # WEBAUTHN_ORIGIN: https://webdicom.example.com
+      # WEBAUTHN_RP_ID: dicomium.example.com
+      # WEBAUTHN_ORIGIN: https://dicomium.example.com
       #
       # NOTE: browsers only allow passkeys in a secure context — HTTPS, or localhost. They
       # will NOT work over plain HTTP on a LAN address (http://192.168.x.x:8080), whatever

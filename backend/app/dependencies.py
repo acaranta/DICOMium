@@ -16,9 +16,9 @@ DbSession = Annotated[AsyncSession, Depends(get_db)]
 
 async def get_current_user(
     db: DbSession,
-    webdicom_session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
+    dicomium_session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
 ) -> User:
-    user = await resolve_session(db, webdicom_session)
+    user = await resolve_session(db, dicomium_session)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -29,9 +29,9 @@ async def get_current_user(
 
 async def get_optional_user(
     db: DbSession,
-    webdicom_session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
+    dicomium_session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
 ) -> User | None:
-    return await resolve_session(db, webdicom_session)
+    return await resolve_session(db, dicomium_session)
 
 
 async def get_admin_user(user: Annotated[User, Depends(get_current_user)]) -> User:

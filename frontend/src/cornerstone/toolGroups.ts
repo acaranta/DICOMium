@@ -18,8 +18,8 @@ import { ANNOTATION_TOOLS, TOOL_NAMES, type ToolId } from './tools'
 
 const { MouseBindings } = Enums
 
-export const STACK_TOOL_GROUP = 'webdicom-stack'
-export const MPR_TOOL_GROUP = 'webdicom-mpr'
+export const STACK_TOOL_GROUP = 'dicomium-stack'
+export const MPR_TOOL_GROUP = 'dicomium-mpr'
 
 /** Bindings that are always live, whatever the active tool is. */
 function addBaseBindings(group: ReturnType<typeof ToolGroupManager.createToolGroup>) {

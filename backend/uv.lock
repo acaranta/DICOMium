@@ -293,6 +293,69 @@ wheels = [
 ]
 
 [[package]]
+name = "dicomium"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "aiosqlite" },
+    { name = "anyio" },
+    { name = "bcrypt" },
+    { name = "cryptography" },
+    { name = "fastapi" },
+    { name = "numpy" },
+    { name = "pillow" },
+    { name = "pydantic", extra = ["email"] },
+    { name = "pydantic-settings" },
+    { name = "pydicom" },
+    { name = "pylibjpeg" },
+    { name = "pylibjpeg-libjpeg" },
+    { name = "pylibjpeg-openjpeg" },
+    { name = "pyotp" },
+    { name = "python-multipart" },
+    { name = "qrcode" },
+    { name = "sqlalchemy" },
+    { name = "uvicorn", extra = ["standard"] },
+    { name = "webauthn" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiosqlite", specifier = ">=0.20" },
+    { name = "anyio", specifier = ">=4.7" },
+    { name = "bcrypt", specifier = ">=4.2" },
+    { name = "cryptography", specifier = ">=44.0" },
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "numpy", specifier = ">=2.1" },
+    { name = "pillow", specifier = ">=11.0" },
+    { name = "pydantic", extras = ["email"], specifier = ">=2.10" },
+    { name = "pydantic-settings", specifier = ">=2.7" },
+    { name = "pydicom", specifier = ">=3.0.1" },
+    { name = "pylibjpeg", specifier = ">=2.1" },
+    { name = "pylibjpeg-libjpeg", specifier = ">=2.3" },
+    { name = "pylibjpeg-openjpeg", specifier = ">=2.4" },
+    { name = "pyotp", specifier = ">=2.10" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "qrcode", specifier = ">=8.0" },
+    { name = "sqlalchemy", specifier = ">=2.0.36" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.34" },
+    { name = "webauthn", specifier = ">=3.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = ">=0.28" },
+    { name = "pytest", specifier = ">=8.3" },
+    { name = "pytest-asyncio", specifier = ">=0.25" },
+]
+
+[[package]]
 name = "dnspython"
 version = "2.8.0"
 source = { registry = "https://af.minixer.cloud/artifactory/api/pypi/ext-pypi/simple" }
@@ -1104,69 +1167,6 @@ dependencies = [
 sdist = { url = "https://af.minixer.cloud/artifactory/api/pypi/ext-pypi/packages/packages/72/22/b19c91e850c4578b7d6cdb53453c5fe2f2e99d0c56e322c65c3caf1b3051/webauthn-3.0.0.tar.gz", hash = "sha256:324e54e1f6eeef486623b5d90df6fcd74ae04ff0c137d2b818a8f709b6ca3ab8" }
 wheels = [
     { url = "https://af.minixer.cloud/artifactory/api/pypi/ext-pypi/packages/packages/1f/d3/38d4efaedba74d854f88b60fd7b80ab37869032f9a9ad54d1892dab20241/webauthn-3.0.0-py3-none-any.whl", hash = "sha256:b5d0c02b6efa16be683f8a75abd2073f5e59a15f42623cc22c31f27600259e64" },
-]
-
-[[package]]
-name = "webdicom"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "aiosqlite" },
-    { name = "anyio" },
-    { name = "bcrypt" },
-    { name = "cryptography" },
-    { name = "fastapi" },
-    { name = "numpy" },
-    { name = "pillow" },
-    { name = "pydantic", extra = ["email"] },
-    { name = "pydantic-settings" },
-    { name = "pydicom" },
-    { name = "pylibjpeg" },
-    { name = "pylibjpeg-libjpeg" },
-    { name = "pylibjpeg-openjpeg" },
-    { name = "pyotp" },
-    { name = "python-multipart" },
-    { name = "qrcode" },
-    { name = "sqlalchemy" },
-    { name = "uvicorn", extra = ["standard"] },
-    { name = "webauthn" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiosqlite", specifier = ">=0.20" },
-    { name = "anyio", specifier = ">=4.7" },
-    { name = "bcrypt", specifier = ">=4.2" },
-    { name = "cryptography", specifier = ">=44.0" },
-    { name = "fastapi", specifier = ">=0.115" },
-    { name = "numpy", specifier = ">=2.1" },
-    { name = "pillow", specifier = ">=11.0" },
-    { name = "pydantic", extras = ["email"], specifier = ">=2.10" },
-    { name = "pydantic-settings", specifier = ">=2.7" },
-    { name = "pydicom", specifier = ">=3.0.1" },
-    { name = "pylibjpeg", specifier = ">=2.1" },
-    { name = "pylibjpeg-libjpeg", specifier = ">=2.3" },
-    { name = "pylibjpeg-openjpeg", specifier = ">=2.4" },
-    { name = "pyotp", specifier = ">=2.10" },
-    { name = "python-multipart", specifier = ">=0.0.20" },
-    { name = "qrcode", specifier = ">=8.0" },
-    { name = "sqlalchemy", specifier = ">=2.0.36" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.34" },
-    { name = "webauthn", specifier = ">=3.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = ">=0.28" },
-    { name = "pytest", specifier = ">=8.3" },
-    { name = "pytest-asyncio", specifier = ">=0.25" },
 ]
 
 [[package]]

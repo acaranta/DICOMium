@@ -1,7 +1,7 @@
 [project]
-name = "webdicom"
+name = "dicomium"
 version = "0.1.0"
-description = "Web-based DICOM viewer with per-user exam storage"
+description = "A private, self-hosted medical imaging viewer for the web"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115",

@@ -13,7 +13,8 @@ class TestSlugify:
         assert slugify("ABDO/PELVIS - ") == "ABDO_PELVIS"
 
     def test_person_name_separator(self):
-        assert slugify("CARANTA^ARTHUR") == "CARANTA_ARTHUR"
+        # DICOM PersonName is ^-separated (family^given^middle^prefix^suffix).
+        assert slugify("DOE^JANE") == "DOE_JANE"
 
     def test_trailing_padding_is_stripped(self):
         assert slugify("ABDO ") == "ABDO"
@@ -63,7 +64,7 @@ class TestIsValidUid:
 
 class TestUserSlug:
     def test_derives_from_local_part(self):
-        assert user_slug("Arthur@caranta.com") == "arthur"
+        assert user_slug("Arthur@example.com") == "arthur"
 
     def test_dedupes(self):
         assert user_slug("arthur@x.com", taken={"arthur"}) == "arthur-2"

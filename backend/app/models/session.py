@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
 
-SESSION_COOKIE = "webdicom_session"
+SESSION_COOKIE = "dicomium_session"
 
 
 class Session(Base, TimestampMixin):

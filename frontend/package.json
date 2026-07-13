@@ -1,5 +1,5 @@
 {
-  "name": "webdicom-frontend",
+  "name": "dicomium-frontend",
   "private": true,
   "version": "0.1.0",
   "type": "module",
