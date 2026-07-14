@@ -46,6 +46,8 @@ export async function loadSeriesImageIds(
     `${WADO_ROOT}/studies/${studyUid}/series/${seriesUid}/metadata`,
     { credentials: 'include', headers: { Accept: 'application/dicom+json' } },
   )
+  // Rendered in the viewport's error banner; i18n happens at the boundary in Viewport.tsx,
+  // which cannot see this status. Keeping the code in the message lets it be translated there.
   if (!res.ok) throw new Error(`Could not load series metadata (${res.status})`)
 
   const instances: DicomJson[] = await res.json()

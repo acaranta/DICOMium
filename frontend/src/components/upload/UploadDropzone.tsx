@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type DragEvent } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { api, type UploadJob } from '../../lib/api'
-import { formatBytes } from '../../lib/dicom'
 import { IconUpload, IconSpinner } from '../ui/Icons'
 
 /**
@@ -11,6 +11,7 @@ import { IconUpload, IconSpinner } from '../ui/Icons'
  * decide what is DICOM. It skips the bundled viewers and PDFs itself.
  */
 export default function UploadDropzone({ onQueued }: { onQueued: (job: UploadJob) => void }) {
+  const { t } = useTranslation('upload')
   const [over, setOver] = useState(false)
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState(0)
@@ -27,13 +28,13 @@ export default function UploadDropzone({ onQueued }: { onQueued: (job: UploadJob
         const job = await api.upload<UploadJob>('/api/uploads', files, setSent)
         onQueued(job)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Upload failed')
+        setError(err instanceof Error ? err.message : t('dropzone.failed'))
       } finally {
         setBusy(false)
         setSent(0)
       }
     },
-    [onQueued],
+    [onQueued, t],
   )
 
   /** Walk a dropped directory tree. The DataTransferItem API is the only way to get at
@@ -96,7 +97,7 @@ export default function UploadDropzone({ onQueued }: { onQueued: (job: UploadJob
           <>
             <IconSpinner className="h-5 w-5 text-accent" />
             <p className="text-xs text-ink-dim">
-              Uploading… <span className="num">{Math.round(sent * 100)}%</span>
+              {t('dropzone.uploading', { percent: Math.round(sent * 100) })}
             </p>
             <div className="h-0.5 w-48 overflow-hidden rounded-full bg-line">
               <div
@@ -109,12 +110,12 @@ export default function UploadDropzone({ onQueued }: { onQueued: (job: UploadJob
           <>
             <IconUpload className="h-5 w-5 text-ink-faint" />
             <p className="text-xs text-ink">
-              Drop an exam here, or <span className="text-accent">browse</span>
+              <Trans i18nKey="dropzone.prompt" ns="upload">
+                Drop an exam here, or <span className="text-accent">browse</span>
+              </Trans>
             </p>
             <p className="max-w-md text-center text-2xs leading-relaxed text-ink-faint">
-              A ZIP or TAR of a burned CD/DVD, a folder, or loose DICOM files. Files need
-              no extension — the server reads their headers. Bundled viewers and PDFs are
-              ignored automatically.
+              {t('dropzone.hint')}
             </p>
           </>
         )}
@@ -140,5 +141,3 @@ export default function UploadDropzone({ onQueued }: { onQueued: (job: UploadJob
     </div>
   )
 }
-
-export { formatBytes }

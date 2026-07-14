@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   api,
@@ -7,6 +8,7 @@ import {
   type TotpBegin,
 } from '../lib/api'
 import { useAuth } from '../lib/auth'
+import { formatDate } from '../lib/format'
 import {
   PasskeyCancelled,
   passkeysAvailable,
@@ -30,6 +32,7 @@ import {
 } from '../components/ui/Icons'
 
 export default function AccountPage() {
+  const { t } = useTranslation('account')
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const [newCodes, setNewCodes] = useState<string[] | null>(null)
@@ -55,7 +58,7 @@ export default function AccountPage() {
     <AppShell>
       <div className="mx-auto h-full max-w-2xl overflow-y-auto px-6 py-6">
         <header className="mb-6">
-          <h1 className="text-base font-medium text-ink">Account &amp; security</h1>
+          <h1 className="text-base font-medium text-ink">{t('title')}</h1>
           <p className="mt-0.5 num text-xs text-ink-dim">{user?.email}</p>
         </header>
 
@@ -87,6 +90,7 @@ function PasskeySection({
   security: SecurityStatus
   onChange: () => void
 }) {
+  const { t } = useTranslation('account')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   // The name is chosen BEFORE the ceremony starts, so the user is not trying to type while the
@@ -97,7 +101,7 @@ function PasskeySection({
   // server must be able to work out a Relying Party ID for this origin.
   const available = passkeysAvailable() && security.passkeys_supported
   const blockedReason = !passkeysAvailable()
-    ? 'Passkeys need a secure connection. Serve this over HTTPS, or use localhost.'
+    ? t('passkeys.unsupported')
     : security.passkeys_unsupported_reason
 
   async function add(nickname: string) {
@@ -109,7 +113,7 @@ function PasskeySection({
       onChange()
     } catch (err) {
       if (!(err instanceof PasskeyCancelled)) {
-        setError(err instanceof Error ? err.message : 'Could not add that passkey')
+        setError(err instanceof Error ? err.message : t('passkeys.addFailed'))
       }
     } finally {
       setBusy(false)
@@ -119,8 +123,8 @@ function PasskeySection({
   return (
     <Section
       icon={<IconKey className="h-4 w-4" />}
-      title="Passkeys"
-      description="Sign in with your fingerprint, face or device PIN — no password, no code. A passkey is already two factors: the device you hold, and the biometric that unlocks it."
+      title={t('passkeys.title')}
+      description={t('passkeys.description')}
     >
       {!available ? (
         <div className="flex items-start gap-2 rounded border border-line bg-void px-3 py-2.5">
@@ -128,9 +132,7 @@ function PasskeySection({
           <p className="text-2xs leading-relaxed text-ink-dim">
             {blockedReason}
             <br />
-            <span className="text-ink-faint">
-              Password sign-in and the authenticator app still work as normal.
-            </span>
+            <span className="text-ink-faint">{t('passkeys.unsupportedFallback')}</span>
           </p>
         </div>
       ) : (
@@ -156,16 +158,14 @@ function PasskeySection({
               onClick={() => setNaming(suggestPasskeyName())}
             >
               <IconKey className="h-3.5 w-3.5" />
-              Add a passkey
+              {t('passkeys.add')}
             </button>
           ) : (
             <div className="rounded border border-line bg-void p-3">
               <label className="label" htmlFor="passkey-name">
-                Name this passkey
+                {t('passkeys.nameLabel')}
               </label>
-              <p className="mb-2 text-2xs text-ink-faint">
-                So you can tell it apart from your others later.
-              </p>
+              <p className="mb-2 text-2xs text-ink-faint">{t('passkeys.nameHint')}</p>
               <input
                 id="passkey-name"
                 className="input"
@@ -187,7 +187,7 @@ function PasskeySection({
                   onClick={() => void add(naming)}
                 >
                   {busy ? <IconSpinner className="h-3.5 w-3.5" /> : <IconKey className="h-3.5 w-3.5" />}
-                  {busy ? 'Waiting for your device…' : 'Continue'}
+                  {busy ? t('passkeys.waiting') : t('action.continue', { ns: 'common' })}
                 </button>
                 <button
                   type="button"
@@ -195,7 +195,7 @@ function PasskeySection({
                   disabled={busy}
                   onClick={() => setNaming(null)}
                 >
-                  Cancel
+                  {t('action.cancel', { ns: 'common' })}
                 </button>
               </div>
             </div>
@@ -213,6 +213,7 @@ function PasskeyRow({
   passkey: SecurityStatus['passkeys'][number]
   onChange: () => void
 }) {
+  const { t } = useTranslation('account')
   const [confirming, setConfirming] = useState(false)
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(passkey.nickname)
@@ -241,7 +242,7 @@ function PasskeyRow({
       setError('')
       onChange()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not rename that passkey')
+      setError(err instanceof Error ? err.message : t('passkeys.renameFailed'))
       setName(passkey.nickname)
     } finally {
       setSaving(false)
@@ -277,7 +278,7 @@ function PasskeyRow({
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                title="Rename this passkey"
+                title={t('passkeys.rename')}
                 className="flex min-w-0 items-center gap-1.5 rounded text-left"
               >
                 <span className="truncate text-xs font-medium text-ink">{passkey.nickname}</span>
@@ -287,7 +288,7 @@ function PasskeyRow({
               {passkey.backed_up && (
                 <span
                   className="text-ok"
-                  title="Synced to a cloud keychain — it will survive losing this device"
+                  title={t('passkeys.backedUp')}
                 >
                   <IconCloud className="h-3.5 w-3.5" />
                 </span>
@@ -296,10 +297,11 @@ function PasskeyRow({
           )}
 
           <p className="num text-2xs text-ink-faint">
-            Added {new Date(passkey.created_at).toLocaleDateString()}
+            {t('passkeys.added', { date: formatDate(passkey.created_at) })}
+            {' · '}
             {passkey.last_used_at
-              ? ` · last used ${new Date(passkey.last_used_at).toLocaleDateString()}`
-              : ' · never used'}
+              ? t('passkeys.lastUsed', { date: formatDate(passkey.last_used_at) })
+              : t('passkeys.neverUsed')}
           </p>
 
           {error && <p className="mt-1 text-2xs text-danger">{error}</p>}
@@ -308,7 +310,7 @@ function PasskeyRow({
         <button
           type="button"
           className="tool-btn hover:text-danger"
-          title="Remove this passkey"
+          title={t('passkeys.remove')}
           onClick={() => setConfirming(true)}
         >
           <IconTrash className="h-3.5 w-3.5" />
@@ -317,8 +319,8 @@ function PasskeyRow({
 
       {confirming && (
         <PasswordConfirm
-          label={`Remove "${passkey.nickname}"?`}
-          action="Remove"
+          label={t('passkeys.removeConfirm', { name: passkey.nickname })}
+          action={t('action.remove', { ns: 'common' })}
           endpoint={`/api/account/passkeys/${passkey.id}/delete`}
           onDone={() => {
             setConfirming(false)
@@ -342,6 +344,7 @@ function TotpSection({
   onChange: () => void
   onCodes: (codes: string[]) => void
 }) {
+  const { t } = useTranslation('account')
   const [setup, setSetup] = useState<TotpBegin | null>(null)
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
@@ -369,25 +372,25 @@ function TotpSection({
   return (
     <Section
       icon={<IconAuthApp className="h-4 w-4" />}
-      title="Authenticator app"
-      description="A 6-digit code from an app like Aegis, 1Password or Google Authenticator, asked for after your password."
+      title={t('totp.title')}
+      description={t('totp.description')}
     >
       {security.totp_enabled ? (
         <>
           <div className="mb-3 flex items-center gap-2 rounded border border-ok/30 bg-ok/5 px-3 py-2">
             <IconCheck className="h-3.5 w-3.5 text-ok" />
-            <span className="text-xs text-ink">Enabled</span>
+            <span className="text-xs text-ink">{t('totp.enabled')}</span>
           </div>
 
           {!disabling ? (
             <button type="button" className="btn btn-danger" onClick={() => setDisabling(true)}>
-              Turn off
+              {t('totp.turnOff')}
             </button>
           ) : (
             <PasswordConfirm
-              label="Turn off two-factor authentication?"
-              hint="Your recovery codes will be revoked at the same time."
-              action="Turn off"
+              label={t('totp.turnOffConfirm')}
+              hint={t('totp.turnOffHint')}
+              action={t('totp.turnOff')}
               endpoint="/api/account/totp/disable"
               onDone={() => {
                 setDisabling(false)
@@ -402,14 +405,12 @@ function TotpSection({
           <div className="flex gap-4">
             <img
               src={setup.qr_data_url}
-              alt="QR code for your authenticator app"
+              alt={t('totp.qrAlt')}
               className="h-36 w-36 shrink-0 rounded border border-line bg-white p-1"
             />
             <div className="min-w-0 flex-1">
-              <p className="text-2xs leading-relaxed text-ink-dim">
-                Scan this with your authenticator app, then enter the code it shows.
-              </p>
-              <p className="mt-2 text-2xs text-ink-faint">Or enter this key by hand:</p>
+              <p className="text-2xs leading-relaxed text-ink-dim">{t('totp.scanHint')}</p>
+              <p className="mt-2 text-2xs text-ink-faint">{t('totp.manualHint')}</p>
               <code className="mt-1 block break-all rounded border border-line bg-void px-2 py-1.5 num text-2xs text-ink">
                 {setup.secret}
               </code>
@@ -417,7 +418,7 @@ function TotpSection({
           </div>
 
           <div>
-            <label className="label" htmlFor="totp-code">Code from the app</label>
+            <label className="label" htmlFor="totp-code">{t('totp.codeLabel')}</label>
             <input
               id="totp-code"
               className="input num text-center text-lg tracking-[0.4em]"
@@ -444,7 +445,7 @@ function TotpSection({
               onClick={() => confirm.mutate()}
             >
               {confirm.isPending ? <IconSpinner className="h-3.5 w-3.5" /> : null}
-              Confirm
+              {t('totp.confirm')}
             </button>
             <button
               type="button"
@@ -455,7 +456,7 @@ function TotpSection({
                 setError('')
               }}
             >
-              Cancel
+              {t('action.cancel', { ns: 'common' })}
             </button>
           </div>
         </div>
@@ -473,7 +474,7 @@ function TotpSection({
             disabled={begin.isPending}
           >
             {begin.isPending ? <IconSpinner className="h-3.5 w-3.5" /> : null}
-            Set up
+            {t('totp.setUp')}
           </button>
         </>
       )}
@@ -492,6 +493,7 @@ function RecoverySection({
   onCodes: (codes: string[]) => void
   onChange: () => void
 }) {
+  const { t } = useTranslation('account')
   const [regenerating, setRegenerating] = useState(false)
 
   if (!security.totp_enabled) return null
@@ -502,23 +504,26 @@ function RecoverySection({
   return (
     <Section
       icon={<IconShield className="h-4 w-4" />}
-      title="Recovery codes"
-      description="Single-use codes to sign in when your authenticator is not to hand."
+      title={t('recovery.title')}
+      description={t('recovery.description')}
     >
+      {/* One sentence, one key. This was four spliced fragments, which no translator could
+          reorder — and the hand-rolled plural was already wrong for French, which treats 0 as
+          singular. */}
       <p className={`mb-3 text-xs ${low ? 'text-warn' : 'text-ink-dim'}`}>
-        <span className="num">{remaining}</span> code{remaining === 1 ? '' : 's'} remaining
-        {low && ' — generate a new set soon'}
+        {t('recovery.remaining', { count: remaining })}
+        {low && ` — ${t('recovery.runningLow')}`}
       </p>
 
       {!regenerating ? (
         <button type="button" className="btn" onClick={() => setRegenerating(true)}>
-          Generate new codes
+          {t('recovery.generate')}
         </button>
       ) : (
         <PasswordConfirm
-          label="Generate a new set of recovery codes?"
-          hint="Your existing codes will stop working immediately."
-          action="Generate"
+          label={t('recovery.generateConfirm')}
+          hint={t('recovery.generateHint')}
+          action={t('recovery.generate')}
           endpoint="/api/account/recovery-codes"
           onDone={(data) => {
             setRegenerating(false)
@@ -556,6 +561,7 @@ function PasswordConfirm({
   onDone: (data?: unknown) => void
   onCancel: () => void
 }) {
+  const { t } = useTranslation('account')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -566,7 +572,7 @@ function PasswordConfirm({
     try {
       onDone(await api.post<unknown>(endpoint, { password }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'That did not work')
+      setError(err instanceof Error ? err.message : t('profile.failed'))
     } finally {
       setBusy(false)
     }
@@ -580,7 +586,7 @@ function PasswordConfirm({
       <input
         type="password"
         className="input mt-2"
-        placeholder="Confirm your password"
+        placeholder={t('confirm.password')}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && password && submit()}
@@ -601,7 +607,7 @@ function PasswordConfirm({
           {action}
         </button>
         <button type="button" className="btn" onClick={onCancel}>
-          Cancel
+          {t('action.cancel', { ns: 'common' })}
         </button>
       </div>
     </div>

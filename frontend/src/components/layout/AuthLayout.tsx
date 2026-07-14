@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import Logo from '../ui/Logo'
 
 /**
@@ -17,6 +18,8 @@ export default function AuthLayout({
   subtitle?: string
   children: ReactNode
 }) {
+  const { t } = useTranslation()
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-base px-4">
       <div
@@ -35,7 +38,7 @@ export default function AuthLayout({
           <div className="mb-3 flex items-center justify-center gap-2.5">
             <Logo className="h-7 w-7" />
             <span className="font-mono text-lg font-medium tracking-tight text-ink">
-              DICOMium
+              {t('app.name')}
             </span>
           </div>
           <h1 className="text-base font-medium text-ink">{title}</h1>
@@ -45,7 +48,7 @@ export default function AuthLayout({
         <div className="rounded border border-line bg-panel p-6">{children}</div>
 
         <p className="mt-6 text-center font-mono text-2xs text-ink-faint">
-          Medical imaging · private · self-hosted
+          {t('app.tagline')}
         </p>
       </div>
     </div>

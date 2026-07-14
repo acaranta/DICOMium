@@ -1,0 +1,33 @@
+{
+  "dropzone": {
+    "prompt": "Drop an exam here, or <1>browse</1>",
+    "hint": "A ZIP or TAR of a burned CD/DVD, a folder, or loose DICOM files. Files need no extension — the server reads their headers. Bundled viewers and PDFs are ignored automatically.",
+    "uploading": "Uploading… {{percent}}%",
+    "failed": "Upload failed"
+  },
+  "job": {
+    "fallbackName": "Upload",
+    "andMore": "+{{count}} more",
+    "progress": "{{processed}} / {{total}} files",
+    "phase": {
+      "pending": "Queued",
+      "receiving": "Receiving",
+      "extracting": "Extracting archive",
+      "scanning": "Finding DICOM files",
+      "importing": "Importing",
+      "finalizing": "Building thumbnails"
+    },
+    "result": {
+      "imported_one": "{{count}} image imported",
+      "imported_other": "{{count}} images imported",
+      "duplicates_one": "{{count}} already present",
+      "duplicates_other": "{{count}} already present",
+      "skipped_one": "{{count}} non-DICOM file ignored",
+      "skipped_other": "{{count}} non-DICOM files ignored"
+    },
+    "errors_one": "{{count}} file could not be imported",
+    "errors_other": "{{count}} files could not be imported",
+    "andMoreErrors": "…and {{count}} more",
+    "cancelled": "Cancelled"
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { api, type AuthConfig } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { loginWithPasskey, PasskeyCancelled, passkeysAvailable } from '../lib/passkeys'
@@ -9,6 +10,7 @@ import AuthLayout from '../components/layout/AuthLayout'
 type Step = 'credentials' | 'mfa'
 
 export default function Login() {
+  const { t } = useTranslation('auth')
   const { user, login, verifyMfa, adopt } = useAuth()
   const navigate = useNavigate()
 
@@ -42,7 +44,7 @@ export default function Login() {
         navigate('/', { replace: true })
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed')
+      setError(err instanceof Error ? err.message : t('login.failed'))
     } finally {
       setBusy(false)
     }
@@ -56,7 +58,7 @@ export default function Login() {
       await verifyMfa(code.trim())
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'That code was not accepted')
+      setError(err instanceof Error ? err.message : t('mfa.rejected'))
       setCode('')
     } finally {
       setBusy(false)
@@ -75,7 +77,7 @@ export default function Login() {
     } catch (err) {
       // Closing the OS prompt is not a failure worth shouting about.
       if (!(err instanceof PasskeyCancelled)) {
-        setError(err instanceof Error ? err.message : 'That passkey did not work')
+        setError(err instanceof Error ? err.message : t('login.failed'))
       }
     } finally {
       setPasskeyBusy(false)
@@ -86,17 +88,13 @@ export default function Login() {
   if (step === 'mfa') {
     return (
       <AuthLayout
-        title="Two-factor authentication"
-        subtitle={
-          usingRecovery
-            ? 'Enter one of the recovery codes you saved.'
-            : 'Enter the 6-digit code from your authenticator app.'
-        }
+        title={t('mfa.title')}
+        subtitle={usingRecovery ? t('mfa.subtitleRecovery') : t('mfa.subtitleTotp')}
       >
         <form onSubmit={submitMfa} className="space-y-4">
           <div>
             <label className="label" htmlFor="code">
-              {usingRecovery ? 'Recovery code' : 'Authentication code'}
+              {usingRecovery ? t('mfa.recoveryLabel') : t('mfa.codeLabel')}
             </label>
             <input
               id="code"
@@ -120,7 +118,7 @@ export default function Login() {
 
           <button type="submit" className="btn btn-primary w-full py-2" disabled={busy}>
             {busy ? <IconSpinner /> : null}
-            {busy ? 'Verifying…' : 'Verify'}
+            {busy ? t('mfa.verifying') : t('mfa.verify')}
           </button>
         </form>
 
@@ -134,9 +132,7 @@ export default function Login() {
               setError('')
             }}
           >
-            {usingRecovery
-              ? 'Use your authenticator app instead'
-              : "Lost your phone? Use a recovery code"}
+            {usingRecovery ? t('mfa.useTotp') : t('mfa.useRecovery')}
           </button>
 
           <div>
@@ -150,7 +146,7 @@ export default function Login() {
                 setError('')
               }}
             >
-              Start over
+              {t('mfa.startOver')}
             </button>
           </div>
         </div>
@@ -163,12 +159,8 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Sign in"
-      subtitle={
-        config?.has_users === false
-          ? 'No accounts yet — the first one becomes the administrator.'
-          : undefined
-      }
+      title={t('login.title')}
+      subtitle={config?.has_users === false ? t('login.firstAccount') : undefined}
     >
       {canUsePasskeys && (
         <>
@@ -179,12 +171,14 @@ export default function Login() {
             disabled={passkeyBusy}
           >
             {passkeyBusy ? <IconSpinner /> : <IconKey />}
-            {passkeyBusy ? 'Waiting for your passkey…' : 'Sign in with a passkey'}
+            {passkeyBusy ? t('login.passkeyWaiting') : t('login.passkey')}
           </button>
 
           <div className="my-5 flex items-center gap-3">
             <div className="h-px flex-1 bg-line" />
-            <span className="text-2xs uppercase tracking-wider text-ink-faint">or</span>
+            <span className="text-2xs uppercase tracking-wider text-ink-faint">
+              {t('login.or')}
+            </span>
             <div className="h-px flex-1 bg-line" />
           </div>
         </>
@@ -192,7 +186,7 @@ export default function Login() {
 
       <form onSubmit={submitCredentials} className="space-y-4">
         <div>
-          <label className="label" htmlFor="email">Email</label>
+          <label className="label" htmlFor="email">{t('login.email')}</label>
           <input
             id="email"
             type="email"
@@ -206,7 +200,7 @@ export default function Login() {
         </div>
 
         <div>
-          <label className="label" htmlFor="password">Password</label>
+          <label className="label" htmlFor="password">{t('login.password')}</label>
           <input
             id="password"
             type="password"
@@ -226,15 +220,15 @@ export default function Login() {
 
         <button type="submit" className="btn btn-primary w-full py-2" disabled={busy}>
           {busy ? <IconSpinner /> : null}
-          {busy ? 'Signing in…' : 'Sign in'}
+          {busy ? t('login.submitting') : t('login.submit')}
         </button>
       </form>
 
       {showRegister && (
         <p className="mt-6 text-center text-xs text-ink-dim">
-          No account?{' '}
+          {t('login.noAccount')}{' '}
           <Link to="/register" className="text-accent hover:underline">
-            Create one
+            {t('login.createOne')}
           </Link>
         </p>
       )}

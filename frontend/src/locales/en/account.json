@@ -1,0 +1,84 @@
+{
+  "title": "Account & security",
+  "profile": {
+    "title": "Avatar",
+    "description": "Generated from your initials. Pick a colour and a style, or use your Gravatar.",
+    "colour": "Colour",
+    "style": "Style",
+    "styles": {
+      "solid": "Solid",
+      "ring": "Ring",
+      "gradient": "Gradient",
+      "pattern": "Pattern"
+    },
+    "gravatar": {
+      "label": "Use my Gravatar instead",
+      "warning": "This sends a hash of your email address to <1>gravatar.com</1> and reveals your IP address to them. Your scans never leave this server — but this does. With it off, DICOMium makes no third-party requests at all."
+    },
+    "failed": "That did not work"
+  },
+  "language": {
+    "title": "Language",
+    "description": "The language of the interface. Measurements and dates follow it too.",
+    "auto": "Follow my browser"
+  },
+  "passkeys": {
+    "title": "Passkeys",
+    "description": "Sign in with your fingerprint, face or device PIN — no password, no code. A passkey is already two factors: the device you hold, and the biometric that unlocks it.",
+    "add": "Add a passkey",
+    "waiting": "Waiting for your device…",
+    "nameLabel": "Name this passkey",
+    "nameHint": "So you can tell it apart from your others later.",
+    "rename": "Rename this passkey",
+    "remove": "Remove this passkey",
+    "removeConfirm": "Remove \"{{name}}\"?",
+    "backedUp": "Synced to a cloud keychain — it will survive losing this device",
+    "added": "Added {{date}}",
+    "lastUsed": "last used {{date}}",
+    "neverUsed": "never used",
+    "addFailed": "Could not add that passkey",
+    "renameFailed": "Could not rename that passkey",
+    "unsupported": "Passkeys need a secure connection. Serve this over HTTPS, or use localhost.",
+    "unsupportedFallback": "Password sign-in and the authenticator app still work as normal.",
+    "devices": {
+      "android": "Android phone",
+      "windows": "Windows PC",
+      "linux": "Linux PC",
+      "generic": "This device"
+    }
+  },
+  "totp": {
+    "title": "Authenticator app",
+    "description": "A 6-digit code from an app like Aegis, 1Password or Google Authenticator, asked for after your password.",
+    "setUp": "Set up",
+    "enabled": "Enabled",
+    "turnOff": "Turn off",
+    "turnOffConfirm": "Turn off two-factor authentication?",
+    "turnOffHint": "Your recovery codes will be revoked at the same time.",
+    "scanHint": "Scan this with your authenticator app, then enter the code it shows.",
+    "manualHint": "Or enter this key by hand:",
+    "qrAlt": "QR code for your authenticator app",
+    "codeLabel": "Code from the app",
+    "confirm": "Confirm"
+  },
+  "recovery": {
+    "title": "Recovery codes",
+    "description": "Single-use codes to sign in when your authenticator is not to hand.",
+    "remaining_one": "{{count}} code remaining",
+    "remaining_other": "{{count}} codes remaining",
+    "runningLow": "generate a new set soon",
+    "generate": "Generate new codes",
+    "generateConfirm": "Generate a new set of recovery codes?",
+    "generateHint": "Your existing codes will stop working immediately.",
+    "saveTitle": "Save your recovery codes",
+    "saveBody": "These are shown <1>once</1>. Each works a single time. If you lose your authenticator and have no code left, you will not be able to sign in.",
+    "acknowledge": "I have saved these codes somewhere safe",
+    "fileName": "dicomium-recovery-codes.txt",
+    "fileHeading": "DICOMium recovery codes",
+    "fileBody": "Each code works once. Keep them somewhere safe and offline — they are the only way back in if you lose your authenticator."
+  },
+  "confirm": {
+    "password": "Confirm your password",
+    "incorrect": "Incorrect password"
+  }
+}

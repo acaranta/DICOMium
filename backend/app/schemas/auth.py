@@ -31,6 +31,8 @@ class UserOut(BaseModel):
     avatar_style: str | None = None
     avatar_color: str | None = None
     use_gravatar: bool = False
+    # NULL = follow the browser.
+    language: str | None = None
     # SHA-256 of the lower-cased email. This is the exact value that would be handed to
     # gravatar.com, and it is only ever *used* when use_gravatar is true.
     gravatar_hash: str | None = None
@@ -48,6 +50,7 @@ class UserOut(BaseModel):
             avatar_style=prefs.avatar_style,
             avatar_color=prefs.avatar_color,
             use_gravatar=prefs.use_gravatar,
+            language=prefs.language,
             gravatar_hash=gravatar_hash,
         )
 

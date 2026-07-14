@@ -22,6 +22,7 @@ from app.models.preferences import (
     AVATAR_STYLES,
     DEFAULT_COLOR,
     DEFAULT_STYLE,
+    LANGUAGES,
     UserPreference,
 )
 from app.models.series import Series
@@ -36,6 +37,7 @@ __all__ = [
     "CHALLENGE_TTL_MINUTES",
     "DEFAULT_COLOR",
     "DEFAULT_STYLE",
+    "LANGUAGES",
     "MAX_MFA_ATTEMPTS",
     "MFA_COOKIE",
     "PENDING_LOGIN_TTL_MINUTES",

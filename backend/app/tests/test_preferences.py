@@ -136,6 +136,62 @@ class TestValidation:
         assert set(prefs["available_colors"]) == set(AVATAR_COLORS)
 
 
+class TestLanguage:
+    async def test_it_starts_unset_meaning_follow_the_browser(self, client):
+        await register(client)
+
+        prefs = (await client.get("/api/account/preferences")).json()
+        assert prefs["language"] is None
+        assert (await client.get("/api/auth/me")).json()["language"] is None
+
+    async def test_the_supported_languages_are_advertised(self, client):
+        await register(client)
+        prefs = (await client.get("/api/account/preferences")).json()
+        assert prefs["available_languages"] == ["en", "fr", "de", "es", "it"]
+
+    @pytest.mark.parametrize("lang", ["en", "fr", "de", "es", "it"])
+    async def test_each_supported_language_can_be_chosen(self, client, lang):
+        await register(client)
+
+        res = await client.patch("/api/account/preferences", json={"language": lang})
+        assert res.status_code == 200
+        assert res.json()["language"] == lang
+        # It must ride along on /me, which is how the app learns the language on every load.
+        assert (await client.get("/api/auth/me")).json()["language"] == lang
+
+    async def test_auto_clears_the_choice(self, client, db):
+        """'auto' is a sentinel, not a language.
+
+        None already means "this PATCH did not mention language", so without a sentinel there
+        would be no way to say "forget my choice and follow the browser again".
+        """
+        await register(client)
+        await client.patch("/api/account/preferences", json={"language": "de"})
+
+        res = await client.patch("/api/account/preferences", json={"language": "auto"})
+        assert res.status_code == 200
+        assert res.json()["language"] is None
+
+        row = (await db.execute(select(UserPreference))).scalar_one()
+        assert row.language is None
+
+    async def test_an_unsupported_language_is_rejected(self, client):
+        await register(client)
+        # Must never reach the database: the UI would then try to load a catalogue that does
+        # not exist and render nothing.
+        assert (
+            await client.patch("/api/account/preferences", json={"language": "kl"})
+        ).status_code == 422
+
+    async def test_language_survives_a_patch_that_does_not_mention_it(self, client):
+        await register(client)
+        await client.patch("/api/account/preferences", json={"language": "it"})
+
+        after = (await client.patch("/api/account/preferences", json={"avatar_color": "rose"})).json()
+        assert after["language"] == "it"
+        assert after["avatar_color"] == "rose"
+
+
 class TestAuth:
     async def test_preferences_require_a_session(self, client):
         assert (await client.get("/api/account/preferences")).status_code == 401

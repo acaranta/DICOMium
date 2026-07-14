@@ -31,8 +31,9 @@ export interface MeasurementStat {
 
 export interface Measurement {
   uid: string
+  /** The Cornerstone tool name ("Length", "EllipticalROI"…). The display name is looked up
+   *  from it in the translation catalogue, so it is a key, not prose. */
   toolName: string
-  label: string
   /** Labelled numbers, laid out as a grid by the panel. */
   stats: MeasurementStat[]
   imageId?: string

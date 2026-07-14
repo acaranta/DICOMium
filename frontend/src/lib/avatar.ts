@@ -30,13 +30,6 @@ export const PALETTE: Record<AvatarColor, Swatch> = {
 export const COLORS = Object.keys(PALETTE) as AvatarColor[]
 export const STYLES: AvatarStyle[] = ['solid', 'ring', 'gradient', 'pattern']
 
-export const STYLE_LABELS: Record<AvatarStyle, string> = {
-  solid: 'Solid',
-  ring: 'Ring',
-  gradient: 'Gradient',
-  pattern: 'Pattern',
-}
-
 /**
  * Initials from an email.
  *

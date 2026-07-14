@@ -1,18 +1,28 @@
 import { useCallback, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/auth'
 import { useClickOutside } from '../../lib/useClickOutside'
+import { useLanguage } from '../../lib/useLanguage'
+import { LANGUAGE_NAMES, type Language } from '../../lib/i18n'
 import type { AvatarColor, AvatarStyle } from '../../lib/avatar'
 import Avatar from '../ui/Avatar'
-import { IconAdmin, IconChevron, IconLogout, IconSettings } from '../ui/Icons'
+import { IconAdmin, IconChevron, IconCheck, IconLogout, IconSettings } from '../ui/Icons'
 
 export default function UserMenu() {
+  const { t } = useTranslation()
   const { user, logout } = useAuth()
+  const { language, preference, languages, setLanguage } = useLanguage()
   const navigate = useNavigate()
+
   const [open, setOpen] = useState(false)
+  const [languagesOpen, setLanguagesOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  const close = useCallback(() => setOpen(false), [])
+  const close = useCallback(() => {
+    setOpen(false)
+    setLanguagesOpen(false)
+  }, [])
   useClickOutside(ref, close, open)
 
   if (!user) return null
@@ -35,6 +45,7 @@ export default function UserMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label={t('menu.open')}
         className={`flex items-center gap-2 rounded border px-2 py-1.5 transition-colors ${
           open
             ? 'border-line-bright bg-raised'
@@ -61,20 +72,60 @@ export default function UserMenu() {
             <div className="min-w-0">
               <div className="truncate font-mono text-2xs text-ink">{user.email}</div>
               <div className="text-2xs text-ink-faint">
-                {user.is_admin ? 'Administrator' : 'User'}
+                {user.is_admin ? t('menu.roleAdmin') : t('menu.roleUser')}
               </div>
             </div>
           </div>
 
           <div className="py-1">
             <MenuLink to="/account" onClick={close} icon={<IconSettings className="h-3.5 w-3.5" />}>
-              Account &amp; security
+              {t('menu.accountSecurity')}
             </MenuLink>
 
             {user.is_admin && (
               <MenuLink to="/admin" onClick={close} icon={<IconAdmin className="h-3.5 w-3.5" />}>
-                Administration
+                {t('menu.administration')}
               </MenuLink>
+            )}
+          </div>
+
+          {/* Language ------------------------------------------------------- */}
+          <div className="border-t border-line py-1">
+            <button
+              type="button"
+              role="menuitem"
+              aria-expanded={languagesOpen}
+              onClick={() => setLanguagesOpen((v) => !v)}
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs text-ink-dim transition-colors hover:bg-hover hover:text-ink"
+            >
+              <span className="font-mono text-2xs uppercase text-ink-faint">{language}</span>
+              <span className="flex-1">{t('menu.language')}</span>
+              <IconChevron
+                className={`h-3 w-3 text-ink-faint transition-transform ${
+                  languagesOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {languagesOpen && (
+              <div className="pb-1">
+                <LanguageOption
+                  selected={preference === 'auto'}
+                  onClick={() => void setLanguage('auto')}
+                >
+                  {t('language.auto')}
+                </LanguageOption>
+
+                {languages.map((code) => (
+                  <LanguageOption
+                    key={code}
+                    selected={preference === code}
+                    onClick={() => void setLanguage(code as Language)}
+                  >
+                    {LANGUAGE_NAMES[code as Language]}
+                  </LanguageOption>
+                ))}
+              </div>
             )}
           </div>
 
@@ -90,12 +141,37 @@ export default function UserMenu() {
               }}
             >
               <IconLogout className="h-3.5 w-3.5" />
-              Sign out
+              {t('menu.signOut')}
             </button>
           </div>
         </div>
       )}
     </div>
+  )
+}
+
+function LanguageOption({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      role="menuitemradio"
+      aria-checked={selected}
+      onClick={onClick}
+      className={`flex w-full items-center gap-2 py-1.5 pl-9 pr-3 text-left text-2xs transition-colors hover:bg-hover ${
+        selected ? 'text-accent' : 'text-ink-dim hover:text-ink'
+      }`}
+    >
+      <span className="flex-1">{children}</span>
+      {selected && <IconCheck className="h-3 w-3" />}
+    </button>
   )
 }
 

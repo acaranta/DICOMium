@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { api, type User } from '../lib/api'
 import { useAuth } from '../lib/auth'
-import { formatBytes } from '../lib/dicom'
+import { formatBytes } from '../lib/format'
 import AppShell from '../components/layout/AppShell'
 import { IconSpinner, IconTrash } from '../components/ui/Icons'
 
@@ -13,6 +14,7 @@ interface Stats {
 }
 
 export default function AdminPage() {
+  const { t } = useTranslation('library')
   const { user: me } = useAuth()
   const queryClient = useQueryClient()
 
@@ -45,14 +47,14 @@ export default function AdminPage() {
   return (
     <AppShell>
       <div className="mx-auto h-full max-w-4xl overflow-y-auto px-6 py-6">
-        <h1 className="mb-6 text-base font-medium text-ink">Administration</h1>
+        <h1 className="mb-6 text-base font-medium text-ink">{t('admin.title')}</h1>
 
         <div className="mb-8 grid grid-cols-4 gap-px overflow-hidden rounded border border-line bg-line">
           {[
-            ['Users', stats?.users],
-            ['Studies', stats?.studies],
-            ['Images', stats?.instances],
-            ['On disk', stats ? formatBytes(stats.bytes_stored) : undefined],
+            [t('admin.stats.users'), stats?.users],
+            [t('admin.stats.studies'), stats?.studies],
+            [t('admin.stats.images'), stats?.instances],
+            [t('admin.stats.onDisk'), stats ? formatBytes(stats.bytes_stored) : undefined],
           ].map(([label, value]) => (
             <div key={label as string} className="bg-panel px-4 py-3">
               <div className="text-2xs uppercase tracking-wider text-ink-dim">{label}</div>
@@ -62,7 +64,7 @@ export default function AdminPage() {
         </div>
 
         <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-ink-dim">
-          Accounts
+          {t('admin.accounts')}
         </h2>
 
         {isLoading ? (
@@ -74,7 +76,13 @@ export default function AdminPage() {
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-line bg-panel">
-                  {['Email', 'Storage slug', 'Role', 'Status', ''].map((h, i) => (
+                  {[
+                    t('admin.columns.email'),
+                    t('admin.columns.slug'),
+                    t('admin.columns.role'),
+                    t('admin.columns.status'),
+                    '',
+                  ].map((h, i) => (
                     <th
                       key={h || i}
                       className="px-3 py-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim"
@@ -91,7 +99,9 @@ export default function AdminPage() {
                     <tr key={u.id} className="border-b border-line bg-base last:border-0">
                       <td className="px-3 py-2.5 text-xs text-ink">
                         {u.email}
-                        {self && <span className="ml-1.5 text-2xs text-ink-faint">(you)</span>}
+                        {self && (
+                          <span className="ml-1.5 text-2xs text-ink-faint">{t('admin.you')}</span>
+                        )}
                       </td>
                       <td className="px-3 py-2.5 num text-2xs text-ink-faint">
                         /dicomfiles/{u.slug}
@@ -108,9 +118,11 @@ export default function AdminPage() {
                               ? 'border-accent-dim bg-accent-dim/20 text-accent'
                               : 'border-line bg-raised text-ink-dim hover:border-line-bright'
                           }`}
-                          title={self ? 'You cannot change your own role' : 'Toggle admin'}
+                          title={
+                            self ? t('admin.cannotChangeOwnRole') : t('admin.toggleAdmin')
+                          }
                         >
-                          {u.is_admin ? 'Admin' : 'User'}
+                          {u.is_admin ? t('admin.roleAdmin') : t('admin.roleUser')}
                         </button>
                       </td>
                       <td className="px-3 py-2.5">
@@ -126,7 +138,7 @@ export default function AdminPage() {
                               : 'border-danger/40 bg-danger/10 text-danger'
                           }`}
                         >
-                          {u.is_active ? 'Active' : 'Disabled'}
+                          {u.is_active ? t('admin.active') : t('admin.disabled')}
                         </button>
                       </td>
                       <td className="px-3 py-2.5 text-right">
@@ -134,13 +146,9 @@ export default function AdminPage() {
                           type="button"
                           disabled={self}
                           className="tool-btn hover:text-danger disabled:opacity-30"
-                          title={self ? 'You cannot delete yourself' : 'Delete this user and all their exams'}
+                          title={self ? t('admin.cannotDeleteSelf') : t('admin.deleteUser')}
                           onClick={() => {
-                            if (
-                              confirm(
-                                `Delete ${u.email}?\n\nThis also deletes every exam they uploaded, from disk. This cannot be undone.`,
-                              )
-                            ) {
+                            if (confirm(t('admin.deleteUserConfirm', { email: u.email }))) {
                               remove.mutate(u.id)
                             }
                           }}

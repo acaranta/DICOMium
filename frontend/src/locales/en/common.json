@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "DICOMium",
+    "tagline": "Medical imaging · private · self-hosted",
+    "description": "A private, self-hosted medical imaging viewer for the web."
+  },
+  "action": {
+    "cancel": "Cancel",
+    "done": "Done",
+    "continue": "Continue",
+    "save": "Save",
+    "delete": "Delete",
+    "remove": "Remove",
+    "back": "Back",
+    "copy": "Copy",
+    "copied": "Copied",
+    "download": "Download",
+    "browse": "browse",
+    "clearAll": "Clear all"
+  },
+  "menu": {
+    "open": "Account menu",
+    "accountSecurity": "Account & security",
+    "administration": "Administration",
+    "signOut": "Sign out",
+    "language": "Language",
+    "roleAdmin": "Administrator",
+    "roleUser": "User"
+  },
+  "language": {
+    "auto": "Follow my browser"
+  },
+  "state": {
+    "loading": "Loading…",
+    "never": "never"
+  }
+}

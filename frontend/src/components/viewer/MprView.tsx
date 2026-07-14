@@ -1,22 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { RenderingEngine } from '@cornerstonejs/core'
 import type { Series, Study } from '../../lib/api'
 import { fetchVolumeSopUids, loadSeriesImageIds } from '../../cornerstone/imageIds'
 import { MPR_VIEWPORTS, setupMpr, type MprHandles } from '../../cornerstone/volume'
+import { formatNumber } from '../../lib/format'
 import { IconSpinner } from '../ui/Icons'
 
-const PLANE_LABEL: Record<string, { name: string; className: string }> = {
-  'mpr-axial': { name: 'Axial', className: 'text-mpr-axial' },
-  'mpr-sagittal': { name: 'Sagittal', className: 'text-mpr-sagittal' },
-  'mpr-coronal': { name: 'Coronal', className: 'text-mpr-coronal' },
+const PLANE_CLASS: Record<string, string> = {
+  'mpr-axial': 'text-mpr-axial',
+  'mpr-sagittal': 'text-mpr-sagittal',
+  'mpr-coronal': 'text-mpr-coronal',
+}
+
+const PLANE_KEY: Record<string, string> = {
+  'mpr-axial': 'axial',
+  'mpr-sagittal': 'sagittal',
+  'mpr-coronal': 'coronal',
 }
 
 /**
  * Three orthogonal planes through one volume, linked by crosshairs.
  *
- * Only the series' dominant-orientation instances go into the volume — reformat series
- * often carry a few off-plane reference images, and the volume loader throws on mixed
- * orientations. imageIds.ts does that filtering.
+ * Only the series' dominant-orientation instances go into the volume — reformat series often
+ * carry a few off-plane reference images, and the volume loader throws on mixed orientations.
+ * imageIds.ts does that filtering.
  */
 export default function MprView({
   study,
@@ -29,6 +37,7 @@ export default function MprView({
   engine: RenderingEngine
   onError: (message: string) => void
 }) {
+  const { t } = useTranslation('viewer')
   const refs = useRef<Record<string, HTMLDivElement | null>>({})
   const [loading, setLoading] = useState(true)
 
@@ -60,7 +69,7 @@ export default function MprView({
         if (cancelled) return
 
         if (volumeImageIds.length < 3) {
-          throw new Error('Not enough slices in a single plane to reconstruct')
+          throw new Error(t('mpr.notEnoughSlices'))
         }
 
         handles = await setupMpr(engine, series.series_instance_uid, volumeImageIds, elements)
@@ -73,9 +82,7 @@ export default function MprView({
         if (cancelled) return
         setLoading(false)
         // A volume that will not build must surface as a message, never a white screen.
-        onError(
-          err instanceof Error ? err.message : 'This series could not be reconstructed',
-        )
+        onError(err instanceof Error ? err.message : t('mpr.failed'))
       }
     })()
 
@@ -93,6 +100,9 @@ export default function MprView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, study.study_instance_uid, series.series_instance_uid])
 
+  const name = series.series_description ?? t('series.fallbackName')
+  const excluded = series.num_instances - series.mpr_instance_count
+
   return (
     <div className="relative grid h-full grid-cols-2 grid-rows-2 gap-px bg-line">
       {MPR_VIEWPORTS.map((id) => (
@@ -104,38 +114,38 @@ export default function MprView({
             className="cs-element absolute inset-0"
             onContextMenu={(e) => e.preventDefault()}
           />
-          <div className={`vp-overlay left-2 top-2 font-medium ${PLANE_LABEL[id].className}`}>
-            {PLANE_LABEL[id].name}
+          <div className={`vp-overlay left-2 top-2 font-medium ${PLANE_CLASS[id]}`}>
+            {t(`mpr.planes.${PLANE_KEY[id]}`)}
           </div>
         </div>
       ))}
 
       {/* The fourth cell explains the controls rather than sitting empty. */}
       <div className="flex flex-col items-start justify-center gap-2 bg-void p-6">
-        <h3 className="text-xs font-medium text-ink">Multiplanar reconstruction</h3>
+        <h3 className="text-xs font-medium text-ink">{t('mpr.title')}</h3>
+
+        {/* One sentence, one key. This used to be spliced together from six JSX fragments,
+            which no translator could reorder. */}
         <p className="text-2xs leading-relaxed text-ink-dim">
-          {series.series_description ?? 'Series'} ·{' '}
-          <span className="num">{series.mpr_instance_count}</span> slices
-          {series.slice_spacing && (
+          {series.slice_spacing
+            ? t('mpr.summary', {
+                name,
+                count: series.mpr_instance_count,
+                spacing: formatNumber(series.slice_spacing, 2),
+              })
+            : t('mpr.summaryNoSpacing', { name, count: series.mpr_instance_count })}
+          {excluded > 0 && (
             <>
               {' '}
-              at <span className="num">{series.slice_spacing.toFixed(2)} mm</span>
-            </>
-          )}
-          {series.mpr_instance_count < series.num_instances && (
-            <>
-              {' '}
-              <span className="text-warn">
-                ({series.num_instances - series.mpr_instance_count} off-plane reference
-                image(s) excluded)
-              </span>
+              <span className="text-warn">{t('mpr.excluded', { count: excluded })}</span>
             </>
           )}
         </p>
+
         <ul className="mt-1 space-y-1 text-2xs text-ink-faint">
-          <li>Drag a reference line to scroll the other two planes.</li>
-          <li>Drag the centre handle to move the crosshair.</li>
-          <li>Right-drag to zoom, middle-drag to pan, wheel to scroll.</li>
+          <li>{t('mpr.hints.referenceLine')}</li>
+          <li>{t('mpr.hints.crosshair')}</li>
+          <li>{t('mpr.hints.mouse')}</li>
         </ul>
       </div>
 
@@ -143,8 +153,7 @@ export default function MprView({
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-void/80">
           <IconSpinner className="h-6 w-6 text-accent" />
           <p className="text-xs text-ink-dim">
-            Building the volume from <span className="num">{series.mpr_instance_count}</span>{' '}
-            slices…
+            {t('mpr.building', { count: series.mpr_instance_count })}
           </p>
         </div>
       )}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { Series } from '../../lib/api'
 import { modalityColor } from '../../lib/dicom'
 import { IconCube } from '../ui/Icons'
@@ -18,9 +19,11 @@ export default function SeriesPanel({
   activeSeriesUid: string | null
   onSelect: (uid: string) => void
 }) {
+  const { t } = useTranslation('viewer')
+
   return (
     <aside className="flex w-rail shrink-0 flex-col border-r border-line bg-panel">
-      <div className="panel-title">Series</div>
+      <div className="panel-title">{t('series.title')}</div>
 
       <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-1.5">
         {series.map((s) => {
@@ -40,8 +43,10 @@ export default function SeriesPanel({
               onClick={() => usable && onSelect(s.series_instance_uid)}
               title={
                 usable
-                  ? `${s.series_description ?? 'Series'} — drag onto a viewport`
-                  : 'This series has no displayable images (report or dose record)'
+                  ? t('series.dragHint', {
+                      name: s.series_description ?? t('series.fallbackName'),
+                    })
+                  : t('series.notViewable')
               }
               className={`group w-full rounded border text-left transition-colors ${
                 selected
@@ -71,7 +76,7 @@ export default function SeriesPanel({
                 {s.is_reconstructable && (
                   <span
                     className="absolute right-1 top-1 rounded bg-black/70 p-0.5 text-accent"
-                    title="Can be reconstructed in 3 planes (MPR)"
+                    title={t('series.mprCapable')}
                   >
                     <IconCube className="h-3 w-3" />
                   </span>
@@ -88,7 +93,7 @@ export default function SeriesPanel({
                     {s.series_number ?? '—'}
                   </span>
                   <span className="truncate text-2xs text-ink" title={s.series_description ?? ''}>
-                    {s.series_description ?? 'Series'}
+                    {s.series_description ?? t('series.fallbackName')}
                   </span>
                 </div>
               </div>

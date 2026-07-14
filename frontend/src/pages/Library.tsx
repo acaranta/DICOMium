@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { api, type Study, type UploadJob } from '../lib/api'
-import { formatAge, formatDate, formatPersonName, modalityColor } from '../lib/dicom'
+import { formatAge, formatPersonName, modalityColor } from '../lib/dicom'
+import { formatDicomDate } from '../lib/format'
 import AppShell from '../components/layout/AppShell'
 import UploadDropzone from '../components/upload/UploadDropzone'
 import UploadJobCard from '../components/upload/UploadJobCard'
 import { IconSearch, IconSpinner, IconTrash } from '../components/ui/Icons'
 
 export default function LibraryPage() {
+  const { t } = useTranslation('library')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
@@ -30,9 +33,9 @@ export default function LibraryPage() {
       <div className="mx-auto h-full max-w-6xl overflow-y-auto px-6 py-6">
         <div className="mb-6 flex items-baseline justify-between">
           <div>
-            <h1 className="text-base font-medium text-ink">Studies</h1>
+            <h1 className="text-base font-medium text-ink">{t('title')}</h1>
             <p className="mt-0.5 text-xs text-ink-dim">
-              {studies ? `${studies.length} exam${studies.length === 1 ? '' : 's'}` : ' '}
+              {studies ? t('count', { count: studies.length }) : ' '}
             </p>
           </div>
 
@@ -40,7 +43,7 @@ export default function LibraryPage() {
             <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
             <input
               className="input pl-8"
-              placeholder="Patient, ID, description…"
+              placeholder={t('search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -48,9 +51,7 @@ export default function LibraryPage() {
         </div>
 
         <div className="mb-6">
-          <UploadDropzone
-            onQueued={(job: UploadJob) => setJobIds((ids) => [job.id, ...ids])}
-          />
+          <UploadDropzone onQueued={(job: UploadJob) => setJobIds((ids) => [job.id, ...ids])} />
         </div>
 
         {jobIds.length > 0 && (
@@ -72,7 +73,7 @@ export default function LibraryPage() {
         ) : !studies?.length ? (
           <div className="rounded border border-line bg-panel py-16 text-center">
             <p className="text-xs text-ink-dim">
-              {search ? 'No studies match that search.' : 'No studies yet — upload an exam above.'}
+              {search ? t('emptySearch') : t('empty')}
             </p>
           </div>
         ) : (
@@ -80,7 +81,15 @@ export default function LibraryPage() {
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-line bg-panel">
-                  {['Patient', 'Study', 'Date', 'Modality', 'Series', 'Images', ''].map((h, i) => (
+                  {[
+                    t('columns.patient'),
+                    t('columns.study'),
+                    t('columns.date'),
+                    t('columns.modality'),
+                    t('columns.series'),
+                    t('columns.images'),
+                    '',
+                  ].map((h, i) => (
                     <th
                       key={h || i}
                       className="px-3 py-2 text-2xs font-semibold uppercase tracking-wider text-ink-dim"
@@ -99,7 +108,7 @@ export default function LibraryPage() {
                   >
                     <td className="px-3 py-2.5">
                       <div className="text-xs font-medium text-ink">
-                        {formatPersonName(s.patient_name)}
+                        {formatPersonName(s.patient_name, t('patient.unknown'))}
                       </div>
                       <div className="num text-2xs text-ink-faint">
                         {s.patient_id}
@@ -119,11 +128,13 @@ export default function LibraryPage() {
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-2.5 num text-xs text-ink-dim">
-                      {formatDate(s.study_date)}
+                      {formatDicomDate(s.study_date)}
                     </td>
 
                     <td className="px-3 py-2.5">
                       <div className="flex gap-1">
+                        {/* Modality codes are DICOM Defined Terms, not English words — never
+                            translated. */}
                         {s.modalities.map((m) => (
                           <span
                             key={m}
@@ -141,15 +152,11 @@ export default function LibraryPage() {
                     <td className="px-3 py-2.5 text-right">
                       <button
                         type="button"
-                        title="Delete this study"
+                        title={t('delete')}
                         className="tool-btn opacity-0 transition-opacity hover:text-danger group-hover:opacity-100"
                         onClick={(e) => {
                           e.stopPropagation()
-                          if (
-                            confirm(
-                              `Delete this study and all ${s.num_instances} of its images from disk?\n\nThis cannot be undone.`,
-                            )
-                          ) {
+                          if (confirm(t('deleteConfirm', { count: s.num_instances }))) {
                             remove.mutate(s.study_instance_uid)
                           }
                         }}

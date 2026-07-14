@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.models import AVATAR_COLORS, AVATAR_STYLES, Passkey
+from app.models import AVATAR_COLORS, AVATAR_STYLES, LANGUAGES, Passkey
 
 
 class LoginResult(BaseModel):
@@ -104,22 +105,30 @@ class PreferencesOut(BaseModel):
     avatar_color: str
     use_gravatar: bool
     gravatar_hash: str
+    # NULL means "follow the browser" — a real state, not a missing one.
+    language: str | None
     # The valid sets, so the UI renders exactly what the server will accept rather than
     # hardcoding a list that can drift out of sync with the backend's validation.
     available_styles: list[str]
     available_colors: list[str]
+    available_languages: list[str]
 
 
 class PreferencesPatch(BaseModel):
     """Every field optional — a PATCH may change one thing.
 
-    Style and colour are validated against the known sets, so an unknown value cannot be
-    stored and then fail to render later.
+    Style, colour and language are validated against the known sets, so an unknown value cannot
+    be stored and then fail to render later.
+
+    `language` uses a sentinel rather than `None` for "unset": None already means "field not
+    present in this PATCH", so there would otherwise be no way to express "clear my language and
+    go back to following the browser".
     """
 
     avatar_style: str | None = None
     avatar_color: str | None = None
     use_gravatar: bool | None = None
+    language: str | Literal["auto"] | None = None
 
     @field_validator("avatar_style")
     @classmethod
@@ -133,6 +142,13 @@ class PreferencesPatch(BaseModel):
     def _known_color(cls, value: str | None) -> str | None:
         if value is not None and value not in AVATAR_COLORS:
             raise ValueError(f"unknown avatar colour: {value!r}")
+        return value
+
+    @field_validator("language")
+    @classmethod
+    def _known_language(cls, value: str | None) -> str | None:
+        if value is not None and value != "auto" and value not in LANGUAGES:
+            raise ValueError(f"unsupported language: {value!r}")
         return value
 
 

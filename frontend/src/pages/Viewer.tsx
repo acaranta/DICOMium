@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { api, type StudyDetail } from '../lib/api'
 import { useViewerStore } from '../store/viewerStore'
@@ -8,7 +9,7 @@ import { createStackToolGroup, setActiveTool, STACK_TOOL_GROUP } from '../corner
 import { collectMeasurements, onAnnotationsChanged } from '../cornerstone/measurements'
 import { toVoiRange, type WlPreset } from '../cornerstone/wlPresets'
 import { captureViewport } from '../cornerstone/screenshot'
-import { TOOLBAR } from '../cornerstone/tools'
+import { TOOLBAR, type ToolId } from '../cornerstone/tools'
 import AppShell from '../components/layout/AppShell'
 import SeriesPanel from '../components/viewer/SeriesPanel'
 import ViewerToolbar, { type ToolbarActions } from '../components/viewer/ViewerToolbar'
@@ -18,6 +19,7 @@ import MprView from '../components/viewer/MprView'
 import { IconSpinner, IconWarn } from '../components/ui/Icons'
 
 export default function ViewerPage() {
+  const { t } = useTranslation('viewer')
   const { studyUid = '' } = useParams()
   const engine = useRenderingEngine()
 
@@ -96,21 +98,29 @@ export default function ViewerPage() {
   }, [setMeasurements])
 
   // Keyboard shortcuts. Ignored while typing in the tag filter.
+  //
+  // The keys come from the translation catalogue, not from a constant: "W" for Window/Level is
+  // a mnemonic that means nothing once the tool is called *Fenetrage*, and on an AZERTY layout
+  // W and Z are not where a QWERTY user expects them.
   useEffect(() => {
+    const shortcuts = new Map<string, ToolId>(
+      TOOLBAR.map((id) => [t(`tools.${id}.key`).toLowerCase(), id]),
+    )
+
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
 
-      const tool = TOOLBAR.find((t) => t.key === e.key.toLowerCase())
+      const tool = shortcuts.get(e.key.toLowerCase())
       if (tool) {
         e.preventDefault()
-        selectTool(tool.id)
+        selectTool(tool)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [selectTool])
+  }, [selectTool, t])
 
   const activeSlot = viewports.find((v) => v.id === activeViewportId)
   const activeSeries = useMemo(
@@ -230,7 +240,7 @@ export default function ViewerPage() {
                 exitMpr()
               }}
             >
-              Back to 2D
+              {t('mpr.backTo2d')}
             </button>
           </div>
         )}

@@ -1,13 +1,9 @@
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { api, type Preferences } from '../../lib/api'
 import { useAuth } from '../../lib/auth'
-import {
-  STYLE_LABELS,
-  PALETTE,
-  type AvatarColor,
-  type AvatarStyle,
-} from '../../lib/avatar'
+import { PALETTE, type AvatarColor, type AvatarStyle } from '../../lib/avatar'
 import Avatar from '../ui/Avatar'
 import { IconCheck, IconSpinner, IconWarn } from '../ui/Icons'
 
@@ -18,6 +14,7 @@ import { IconCheck, IconSpinner, IconWarn } from '../ui/Icons'
  * third party, so it says so, in plain words, right next to itself.
  */
 export default function ProfileSection() {
+  const { t } = useTranslation('account')
   const { user, refresh } = useAuth()
   const [error, setError] = useState('')
 
@@ -62,16 +59,16 @@ export default function ProfileSection() {
           size={56}
         />
         <div>
-          <h2 className="text-xs font-medium text-ink">Avatar</h2>
+          <h2 className="text-xs font-medium text-ink">{t('profile.title')}</h2>
           <p className="mt-0.5 text-2xs leading-relaxed text-ink-dim">
-            Generated from your initials. Pick a colour and a style, or use your Gravatar.
+            {t('profile.description')}
           </p>
         </div>
       </div>
 
       {/* Colour ------------------------------------------------------------ */}
       <fieldset className="mb-4" disabled={prefs.use_gravatar}>
-        <legend className="label">Colour</legend>
+        <legend className="label">{t('profile.colour')}</legend>
         <div className={`flex flex-wrap gap-2 ${prefs.use_gravatar ? 'opacity-40' : ''}`}>
           {prefs.available_colors.map((c) => {
             const swatch = PALETTE[c as AvatarColor]
@@ -102,7 +99,7 @@ export default function ProfileSection() {
 
       {/* Style ------------------------------------------------------------- */}
       <fieldset className="mb-4" disabled={prefs.use_gravatar}>
-        <legend className="label">Style</legend>
+        <legend className="label">{t('profile.style')}</legend>
         <div className={`flex flex-wrap gap-2 ${prefs.use_gravatar ? 'opacity-40' : ''}`}>
           {prefs.available_styles.map((s) => {
             const selected = s === style
@@ -127,7 +124,7 @@ export default function ProfileSection() {
                   useGravatar={false}
                 />
                 <span className={`text-2xs ${selected ? 'text-accent' : 'text-ink-dim'}`}>
-                  {STYLE_LABELS[s as AvatarStyle] ?? s}
+                  {t(`profile.styles.${s}`, { defaultValue: s })}
                 </span>
               </button>
             )
@@ -145,13 +142,14 @@ export default function ProfileSection() {
             className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-line bg-void accent-accent"
           />
           <span className="min-w-0">
-            <span className="block text-xs text-ink">Use my Gravatar instead</span>
+            <span className="block text-xs text-ink">{t('profile.gravatar.label')}</span>
             <span className="mt-1 flex items-start gap-1.5 text-2xs leading-relaxed text-ink-dim">
               <IconWarn className="mt-px h-3 w-3 shrink-0 text-warn" />
               <span>
-                This sends a hash of your email address to <strong>gravatar.com</strong> and
-                reveals your IP address to them. Your scans never leave this server — but this
-                does. With it off, DICOMium makes no third-party requests at all.
+                <Trans i18nKey="profile.gravatar.warning" ns="account">
+                  This sends a hash of your email address to <strong>gravatar.com</strong> and
+                  reveals your IP address to them.
+                </Trans>
               </span>
             </span>
           </span>

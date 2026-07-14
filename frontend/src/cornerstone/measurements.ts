@@ -7,6 +7,7 @@
 import { annotation, Enums as ToolEnums } from '@cornerstonejs/tools'
 import { eventTarget } from '@cornerstonejs/core'
 import type { Measurement } from '../store/viewerStore'
+import { formatNumber } from '../lib/format'
 
 const { Events } = ToolEnums
 
@@ -24,9 +25,18 @@ type AnyAnnotation = {
   }
 }
 
+/**
+ * Format a measured value in the active locale.
+ *
+ * This is not cosmetic. A length reads `57.3 mm` in English and MUST read `57,3 mm` in French,
+ * German, Spanish and Italian. A decimal separator misread in a medical measurement is a real
+ * error, and `toFixed()` — which this replaced — always emits a full stop.
+ *
+ * The UNIT is not touched: `mm`, `mm²`, `°` are SI, and `HU` is an eponym (Hounsfield). They
+ * are the same in every language.
+ */
 function fmt(value: unknown, digits = 1): string {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '—'
-  return value.toFixed(digits)
+  return formatNumber(value, digits)
 }
 
 function unitOf(stats: CachedStats): string | undefined {
@@ -83,24 +93,19 @@ function describe(a: AnyAnnotation): Stat[] {
   }
 }
 
-const LABELS: Record<string, string> = {
-  Length: 'Length',
-  Angle: 'Angle',
-  RectangleROI: 'Rect ROI',
-  EllipticalROI: 'Ellipse ROI',
-  Probe: 'Probe',
-}
+/** The Cornerstone tool names we render. The display name comes from the catalogue
+ *  (viewer.json → measurements.tools.*), keyed on these. */
+const RENDERED_TOOLS = new Set(['Length', 'Angle', 'RectangleROI', 'EllipticalROI', 'Probe'])
 
 export function collectMeasurements(): Measurement[] {
   const manager = annotation.state.getAnnotationManager()
   const all = manager.getAllAnnotations() as AnyAnnotation[]
 
   return all
-    .filter((a) => a.annotationUID && LABELS[a.metadata?.toolName ?? ''])
+    .filter((a) => a.annotationUID && RENDERED_TOOLS.has(a.metadata?.toolName ?? ''))
     .map((a) => ({
       uid: a.annotationUID as string,
       toolName: a.metadata?.toolName ?? '',
-      label: LABELS[a.metadata?.toolName ?? ''] ?? 'Measurement',
       stats: describe(a),
       imageId: a.metadata?.referencedImageId,
     }))

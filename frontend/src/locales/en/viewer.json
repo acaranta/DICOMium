@@ -1,0 +1,110 @@
+{
+  "back": "Back to the study list",
+  "tools": {
+    "windowLevel": { "label": "Window/Level", "hint": "Drag to adjust brightness & contrast", "key": "w" },
+    "pan": { "label": "Pan", "hint": "Drag to move the image", "key": "p" },
+    "zoom": { "label": "Zoom", "hint": "Drag to zoom", "key": "z" },
+    "length": { "label": "Length", "hint": "Measure a distance in mm", "key": "l" },
+    "angle": { "label": "Angle", "hint": "Measure an angle", "key": "a" },
+    "rectangleRoi": { "label": "Rectangle ROI", "hint": "Region statistics (mean, min, max, SD)", "key": "r" },
+    "ellipseRoi": { "label": "Ellipse ROI", "hint": "Region statistics (mean, min, max, SD)", "key": "e" },
+    "probe": { "label": "Probe", "hint": "Read the value at a point", "key": "b" },
+    "eraser": { "label": "Erase", "hint": "Delete a measurement", "key": "x" }
+  },
+  "toolbar": {
+    "presets": "Presets",
+    "presetsCtOnly": "Window presets",
+    "presetsDisabled": "Presets are defined for CT only",
+    "layout": "Viewport layout",
+    "invert": "Invert greyscale",
+    "rotate": "Rotate 90°",
+    "flipH": "Flip horizontally",
+    "flipV": "Flip vertically",
+    "reset": "Reset view",
+    "screenshot": "Save as PNG",
+    "measurements": "Measurements",
+    "tags": "DICOM tags"
+  },
+  "presets": {
+    "soft": "Soft tissue",
+    "lung": "Lung",
+    "bone": "Bone",
+    "brain": "Brain",
+    "abdomen": "Abdomen",
+    "liver": "Liver",
+    "mediastinum": "Mediastinum",
+    "angio": "Angio"
+  },
+  "overlay": {
+    "zoom": "Zoom"
+  },
+  "series": {
+    "title": "Series",
+    "dragHint": "{{name}} — drag onto a viewport",
+    "notViewable": "This series has no displayable images (report or dose record)",
+    "mprCapable": "Can be reconstructed in 3 planes (MPR)",
+    "fallbackName": "Series"
+  },
+  "viewport": {
+    "dropHere": "Drag a series here",
+    "releaseToLoad": "Release to load",
+    "loadFailed": "Could not load this series",
+    "noImages": "This series has no displayable images",
+    "metadataFailed": "Could not load series metadata ({{status}})"
+  },
+  "mpr": {
+    "enter": "Reconstruct in 3 planes ({{count}} slices)",
+    "leave": "Leave MPR",
+    "needSeries": "Load a series first",
+    "notReconstructable": "This series is not a regular 3D stack (too few slices, mixed orientations, or uneven spacing)",
+    "tooLarge": "Too large to reconstruct ({{count}} slices)",
+    "backTo2d": "Back to 2D",
+    "title": "Multiplanar reconstruction",
+    "building": "Building the volume from {{count}} slices…",
+    "planes": {
+      "axial": "Axial",
+      "sagittal": "Sagittal",
+      "coronal": "Coronal"
+    },
+    "summary": "{{name}} · {{count}} slices at {{spacing}} mm",
+    "summaryNoSpacing": "{{name}} · {{count}} slices",
+    "excluded_one": "({{count}} off-plane reference image excluded)",
+    "excluded_other": "({{count}} off-plane reference images excluded)",
+    "hints": {
+      "referenceLine": "Drag a reference line to scroll the other two planes.",
+      "crosshair": "Drag the centre handle to move the crosshair.",
+      "mouse": "Right-drag to zoom, middle-drag to pan, wheel to scroll."
+    },
+    "notEnoughSlices": "Not enough slices in a single plane to reconstruct",
+    "failed": "This series could not be reconstructed"
+  },
+  "measurements": {
+    "title": "Measurements",
+    "empty": "No measurements yet. Pick Length, Angle, an ROI or Probe from the toolbar and drag on the image.",
+    "delete": "Delete this measurement",
+    "tools": {
+      "Length": "Length",
+      "Angle": "Angle",
+      "RectangleROI": "Rect ROI",
+      "EllipticalROI": "Ellipse ROI",
+      "Probe": "Probe"
+    },
+    "stats": {
+      "length": "length",
+      "angle": "angle",
+      "mean": "mean",
+      "SD": "SD",
+      "min": "min",
+      "max": "max",
+      "area": "area",
+      "value": "value"
+    }
+  },
+  "tags": {
+    "title": "DICOM tags",
+    "filter": "Filter by tag, name or value",
+    "noSeries": "Load a series to inspect its header.",
+    "noMatch": "No matching tags."
+  },
+  "screenshotFailed": "Could not save the image"
+}

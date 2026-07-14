@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Enums, type RenderingEngine, type Types, eventTarget } from '@cornerstonejs/core'
 // stackContextPrefetch lives in tools, not core.
 import { utilities as toolUtilities } from '@cornerstonejs/tools'
@@ -44,6 +45,7 @@ export default function Viewport({
   onReady: (handle: ViewportHandle | null) => void
   onSopChange: (sopUid: string | null) => void
 }) {
+  const { t } = useTranslation('viewer')
   const elementRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -78,7 +80,7 @@ export default function Viewport({
 
         const { imageIds } = await loadSeriesImageIds(study.study_instance_uid, seriesUid)
         if (cancelled) return
-        if (!imageIds.length) throw new Error('This series has no displayable images')
+        if (!imageIds.length) throw new Error(t('viewport.noImages'))
 
         await viewport.setStack(imageIds, 0)
         viewport.render()
@@ -91,7 +93,7 @@ export default function Viewport({
         onReady({ viewport, element })
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Could not load this series')
+          setError(err instanceof Error ? err.message : t('viewport.loadFailed'))
           onReady(null)
         }
       } finally {
@@ -212,7 +214,7 @@ export default function Viewport({
       {!seriesUid && !loading && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <p className="text-2xs uppercase tracking-wider text-ink-faint">
-            {dragOver ? 'Release to load' : 'Drag a series here'}
+            {dragOver ? t('viewport.releaseToLoad') : t('viewport.dropHere')}
           </p>
         </div>
       )}

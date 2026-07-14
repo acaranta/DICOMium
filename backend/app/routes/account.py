@@ -18,6 +18,7 @@ from app.dependencies import CurrentUser, DbSession
 from app.models import (
     AVATAR_COLORS,
     AVATAR_STYLES,
+    LANGUAGES,
     Passkey,
     RecoveryCode,
     TotpCredential,
@@ -84,9 +85,11 @@ def _prefs_out(prefs, email: str) -> PreferencesOut:
         avatar_style=prefs.avatar_style,
         avatar_color=prefs.avatar_color,
         use_gravatar=prefs.use_gravatar,
+        language=prefs.language,
         gravatar_hash=avatar.gravatar_hash(email),
         available_styles=list(AVATAR_STYLES),
         available_colors=list(AVATAR_COLORS),
+        available_languages=list(LANGUAGES),
     )
 
 
@@ -113,6 +116,11 @@ async def patch_preferences(body: PreferencesPatch, user: CurrentUser, db: DbSes
     if body.use_gravatar is not None:
         prefs.use_gravatar = body.use_gravatar
         log.info("%s %s gravatar", user.email, "enabled" if body.use_gravatar else "disabled")
+
+    if body.language is not None:
+        # "auto" clears the choice and hands control back to the browser. It has to be an
+        # explicit sentinel: None already means "this PATCH did not mention language".
+        prefs.language = None if body.language == "auto" else body.language
 
     await db.commit()
     await db.refresh(prefs)

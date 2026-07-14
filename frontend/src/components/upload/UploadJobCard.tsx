@@ -1,22 +1,18 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Trans, useTranslation } from 'react-i18next'
 import { api, type UploadJob } from '../../lib/api'
 import { IconCheck, IconChevron, IconSpinner, IconWarn } from '../ui/Icons'
-
-const PHASE_LABEL: Record<string, string> = {
-  pending: 'Queued',
-  receiving: 'Receiving',
-  extracting: 'Extracting archive',
-  scanning: 'Finding DICOM files',
-  importing: 'Importing',
-  finalizing: 'Building thumbnails',
-}
 
 /**
  * Live progress for one ingest job.
  *
- * Polls while the job is running and stops the moment it reaches a terminal state — a
- * finished job is immutable, so continuing to poll would be pure waste.
+ * Polls while the job is running and stops the moment it reaches a terminal state — a finished
+ * job is immutable, so continuing to poll would be pure waste.
+ *
+ * The summary is composed HERE, from the counts, rather than printing the sentence the backend
+ * used to send. That sentence was three optional plural clauses joined with "; " and was
+ * untranslatable — and the counts were already on this object anyway.
  */
 export default function UploadJobCard({
   jobId,
@@ -27,6 +23,7 @@ export default function UploadJobCard({
   initial?: UploadJob
   onDone?: () => void
 }) {
+  const { t } = useTranslation('upload')
   const [showErrors, setShowErrors] = useState(false)
   const [notified, setNotified] = useState(false)
 
@@ -49,9 +46,16 @@ export default function UploadJobCard({
   const done = job.status === 'completed'
   const running = !job.is_terminal
 
-  // During extract/scan the total is not yet known, so show an indeterminate bar rather
-  // than a progress bar that would jump backwards once the denominator appears.
+  // During extract/scan the total is not yet known, so show an indeterminate bar rather than a
+  // progress bar that would jump backwards once the denominator appears.
   const indeterminate = running && job.total_files === 0
+
+  // The outcome, in the user's language, assembled from the counts.
+  const summary = [
+    job.imported_count > 0 && t('job.result.imported', { count: job.imported_count }),
+    job.duplicate_count > 0 && t('job.result.duplicates', { count: job.duplicate_count }),
+    job.skipped_count > 0 && t('job.result.skipped', { count: job.skipped_count }),
+  ].filter(Boolean) as string[]
 
   return (
     <div
@@ -70,14 +74,23 @@ export default function UploadJobCard({
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-medium text-ink">
-            {job.source_names[0] ?? 'Upload'}
+            {job.source_names[0] ?? t('job.fallbackName')}
             {job.source_names.length > 1 && (
-              <span className="text-ink-faint"> +{job.source_names.length - 1} more</span>
+              <span className="text-ink-faint">
+                {' '}
+                {t('job.andMore', { count: job.source_names.length - 1 })}
+              </span>
             )}
           </p>
 
           <p className="mt-0.5 text-2xs text-ink-dim">
-            {running ? PHASE_LABEL[job.status] ?? job.status : job.message}
+            {running
+              ? t(`job.phase.${job.status}`, { defaultValue: job.status })
+              : // A failed job carries a reason from the server; a successful one is summarised
+                // from its counts.
+                failed
+                ? job.message
+                : summary.join(' · ')}
           </p>
 
           {running && (
@@ -94,19 +107,12 @@ export default function UploadJobCard({
               </div>
               {job.total_files > 0 && (
                 <p className="mt-1 num text-2xs text-ink-faint">
-                  {job.processed_files} / {job.total_files} files
+                  {t('job.progress', {
+                    processed: job.processed_files,
+                    total: job.total_files,
+                  })}
                 </p>
               )}
-            </div>
-          )}
-
-          {job.is_terminal && !failed && (
-            <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 num text-2xs text-ink-faint">
-              {job.imported_count > 0 && (
-                <span className="text-ok">+{job.imported_count} imported</span>
-              )}
-              {job.duplicate_count > 0 && <span>{job.duplicate_count} already present</span>}
-              {job.skipped_count > 0 && <span>{job.skipped_count} non-DICOM ignored</span>}
             </div>
           )}
 
@@ -120,7 +126,7 @@ export default function UploadJobCard({
                 <IconChevron
                   className={`h-3 w-3 transition-transform ${showErrors ? 'rotate-0' : '-rotate-90'}`}
                 />
-                {job.error_count} file{job.error_count === 1 ? '' : 's'} could not be imported
+                {t('job.errors', { count: job.error_count })}
               </button>
 
               {showErrors && (
@@ -128,12 +134,19 @@ export default function UploadJobCard({
                   {job.errors.map((e, i) => (
                     <li key={i} className="num text-2xs leading-relaxed text-ink-faint">
                       <span className="text-ink-dim">{e.path}</span>{' '}
-                      <span className="text-warn">{e.error_type}</span> — {e.message}
+                      <span className="text-warn">
+                        <Trans
+                          i18nKey={`ingest.errorType.${e.error_type}`}
+                          ns="errors"
+                          defaults={e.error_type}
+                        />
+                      </span>{' '}
+                      — {e.message}
                     </li>
                   ))}
                   {job.error_count > job.errors.length && (
                     <li className="text-2xs italic text-ink-faint">
-                      …and {job.error_count - job.errors.length} more
+                      {t('job.andMoreErrors', { count: job.error_count - job.errors.length })}
                     </li>
                   )}
                 </ul>

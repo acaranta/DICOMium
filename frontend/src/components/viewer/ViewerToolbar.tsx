@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Series } from '../../lib/api'
 import { LAYOUTS, useViewerStore } from '../../store/viewerStore'
 import { TOOLBAR, type ToolId } from '../../cornerstone/tools'
@@ -59,6 +60,7 @@ export default function ViewerToolbar({
   actions: ToolbarActions
   onToggleMpr: () => void
 }) {
+  const { t } = useTranslation('viewer')
   const { activeTool, setActiveTool, layout, setLayout, mprActive, rightPanel, setRightPanel } =
     useViewerStore()
   const [presetsOpen, setPresetsOpen] = useState(false)
@@ -66,37 +68,43 @@ export default function ViewerToolbar({
 
   const presets = presetsFor(activeSeries?.modality ?? '')
 
-  // MPR needs a regular volume. The reason is spelled out in the tooltip rather than
-  // leaving a mysteriously dead button.
+  // MPR needs a regular volume. The reason is spelled out in the tooltip rather than leaving a
+  // mysteriously dead button.
   const tooBig = (activeSeries?.mpr_instance_count ?? 0) > MAX_MPR_INSTANCES
   const canMpr = !!activeSeries?.is_reconstructable && !tooBig
   const mprReason = !activeSeries
-    ? 'Load a series first'
+    ? t('mpr.needSeries')
     : !activeSeries.is_reconstructable
-      ? 'This series is not a regular 3D stack (too few slices, mixed orientations, or uneven spacing)'
+      ? t('mpr.notReconstructable')
       : tooBig
-        ? `Too large to reconstruct (${activeSeries.mpr_instance_count} slices)`
-        : `Reconstruct in 3 planes (${activeSeries.mpr_instance_count} slices)`
+        ? t('mpr.tooLarge', { count: activeSeries.mpr_instance_count })
+        : t('mpr.enter', { count: activeSeries.mpr_instance_count })
 
   return (
     <div className="flex h-11 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-2">
-      <Link to="/" className="tool-btn" title="Back to the study list">
+      <Link to="/" className="tool-btn" title={t('back')}>
         <IconBack />
       </Link>
 
       <div className="divider" />
 
-      {TOOLBAR.map((tool) => {
-        const Icon = TOOL_ICONS[tool.id]
+      {TOOLBAR.map((id) => {
+        const Icon = TOOL_ICONS[id]
+        const label = t(`tools.${id}.label`)
+        const hint = t(`tools.${id}.hint`)
+        // The shortcut is translated too: "W" for Window/Level is a mnemonic that means nothing
+        // once the tool is called *Fenêtrage*.
+        const key = t(`tools.${id}.key`)
+
         return (
           <button
-            key={tool.id}
+            key={id}
             type="button"
             className="tool-btn"
-            data-active={activeTool === tool.id && !mprActive}
-            disabled={mprActive && tool.id === 'eraser'}
-            onClick={() => setActiveTool(tool.id)}
-            title={`${tool.label} — ${tool.hint}  (${tool.key.toUpperCase()})`}
+            data-active={activeTool === id && !mprActive}
+            disabled={mprActive && id === 'eraser'}
+            onClick={() => setActiveTool(id)}
+            title={`${label} — ${hint}  (${key.toUpperCase()})`}
           >
             <Icon />
           </button>
@@ -113,9 +121,9 @@ export default function ViewerToolbar({
           disabled={!presets.length}
           onClick={() => setPresetsOpen((v) => !v)}
           onBlur={() => setTimeout(() => setPresetsOpen(false), 120)}
-          title={presets.length ? 'Window presets' : 'Presets are defined for CT only'}
+          title={presets.length ? t('toolbar.presetsCtOnly') : t('toolbar.presetsDisabled')}
         >
-          <span className="text-2xs">Presets</span>
+          <span className="text-2xs">{t('toolbar.presets')}</span>
           <IconChevron className="h-3 w-3" />
         </button>
 
@@ -131,7 +139,8 @@ export default function ViewerToolbar({
                   setPresetsOpen(false)
                 }}
               >
-                <span>{p.label}</span>
+                <span>{t(`presets.${p.id}`)}</span>
+                {/* Hounsfield width/centre — universal, not localised. */}
                 <span className="num text-2xs text-ink-faint">
                   {p.width}/{p.center}
                 </span>
@@ -148,7 +157,7 @@ export default function ViewerToolbar({
           disabled={mprActive}
           onClick={() => setLayoutOpen((v) => !v)}
           onBlur={() => setTimeout(() => setLayoutOpen(false), 120)}
-          title="Viewport layout"
+          title={t('toolbar.layout')}
         >
           <span className="num text-2xs">
             {layout.rows}×{layout.cols}
@@ -177,22 +186,27 @@ export default function ViewerToolbar({
 
       <div className="divider" />
 
-      <button type="button" className="tool-btn" onClick={actions.invert} title="Invert greyscale">
+      <button type="button" className="tool-btn" onClick={actions.invert} title={t('toolbar.invert')}>
         <IconInvert />
       </button>
-      <button type="button" className="tool-btn" onClick={actions.rotate} title="Rotate 90°">
+      <button type="button" className="tool-btn" onClick={actions.rotate} title={t('toolbar.rotate')}>
         <IconRotate />
       </button>
-      <button type="button" className="tool-btn" onClick={actions.flipH} title="Flip horizontally">
+      <button type="button" className="tool-btn" onClick={actions.flipH} title={t('toolbar.flipH')}>
         <IconFlipH />
       </button>
-      <button type="button" className="tool-btn" onClick={actions.flipV} title="Flip vertically">
+      <button type="button" className="tool-btn" onClick={actions.flipV} title={t('toolbar.flipV')}>
         <IconFlipV />
       </button>
-      <button type="button" className="tool-btn" onClick={actions.reset} title="Reset view">
+      <button type="button" className="tool-btn" onClick={actions.reset} title={t('toolbar.reset')}>
         <IconReset />
       </button>
-      <button type="button" className="tool-btn" onClick={actions.screenshot} title="Save as PNG">
+      <button
+        type="button"
+        className="tool-btn"
+        onClick={actions.screenshot}
+        title={t('toolbar.screenshot')}
+      >
         <IconCamera />
       </button>
 
@@ -204,7 +218,7 @@ export default function ViewerToolbar({
         data-active={mprActive}
         disabled={!canMpr && !mprActive}
         onClick={onToggleMpr}
-        title={mprActive ? 'Leave MPR' : mprReason}
+        title={mprActive ? t('mpr.leave') : mprReason}
       >
         <IconCube />
       </button>
@@ -216,7 +230,7 @@ export default function ViewerToolbar({
         className="tool-btn"
         data-active={rightPanel === 'measurements'}
         onClick={() => setRightPanel(rightPanel === 'measurements' ? null : 'measurements')}
-        title="Measurements"
+        title={t('toolbar.measurements')}
       >
         <IconRuler />
       </button>
@@ -225,7 +239,7 @@ export default function ViewerToolbar({
         className="tool-btn"
         data-active={rightPanel === 'tags'}
         onClick={() => setRightPanel(rightPanel === 'tags' ? null : 'tags')}
-        title="DICOM tags"
+        title={t('toolbar.tags')}
       >
         <IconTag />
       </button>

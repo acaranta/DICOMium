@@ -1,0 +1,47 @@
+{
+  "title": "Studies",
+  "count_one": "{{count}} exam",
+  "count_other": "{{count}} exams",
+  "search": "Patient, ID, description…",
+  "empty": "No studies yet — upload an exam above.",
+  "emptySearch": "No studies match that search.",
+  "columns": {
+    "patient": "Patient",
+    "study": "Study",
+    "date": "Date",
+    "modality": "Modality",
+    "series": "Series",
+    "images": "Images"
+  },
+  "delete": "Delete this study",
+  "deleteConfirm": "Delete this study and all {{count}} of its images from disk?\n\nThis cannot be undone.",
+  "patient": {
+    "unknown": "Unknown"
+  },
+  "admin": {
+    "title": "Administration",
+    "stats": {
+      "users": "Users",
+      "studies": "Studies",
+      "images": "Images",
+      "onDisk": "On disk"
+    },
+    "accounts": "Accounts",
+    "columns": {
+      "email": "Email",
+      "slug": "Storage slug",
+      "role": "Role",
+      "status": "Status"
+    },
+    "you": "(you)",
+    "roleAdmin": "Admin",
+    "roleUser": "User",
+    "active": "Active",
+    "disabled": "Disabled",
+    "toggleAdmin": "Toggle admin",
+    "cannotChangeOwnRole": "You cannot change your own role",
+    "cannotDeleteSelf": "You cannot delete yourself",
+    "deleteUser": "Delete this user and all their exams",
+    "deleteUserConfirm": "Delete {{email}}?\n\nThis also deletes every exam they uploaded, from disk. This cannot be undone."
+  }
+}

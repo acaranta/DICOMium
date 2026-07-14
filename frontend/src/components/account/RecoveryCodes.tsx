@@ -1,14 +1,14 @@
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { IconCheck, IconCopy, IconDownload, IconWarn } from '../ui/Icons'
 
 /**
  * The codes, shown exactly once.
  *
- * The server keeps only bcrypt hashes, so once this panel is dismissed they genuinely
- * cannot be recovered — only replaced. The UI therefore refuses to close until the user
- * has explicitly ticked that they saved them. That friction is the whole point: a user who
- * clicks past this screen has, without knowing it, made "lost my phone" mean "lost my
- * account".
+ * The server keeps only bcrypt hashes, so once this panel is dismissed they genuinely cannot be
+ * recovered — only replaced. The UI therefore refuses to close until the user has explicitly
+ * ticked that they saved them. That friction is the whole point: a user who clicks past this
+ * screen has, without knowing it, made "lost my phone" mean "lost my account".
  */
 export default function RecoveryCodes({
   codes,
@@ -17,6 +17,7 @@ export default function RecoveryCodes({
   codes: string[]
   onDone: () => void
 }) {
+  const { t } = useTranslation('account')
   const [acknowledged, setAcknowledged] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -30,22 +31,16 @@ export default function RecoveryCodes({
   }
 
   function download() {
+    // One paragraph, not hand-wrapped lines: a translation is a different length and
+    // hand-broken lines would come out ragged.
     const blob = new Blob(
-      [
-        'DICOMium recovery codes\n',
-        '\n',
-        'Each code works once. Keep them somewhere safe and offline —\n',
-        'they are the only way back in if you lose your authenticator.\n',
-        '\n',
-        asText,
-        '\n',
-      ],
+      [t('recovery.fileHeading'), '\n\n', t('recovery.fileBody'), '\n\n', asText, '\n'],
       { type: 'text/plain' },
     )
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'dicomium-recovery-codes.txt'
+    link.download = t('recovery.fileName')
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -55,11 +50,13 @@ export default function RecoveryCodes({
       <div className="mb-3 flex items-start gap-2">
         <IconWarn className="mt-0.5 h-4 w-4 shrink-0 text-warn" />
         <div>
-          <h3 className="text-xs font-medium text-ink">Save your recovery codes</h3>
+          <h3 className="text-xs font-medium text-ink">{t('recovery.saveTitle')}</h3>
           <p className="mt-1 text-2xs leading-relaxed text-ink-dim">
-            These are shown <strong className="text-warn">once</strong>. Each works a single
-            time. If you lose your authenticator and have no code left, you will not be able
-            to sign in.
+            <Trans i18nKey="recovery.saveBody" ns="account">
+              These are shown <strong className="text-warn">once</strong>. Each works a single
+              time. If you lose your authenticator and have no code left, you will not be able to
+              sign in.
+            </Trans>
           </p>
         </div>
       </div>
@@ -74,12 +71,16 @@ export default function RecoveryCodes({
 
       <div className="mb-3 flex gap-2">
         <button type="button" className="btn flex-1 justify-center" onClick={copy}>
-          {copied ? <IconCheck className="h-3.5 w-3.5 text-ok" /> : <IconCopy className="h-3.5 w-3.5" />}
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? (
+            <IconCheck className="h-3.5 w-3.5 text-ok" />
+          ) : (
+            <IconCopy className="h-3.5 w-3.5" />
+          )}
+          {copied ? t('action.copied', { ns: 'common' }) : t('action.copy', { ns: 'common' })}
         </button>
         <button type="button" className="btn flex-1 justify-center" onClick={download}>
           <IconDownload className="h-3.5 w-3.5" />
-          Download
+          {t('action.download', { ns: 'common' })}
         </button>
       </div>
 
@@ -90,7 +91,7 @@ export default function RecoveryCodes({
           onChange={(e) => setAcknowledged(e.target.checked)}
           className="h-3.5 w-3.5 rounded border-line bg-void accent-accent"
         />
-        I have saved these codes somewhere safe
+        {t('recovery.acknowledge')}
       </label>
 
       <button
@@ -99,7 +100,7 @@ export default function RecoveryCodes({
         disabled={!acknowledged}
         onClick={onDone}
       >
-        Done
+        {t('action.done', { ns: 'common' })}
       </button>
     </div>
   )

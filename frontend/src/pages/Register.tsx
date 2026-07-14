@@ -1,13 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { api, type AuthConfig } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { IconSpinner } from '../components/ui/Icons'
 import AuthLayout from '../components/layout/AuthLayout'
 
 export default function Register() {
+  const { t } = useTranslation('auth')
   const { user, register } = useAuth()
   const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -30,11 +33,11 @@ export default function Register() {
     setError('')
 
     if (password !== confirm) {
-      setError('The passwords do not match')
+      setError(t('register.mismatch'))
       return
     }
     if (password.length < minLength) {
-      setError(`Use at least ${minLength} characters`)
+      setError(t('register.tooShort', { count: minLength }))
       return
     }
 
@@ -43,7 +46,7 @@ export default function Register() {
       await register(email, password)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+      setError(err instanceof Error ? err.message : t('register.failed'))
     } finally {
       setBusy(false)
     }
@@ -51,13 +54,10 @@ export default function Register() {
 
   if (closed) {
     return (
-      <AuthLayout title="Registration is closed">
-        <p className="text-xs leading-relaxed text-ink-dim">
-          This instance is not accepting new accounts. Ask an administrator to create one
-          for you.
-        </p>
+      <AuthLayout title={t('register.closedTitle')}>
+        <p className="text-xs leading-relaxed text-ink-dim">{t('register.closedBody')}</p>
         <Link to="/login" className="btn mt-5 w-full justify-center py-2">
-          Back to sign in
+          {t('register.backToSignIn')}
         </Link>
       </AuthLayout>
     )
@@ -65,16 +65,12 @@ export default function Register() {
 
   return (
     <AuthLayout
-      title="Create an account"
-      subtitle={
-        isFirstUser
-          ? 'This is the first account on this instance — it will be the administrator.'
-          : undefined
-      }
+      title={t('register.title')}
+      subtitle={isFirstUser ? t('register.firstAccount') : undefined}
     >
       <form onSubmit={submit} className="space-y-4">
         <div>
-          <label className="label" htmlFor="email">Email</label>
+          <label className="label" htmlFor="email">{t('register.email')}</label>
           <input
             id="email"
             type="email"
@@ -88,7 +84,7 @@ export default function Register() {
         </div>
 
         <div>
-          <label className="label" htmlFor="password">Password</label>
+          <label className="label" htmlFor="password">{t('register.password')}</label>
           <input
             id="password"
             type="password"
@@ -99,12 +95,12 @@ export default function Register() {
             required
           />
           <p className="mt-1 text-2xs text-ink-faint">
-            At least {minLength} characters.
+            {t('register.passwordHint', { count: minLength })}
           </p>
         </div>
 
         <div>
-          <label className="label" htmlFor="confirm">Confirm password</label>
+          <label className="label" htmlFor="confirm">{t('register.confirm')}</label>
           <input
             id="confirm"
             type="password"
@@ -124,14 +120,14 @@ export default function Register() {
 
         <button type="submit" className="btn btn-primary w-full py-2" disabled={busy}>
           {busy ? <IconSpinner /> : null}
-          {busy ? 'Creating…' : 'Create account'}
+          {busy ? t('register.submitting') : t('register.submit')}
         </button>
       </form>
 
       <p className="mt-6 text-center text-xs text-ink-dim">
-        Already registered?{' '}
+        {t('register.haveAccount')}{' '}
         <Link to="/login" className="text-accent hover:underline">
-          Sign in
+          {t('register.signIn')}
         </Link>
       </p>
     </AuthLayout>
