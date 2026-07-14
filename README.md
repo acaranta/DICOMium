@@ -59,9 +59,9 @@ directory tree you can read with `ls`.
       <em>Your library. Drop a DVD on it and it sorts itself out.</em>
     </td>
     <td width="50%" valign="top">
-      <img src="assets/screenshots/account.png" alt="Account security: passkeys, authenticator app, recovery codes" />
+      <img src="assets/screenshots/account.png" alt="Account: avatar, named passkeys, authenticator app, recovery codes" />
       <br />
-      <em>Passkeys, an authenticator app, and recovery codes.</em>
+      <em>Your avatar, named passkeys, TOTP and recovery codes.</em>
     </td>
   </tr>
 </table>
