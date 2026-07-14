@@ -10,6 +10,8 @@ import { collectMeasurements, onAnnotationsChanged } from '../cornerstone/measur
 import { toVoiRange, type WlPreset } from '../cornerstone/wlPresets'
 import { captureViewport } from '../cornerstone/screenshot'
 import { TOOLBAR, type ToolId } from '../cornerstone/tools'
+import { play as playCine, stop as stopCine, type FpsChoice } from '../cornerstone/cine'
+import { WADO_ROOT } from '../cornerstone/imageIds'
 import AppShell from '../components/layout/AppShell'
 import SeriesPanel from '../components/viewer/SeriesPanel'
 import ViewerToolbar, { type ToolbarActions } from '../components/viewer/ViewerToolbar'
@@ -41,6 +43,10 @@ export default function ViewerPage() {
     setMeasurements,
     setInspectorSop,
     reset,
+    playing: playingSlots,
+    cineFps,
+    setPlaying,
+    setCineFps,
   } = useViewerStore()
 
   // Live Cornerstone viewport handles, keyed by slot. A ref, not state: they are needed
@@ -97,6 +103,30 @@ export default function ViewerPage() {
     return onAnnotationsChanged(sync)
   }, [setMeasurements])
 
+  /**
+   * Play or pause the active viewport.
+   *
+   * Shared by the toolbar button and the Space key, so the two can never disagree about what
+   * "playing" means. The frame rate is read from the first imageId of the stack: every frame of
+   * one series carries the same timing, and it is the series that is being played.
+   */
+  const toggleCine = useCallback(() => {
+    const handle = handles.current[activeViewportId]
+    if (!handle) return
+
+    const imageIds = handle.viewport.getImageIds?.() ?? []
+    if (imageIds.length < 2) return // a single image is a picture, not a loop
+
+    if (playingSlots[activeViewportId]) {
+      stopCine(handle.element, activeViewportId)
+      setPlaying(activeViewportId, false)
+    } else {
+      playCine(handle.element, imageIds[0], cineFps, imageIds.length)
+      setPlaying(activeViewportId, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeViewportId, playingSlots, cineFps, setPlaying])
+
   // Keyboard shortcuts. Ignored while typing in the tag filter.
   //
   // The keys come from the translation catalogue, not from a constant: "W" for Window/Level is
@@ -112,6 +142,18 @@ export default function ViewerPage() {
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
 
+      // Cine gets its own branch: it is a playback *mode*, not a mouse tool, so it must not go
+      // through selectTool. Space is a position rather than a mnemonic — every media player
+      // uses it — so unlike the tool keys it does not move between languages.
+      //
+      // preventDefault matters more here than elsewhere: Space would otherwise ALSO re-activate
+      // whichever toolbar button still had focus, toggling cine straight back off.
+      if (e.key === ' ') {
+        e.preventDefault()
+        toggleCine()
+        return
+      }
+
       const tool = shortcuts.get(e.key.toLowerCase())
       if (tool) {
         e.preventDefault()
@@ -120,7 +162,7 @@ export default function ViewerPage() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [selectTool, t])
+  }, [selectTool, toggleCine, t])
 
   const activeSlot = viewports.find((v) => v.id === activeViewportId)
   const activeSeries = useMemo(
@@ -134,7 +176,39 @@ export default function ViewerPage() {
 
   const activeViewport = () => handles.current[activeViewportId]?.viewport
 
+  /**
+   * An imageId from the active viewport, for the toolbar to read cine timing out of.
+   *
+   * Rebuilt rather than read from `handles`, which is a ref and so cannot drive a re-render:
+   * the toolbar has to update when the series changes. `inspectorSopUid` already tracks the
+   * on-screen instance reactively, and imageIds.ts builds ids in exactly this shape.
+   */
+  const activeImageId = useMemo(() => {
+    const seriesUid = activeSlot?.seriesUid
+    if (!studyUid || !seriesUid || !inspectorSopUid) return undefined
+    return `wadors:${WADO_ROOT}/studies/${studyUid}/series/${seriesUid}/instances/${inspectorSopUid}/frames/1`
+  }, [studyUid, activeSlot?.seriesUid, inspectorSopUid])
+
   const actions: ToolbarActions = {
+    toggleCine,
+
+    setCineFps: useCallback(
+      (fps: FpsChoice) => {
+        setCineFps(fps)
+
+        // Restart anything already playing, or the new rate would not take effect until the
+        // user paused and pressed play again — which reads as the control being broken.
+        const handle = handles.current[activeViewportId]
+        if (!handle || !playingSlots[activeViewportId]) return
+
+        const imageIds = handle.viewport.getImageIds?.() ?? []
+        stopCine(handle.element, activeViewportId)
+        playCine(handle.element, imageIds[0], fps, imageIds.length)
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [activeViewportId, playingSlots, setCineFps],
+    ),
+
     applyPreset: useCallback((preset: WlPreset) => {
       const viewport = activeViewport()
       if (!viewport) return
@@ -224,6 +298,7 @@ export default function ViewerPage() {
       <div className="flex h-full flex-col">
         <ViewerToolbar
           activeSeries={mprActive ? mprSeries : activeSeries}
+          activeImageId={activeImageId}
           actions={actions}
           onToggleMpr={toggleMpr}
         />

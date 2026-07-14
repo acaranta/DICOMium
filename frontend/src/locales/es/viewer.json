@@ -61,6 +61,15 @@
     "measurements": "Mediciones",
     "tags": "Etiquetas DICOM"
   },
+  "cine": {
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "speed": "Velocidad de reproducción",
+    "auto": "Auto",
+    "fps": "{{count}} fps",
+    "notPlayable": "Esta serie solo tiene una imagen — no hay nada que reproducir",
+    "keyLabel": "Espacio"
+  },
   "presets": {
     "soft": "Partes blandas",
     "lung": "Parénquima pulmonar",

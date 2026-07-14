@@ -61,6 +61,15 @@
     "measurements": "Misure",
     "tags": "Tag DICOM"
   },
+  "cine": {
+    "play": "Riproduci",
+    "pause": "Pausa",
+    "speed": "Velocità di riproduzione",
+    "auto": "Auto",
+    "fps": "{{count}} fps",
+    "notPlayable": "Questa serie contiene una sola immagine — non c'è nulla da riprodurre",
+    "keyLabel": "Spazio"
+  },
   "presets": {
     "soft": "Parti molli",
     "lung": "Parenchima polmonare",

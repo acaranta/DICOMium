@@ -4,8 +4,10 @@ import { Enums, type RenderingEngine, type Types, eventTarget } from '@cornersto
 // stackContextPrefetch lives in tools, not core.
 import { utilities as toolUtilities } from '@cornerstonejs/tools'
 import type { Series, Study } from '../../lib/api'
+import { stop as stopCine } from '../../cornerstone/cine'
 import { loadSeriesImageIds } from '../../cornerstone/imageIds'
 import { addViewports, STACK_TOOL_GROUP } from '../../cornerstone/toolGroups'
+import { useViewerStore } from '../../store/viewerStore'
 import ViewportOverlay from './ViewportOverlay'
 import { IconSpinner } from '../ui/Icons'
 
@@ -46,6 +48,7 @@ export default function Viewport({
   onSopChange: (sopUid: string | null) => void
 }) {
   const { t } = useTranslation('viewer')
+  const setPlaying = useViewerStore((s) => s.setPlaying)
   const elementRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -103,6 +106,12 @@ export default function Viewport({
 
     return () => {
       cancelled = true
+      // Cine's interval lives outside React. Tearing the element down without stopping it
+      // leaves a timer ticking against a dead viewport, which throws on every frame — so the
+      // stop must come BEFORE disableElement.
+      if (element) stopCine(element, slotId)
+      setPlaying(slotId, false)
+
       try {
         engine.disableElement(slotId)
       } catch {
@@ -117,6 +126,13 @@ export default function Viewport({
     const element = elementRef.current
     if (!element || !seriesUid) return
 
+    // Cine fires this handler at up to 60 Hz. The frame counter must keep up — watching it move
+    // is the whole point — but the rest of the work here reaches out of this component:
+    // onSopChange re-renders the tag inspector in the parent tree. Left unthrottled that is a
+    // re-render storm on every frame, for a panel no one can read at 24 fps anyway.
+    let lastSlowUpdate = 0
+    const SLOW_INTERVAL_MS = 200
+
     const onImageRendered = () => {
       const viewport = engine.getViewport(slotId) as Types.IStackViewport | undefined
       if (!viewport) return
@@ -124,6 +140,10 @@ export default function Viewport({
       const ids = viewport.getImageIds?.() ?? []
       const current = viewport.getCurrentImageIdIndex?.() ?? 0
       setIndex({ current: current + 1, total: ids.length })
+
+      const now = performance.now()
+      if (now - lastSlowUpdate < SLOW_INTERVAL_MS) return
+      lastSlowUpdate = now
 
       const properties = viewport.getProperties?.()
       const range = properties?.voiRange

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { FpsChoice } from '../cornerstone/cine'
 import type { ToolId } from '../cornerstone/tools'
 
 // Zustand rather than Context: window/level dragging fires on every mouse move, and
@@ -49,6 +50,11 @@ interface ViewerState {
   mprActive: boolean
   mprSeriesUid: string | null
 
+  /** Which viewports are looping, by slot id. Each slot in a 2x2 grid plays independently. */
+  playing: Record<string, boolean>
+  /** The user's speed choice. `null` means "read it from the DICOM header". */
+  cineFps: FpsChoice
+
   measurements: Measurement[]
   inspectorSopUid: string | null
   rightPanel: 'tags' | 'measurements' | null
@@ -60,6 +66,8 @@ interface ViewerState {
   assignSeries: (viewportId: string, seriesUid: string) => void
   enterMpr: (seriesUid: string) => void
   exitMpr: () => void
+  setPlaying: (viewportId: string, playing: boolean) => void
+  setCineFps: (fps: FpsChoice) => void
   setMeasurements: (m: Measurement[]) => void
   setInspectorSop: (sop: string | null) => void
   setRightPanel: (panel: 'tags' | 'measurements' | null) => void
@@ -86,6 +94,9 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
 
   mprActive: false,
   mprSeriesUid: null,
+
+  playing: {},
+  cineFps: null,
 
   measurements: [],
   inspectorSopUid: null,
@@ -123,6 +134,10 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
     })
   },
 
+  setPlaying: (viewportId, playing) =>
+    set((s) => ({ playing: { ...s.playing, [viewportId]: playing } })),
+  setCineFps: (cineFps) => set({ cineFps }),
+
   setMeasurements: (measurements) => set({ measurements }),
   setInspectorSop: (inspectorSopUid) => set({ inspectorSopUid }),
   setRightPanel: (rightPanel) => set({ rightPanel }),
@@ -136,6 +151,8 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
       activeTool: 'windowLevel',
       mprActive: false,
       mprSeriesUid: null,
+      playing: {},
+      // cineFps is deliberately NOT reset: it is a preference, not per-study state.
       measurements: [],
       inspectorSopUid: null,
       rightPanel: null,

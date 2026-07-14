@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import type { Series } from '../../lib/api'
 import { LAYOUTS, useViewerStore } from '../../store/viewerStore'
 import { TOOLBAR, type ToolId } from '../../cornerstone/tools'
+import { effectiveFps, FPS_CHOICES, type FpsChoice } from '../../cornerstone/cine'
 import { presetsFor, type WlPreset } from '../../cornerstone/wlPresets'
 import { MAX_MPR_INSTANCES } from '../../cornerstone/volume'
 import {
@@ -17,6 +18,8 @@ import {
   IconInvert,
   IconLength,
   IconPan,
+  IconPause,
+  IconPlay,
   IconProbe,
   IconRectRoi,
   IconReset,
@@ -49,24 +52,49 @@ export interface ToolbarActions {
   flipV: () => void
   reset: () => void
   screenshot: () => void
+  toggleCine: () => void
+  setCineFps: (fps: FpsChoice) => void
 }
 
 export default function ViewerToolbar({
   activeSeries,
+  activeImageId,
   actions,
   onToggleMpr,
 }: {
   activeSeries: Series | undefined
+  /** An imageId from the active viewport — cine reads its DICOM header for the frame rate. */
+  activeImageId: string | undefined
   actions: ToolbarActions
   onToggleMpr: () => void
 }) {
   const { t } = useTranslation('viewer')
-  const { activeTool, setActiveTool, layout, setLayout, mprActive, rightPanel, setRightPanel } =
-    useViewerStore()
+  const {
+    activeTool,
+    setActiveTool,
+    layout,
+    setLayout,
+    mprActive,
+    rightPanel,
+    setRightPanel,
+    activeViewportId,
+    playing: playingSlots,
+    cineFps,
+  } = useViewerStore()
   const [presetsOpen, setPresetsOpen] = useState(false)
   const [layoutOpen, setLayoutOpen] = useState(false)
+  const [fpsOpen, setFpsOpen] = useState(false)
 
   const presets = presetsFor(activeSeries?.modality ?? '')
+
+  // A single image cannot be played, and MPR is a volume viewport — a different playback
+  // context that this button does not drive.
+  const frameCount = activeSeries?.num_frames_total ?? 0
+  const canPlay = !mprActive && frameCount > 1
+  const playing = !!playingSlots[activeViewportId]
+
+  const autoFps = effectiveFps(activeImageId, null)
+  const shownFps = cineFps ?? autoFps
 
   // MPR needs a regular volume. The reason is spelled out in the tooltip rather than leaving a
   // mysteriously dead button.
@@ -178,6 +206,70 @@ export default function ViewerToolbar({
                 }}
               >
                 {l.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="divider" />
+
+      {/* Cine. A stack of one is a picture, not a loop — and MPR is a volume viewport, which is
+          a different playback context entirely. */}
+      <button
+        type="button"
+        className="tool-btn"
+        data-active={playing}
+        disabled={!canPlay}
+        onClick={actions.toggleCine}
+        title={
+          canPlay
+            ? `${playing ? t('cine.pause') : t('cine.play')}  (${t('cine.keyLabel')})`
+            : t('cine.notPlayable')
+        }
+      >
+        {playing ? <IconPause /> : <IconPlay />}
+      </button>
+
+      <div className="relative">
+        <button
+          type="button"
+          className="btn h-8 gap-1 px-2"
+          disabled={!canPlay}
+          onClick={() => setFpsOpen((v) => !v)}
+          onBlur={() => setTimeout(() => setFpsOpen(false), 120)}
+          title={t('cine.speed')}
+        >
+          {/* Always the rate that will actually be used, so "Auto" is never a mystery. */}
+          <span className="num text-2xs">{t('cine.fps', { count: shownFps })}</span>
+          <IconChevron className="h-3 w-3" />
+        </button>
+
+        {fpsOpen && (
+          <div className="absolute left-0 top-9 z-50 w-32 rounded border border-line bg-raised py-1 shadow-xl">
+            {FPS_CHOICES.map((choice) => (
+              <button
+                key={choice ?? 'auto'}
+                type="button"
+                className={`flex w-full items-baseline justify-between px-3 py-1.5 text-left text-xs hover:bg-hover ${
+                  choice === cineFps ? 'text-accent' : 'text-ink'
+                }`}
+                onMouseDown={() => {
+                  actions.setCineFps(choice)
+                  setFpsOpen(false)
+                }}
+              >
+                {choice === null ? (
+                  <>
+                    <span>{t('cine.auto')}</span>
+                    {/* What Auto resolves to for THIS series, read from its DICOM header. */}
+                    <span className="num text-2xs text-ink-faint">
+                      {t('cine.fps', { count: autoFps })}
+                    </span>
+                  </>
+                ) : (
+                  <span className="num">{t('cine.fps', { count: choice })}</span>
+                )}
               </button>
             ))}
           </div>

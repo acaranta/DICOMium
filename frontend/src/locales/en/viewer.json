@@ -61,6 +61,15 @@
     "measurements": "Measurements",
     "tags": "DICOM tags"
   },
+  "cine": {
+    "play": "Play",
+    "pause": "Pause",
+    "speed": "Playback speed",
+    "auto": "Auto",
+    "fps": "{{count}} fps",
+    "notPlayable": "This series has only one image — nothing to play",
+    "keyLabel": "Space"
+  },
   "presets": {
     "soft": "Soft tissue",
     "lung": "Lung",

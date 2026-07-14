@@ -61,6 +61,15 @@
     "measurements": "Messungen",
     "tags": "DICOM-Tags"
   },
+  "cine": {
+    "play": "Abspielen",
+    "pause": "Pause",
+    "speed": "Wiedergabegeschwindigkeit",
+    "auto": "Auto",
+    "fps": "{{count}} fps",
+    "notPlayable": "Diese Serie enthält nur ein Bild — es gibt nichts abzuspielen",
+    "keyLabel": "Leertaste"
+  },
   "presets": {
     "soft": "Weichteile",
     "lung": "Lunge",

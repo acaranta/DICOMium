@@ -61,6 +61,15 @@
     "measurements": "Mesures",
     "tags": "Balises DICOM"
   },
+  "cine": {
+    "play": "Lecture",
+    "pause": "Pause",
+    "speed": "Vitesse de lecture",
+    "auto": "Auto",
+    "fps": "{{count}} fps",
+    "notPlayable": "Cette série ne contient qu'une seule image — rien à lire",
+    "keyLabel": "Espace"
+  },
   "presets": {
     "soft": "Parties molles",
     "lung": "Parenchyme pulmonaire",

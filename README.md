@@ -78,8 +78,18 @@ directory tree you can read with `ls`.
   On CT these read in **Hounsfield units** — an ROI over air reads about −1000 HU.
 - Viewport grids from 1×1 to 3×3; drag any series into any cell
 - **MPR**: reconstruct a volume into linked axial / sagittal / coronal planes with crosshairs
-- Multi-frame series (ultrasound and angiography loops) load frame-by-frame and scroll
+- **Cine playback** — press <kbd>Space</kbd> to play any stack as a loop. The speed defaults to
+  **Auto**, which is the rate the DICOM header itself asks for
+  (`RecommendedDisplayFrameRate`, else `CineRate`, else `FrameTime`), so an ultrasound loop
+  plays back at the rate it was recorded rather than at a number someone guessed. A plain CT
+  carries no timing, so it falls back to a comfortable scrolling speed. Override it from the
+  toolbar (10–60 fps).
 - Searchable DICOM tag inspector, and PNG export with the measurements drawn on
+
+**Library** — the study list is searched and paged **on the server**, so a large library stays
+fast and, more to the point, honest: the header count is the real total, not the number of rows
+that happened to fit on the page. (It used to say "100 exams" to anyone with more than a
+hundred.) Search covers patient name, patient ID, accession number and study description.
 
 **Ingest** — built for the mess that real burned discs actually contain.
 
@@ -147,14 +157,10 @@ order it is likely to be worth doing. Contributions and opinions on the ordering
 
 Small, visible gaps you notice within a few minutes of using it.
 
-- **Cine playback.** Multi-frame loops already load and scroll; they just have no play button
-  yet.
 - **Touch and a responsive layout.** Today it assumes a mouse and a wide screen. Tablets are
   the obvious place to read a scan on the sofa.
 - **Window presets beyond CT.** The presets are Hounsfield windows, which only mean anything
   on CT — so MR and ultrasound get a greyed-out button and nothing else.
-- **Pagination in the study list.** The API already supports it; the interface does not, so a
-  large library quietly stops at 100 studies.
 - **More languages, and a native review of the five that exist.** The machinery is done —
   a new language is a directory of JSON under `frontend/src/locales/` and one line in
   `lib/i18n.ts`. What it cannot supply is a radiologist who reads scans in that language and
@@ -329,6 +335,16 @@ cannot decode are decoded server-side.
 
 **Stack**: FastAPI · pydicom · SQLAlchemy 2.0 (async) · SQLite · uv — React 18 · Vite ·
 TypeScript · Tailwind · Cornerstone3D 5.
+
+`GET /api/studies` returns a page, not a bare array:
+
+```json
+{ "items": [ … ], "total": 2421, "limit": 50, "offset": 0 }
+```
+
+`total` counts the studies matching the current filters, which is what lets the interface state
+a real number instead of counting the rows it was handed. `limit` is bounded to 1–500. The
+DICOMweb API under `/dicomweb/*` is untouched and keeps QIDO-RS's standard bare-list shape.
 
 ## Development
 
