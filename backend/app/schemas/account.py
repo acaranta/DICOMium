@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from app.models import Passkey
+from app.models import AVATAR_COLORS, AVATAR_STYLES, Passkey
 
 
 class LoginResult(BaseModel):
@@ -97,6 +97,43 @@ class PasswordConfirmRequest(BaseModel):
     """
 
     password: str = Field(max_length=72)
+
+
+class PreferencesOut(BaseModel):
+    avatar_style: str
+    avatar_color: str
+    use_gravatar: bool
+    gravatar_hash: str
+    # The valid sets, so the UI renders exactly what the server will accept rather than
+    # hardcoding a list that can drift out of sync with the backend's validation.
+    available_styles: list[str]
+    available_colors: list[str]
+
+
+class PreferencesPatch(BaseModel):
+    """Every field optional — a PATCH may change one thing.
+
+    Style and colour are validated against the known sets, so an unknown value cannot be
+    stored and then fail to render later.
+    """
+
+    avatar_style: str | None = None
+    avatar_color: str | None = None
+    use_gravatar: bool | None = None
+
+    @field_validator("avatar_style")
+    @classmethod
+    def _known_style(cls, value: str | None) -> str | None:
+        if value is not None and value not in AVATAR_STYLES:
+            raise ValueError(f"unknown avatar style: {value!r}")
+        return value
+
+    @field_validator("avatar_color")
+    @classmethod
+    def _known_color(cls, value: str | None) -> str | None:
+        if value is not None and value not in AVATAR_COLORS:
+            raise ValueError(f"unknown avatar colour: {value!r}")
+        return value
 
 
 from app.schemas.auth import UserOut  # noqa: E402  (circular: LoginResult references it)

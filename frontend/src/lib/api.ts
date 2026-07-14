@@ -88,6 +88,23 @@ export interface User {
   slug: string
   is_admin: boolean
   is_active: boolean
+
+  // Avatar settings ride along on /api/auth/me, so the header needs no second request.
+  avatar_style: string | null
+  avatar_color: string | null
+  use_gravatar: boolean
+  gravatar_hash: string | null
+}
+
+export interface Preferences {
+  avatar_style: string
+  avatar_color: string
+  use_gravatar: boolean
+  gravatar_hash: string
+  // The server tells us what it will accept, rather than the UI hardcoding a list that could
+  // drift out of sync with the backend's validation.
+  available_styles: string[]
+  available_colors: string[]
 }
 
 export interface AuthConfig {

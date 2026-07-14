@@ -26,6 +26,32 @@ export function passkeysAvailable(): boolean {
   return browserSupportsWebAuthn() && window.isSecureContext
 }
 
+/**
+ * A human name to pre-fill when adding a passkey.
+ *
+ * The old default was `navigator.platform`, which yields "Linux x86_64" — so every passkey a
+ * user added from the same machine looked identical, and the list became useless the moment
+ * they had two. This is only a suggestion: the user can edit it before saving, and rename it
+ * afterwards.
+ */
+export function suggestPasskeyName(): string {
+  const ua = navigator.userAgent
+
+  if (/iPhone/i.test(ua)) return 'iPhone'
+  if (/iPad/i.test(ua)) return 'iPad'
+  if (/Android/i.test(ua)) return 'Android phone'
+  if (/Macintosh|Mac OS X/i.test(ua)) return 'Mac'
+  if (/Windows/i.test(ua)) return 'Windows PC'
+  if (/CrOS/i.test(ua)) return 'Chromebook'
+  if (/Linux/i.test(ua)) return 'Linux PC'
+  return 'This device'
+}
+
+/** Rename a passkey. No password needed: a label is not a security boundary. */
+export function renamePasskey(id: number, nickname: string): Promise<Passkey> {
+  return api.patch<Passkey>(`/api/account/passkeys/${id}`, { nickname })
+}
+
 function translate(err: unknown): Error {
   const name = (err as { name?: string })?.name
 

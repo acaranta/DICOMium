@@ -15,18 +15,27 @@ from fastapi import APIRouter, HTTPException, Request, Response, status
 from sqlalchemy import delete, select
 
 from app.dependencies import CurrentUser, DbSession
-from app.models import Passkey, RecoveryCode, TotpCredential, User
+from app.models import (
+    AVATAR_COLORS,
+    AVATAR_STYLES,
+    Passkey,
+    RecoveryCode,
+    TotpCredential,
+    User,
+)
 from app.schemas.account import (
     PasskeyOut,
     PasskeyRegisterRequest,
     PasskeyRenameRequest,
     PasswordConfirmRequest,
+    PreferencesOut,
+    PreferencesPatch,
     RecoveryCodesOut,
     SecurityStatusOut,
     TotpBeginOut,
     TotpConfirmRequest,
 )
-from app.services import crypto, recovery, totp
+from app.services import avatar, crypto, recovery, totp
 from app.services import webauthn as webauthn_svc
 from app.services.auth import totp_enabled, verify_password
 
@@ -65,6 +74,49 @@ async def security_status(user: CurrentUser, db: DbSession, request: Request):
         passkeys_supported=supported,
         passkeys_unsupported_reason=reason,
     )
+
+
+# ---- preferences (avatar) ----------------------------------------------------
+
+
+def _prefs_out(prefs, email: str) -> PreferencesOut:
+    return PreferencesOut(
+        avatar_style=prefs.avatar_style,
+        avatar_color=prefs.avatar_color,
+        use_gravatar=prefs.use_gravatar,
+        gravatar_hash=avatar.gravatar_hash(email),
+        available_styles=list(AVATAR_STYLES),
+        available_colors=list(AVATAR_COLORS),
+    )
+
+
+@router.get("/preferences", response_model=PreferencesOut)
+async def get_preferences(user: CurrentUser, db: DbSession):
+    prefs = await avatar.preferences_for(db, user)
+    return _prefs_out(prefs, user.email)
+
+
+@router.patch("/preferences", response_model=PreferencesOut)
+async def patch_preferences(body: PreferencesPatch, user: CurrentUser, db: DbSession):
+    """Change the avatar, or opt in to Gravatar.
+
+    No password re-confirmation: none of this is security-relevant. (Enabling Gravatar leaks a
+    hash of the user's own email to a third party, which is a privacy decision they are entitled
+    to make about themselves — the UI states the consequence plainly.)
+    """
+    prefs = await avatar.preferences_for(db, user)
+
+    if body.avatar_style is not None:
+        prefs.avatar_style = body.avatar_style
+    if body.avatar_color is not None:
+        prefs.avatar_color = body.avatar_color
+    if body.use_gravatar is not None:
+        prefs.use_gravatar = body.use_gravatar
+        log.info("%s %s gravatar", user.email, "enabled" if body.use_gravatar else "disabled")
+
+    await db.commit()
+    await db.refresh(prefs)
+    return _prefs_out(prefs, user.email)
 
 
 # ---- passkeys ----------------------------------------------------------------

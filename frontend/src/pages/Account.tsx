@@ -7,14 +7,22 @@ import {
   type TotpBegin,
 } from '../lib/api'
 import { useAuth } from '../lib/auth'
-import { PasskeyCancelled, passkeysAvailable, registerPasskey } from '../lib/passkeys'
+import {
+  PasskeyCancelled,
+  passkeysAvailable,
+  registerPasskey,
+  renamePasskey,
+  suggestPasskeyName,
+} from '../lib/passkeys'
 import AppShell from '../components/layout/AppShell'
+import ProfileSection from '../components/account/ProfileSection'
 import RecoveryCodes from '../components/account/RecoveryCodes'
 import {
   IconAuthApp,
   IconCheck,
   IconCloud,
   IconKey,
+  IconPencil,
   IconShield,
   IconSpinner,
   IconTrash,
@@ -57,6 +65,7 @@ export default function AccountPage() {
           </div>
         )}
 
+        <ProfileSection />
         <PasskeySection security={security} onChange={invalidate} />
         <TotpSection
           security={security}
@@ -80,6 +89,9 @@ function PasskeySection({
 }) {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  // The name is chosen BEFORE the ceremony starts, so the user is not trying to type while the
+  // operating system's passkey dialog is up.
+  const [naming, setNaming] = useState<string | null>(null)
 
   // Two independent gates: the browser must support WebAuthn in a secure context, and the
   // server must be able to work out a Relying Party ID for this origin.
@@ -88,12 +100,12 @@ function PasskeySection({
     ? 'Passkeys need a secure connection. Serve this over HTTPS, or use localhost.'
     : security.passkeys_unsupported_reason
 
-  async function add() {
+  async function add(nickname: string) {
     setError('')
     setBusy(true)
     try {
-      const suggested = navigator.platform || 'This device'
-      await registerPasskey(suggested)
+      await registerPasskey(nickname.trim() || suggestPasskeyName())
+      setNaming(null)
       onChange()
     } catch (err) {
       if (!(err instanceof PasskeyCancelled)) {
@@ -137,10 +149,57 @@ function PasskeySection({
             </p>
           )}
 
-          <button type="button" className="btn" onClick={add} disabled={busy}>
-            {busy ? <IconSpinner className="h-3.5 w-3.5" /> : <IconKey className="h-3.5 w-3.5" />}
-            {busy ? 'Waiting for your device…' : 'Add a passkey'}
-          </button>
+          {naming === null ? (
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setNaming(suggestPasskeyName())}
+            >
+              <IconKey className="h-3.5 w-3.5" />
+              Add a passkey
+            </button>
+          ) : (
+            <div className="rounded border border-line bg-void p-3">
+              <label className="label" htmlFor="passkey-name">
+                Name this passkey
+              </label>
+              <p className="mb-2 text-2xs text-ink-faint">
+                So you can tell it apart from your others later.
+              </p>
+              <input
+                id="passkey-name"
+                className="input"
+                value={naming}
+                onChange={(e) => setNaming(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && naming.trim()) void add(naming)
+                  if (e.key === 'Escape') setNaming(null)
+                }}
+                maxLength={64}
+                autoFocus
+                disabled={busy}
+              />
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={!naming.trim() || busy}
+                  onClick={() => void add(naming)}
+                >
+                  {busy ? <IconSpinner className="h-3.5 w-3.5" /> : <IconKey className="h-3.5 w-3.5" />}
+                  {busy ? 'Waiting for your device…' : 'Continue'}
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={busy}
+                  onClick={() => setNaming(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </Section>
@@ -155,28 +214,95 @@ function PasskeyRow({
   onChange: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState(passkey.nickname)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  async function commit() {
+    const next = name.trim()
+
+    // An empty name is exactly the problem this feature exists to fix, so refuse it here
+    // rather than storing "" and rendering a nameless row.
+    if (!next) {
+      setName(passkey.nickname)
+      setEditing(false)
+      return
+    }
+    if (next === passkey.nickname) {
+      setEditing(false)
+      return
+    }
+
+    setSaving(true)
+    try {
+      await renamePasskey(passkey.id, next)
+      setEditing(false)
+      setError('')
+      onChange()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not rename that passkey')
+      setName(passkey.nickname)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function cancel() {
+    setName(passkey.nickname)
+    setEditing(false)
+    setError('')
+  }
 
   return (
-    <li className="px-3 py-2.5">
+    <li className="group/row px-3 py-2.5">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <span className="truncate text-xs font-medium text-ink">{passkey.nickname}</span>
-            {passkey.backed_up && (
-              <span
-                className="text-ok"
-                title="Synced to a cloud keychain — it will survive losing this device"
+          {editing ? (
+            <input
+              className="input py-1 text-xs"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={commit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void commit()
+                if (e.key === 'Escape') cancel()
+              }}
+              maxLength={64}
+              autoFocus
+              disabled={saving}
+            />
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                title="Rename this passkey"
+                className="flex min-w-0 items-center gap-1.5 rounded text-left"
               >
-                <IconCloud className="h-3.5 w-3.5" />
-              </span>
-            )}
-          </div>
+                <span className="truncate text-xs font-medium text-ink">{passkey.nickname}</span>
+                <IconPencil className="h-3 w-3 shrink-0 text-ink-faint opacity-0 transition-opacity group-hover/row:opacity-100" />
+              </button>
+
+              {passkey.backed_up && (
+                <span
+                  className="text-ok"
+                  title="Synced to a cloud keychain — it will survive losing this device"
+                >
+                  <IconCloud className="h-3.5 w-3.5" />
+                </span>
+              )}
+            </div>
+          )}
+
           <p className="num text-2xs text-ink-faint">
             Added {new Date(passkey.created_at).toLocaleDateString()}
             {passkey.last_used_at
               ? ` · last used ${new Date(passkey.last_used_at).toLocaleDateString()}`
               : ' · never used'}
           </p>
+
+          {error && <p className="mt-1 text-2xs text-danger">{error}</p>}
         </div>
 
         <button

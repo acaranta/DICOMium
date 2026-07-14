@@ -20,7 +20,7 @@ from app.models import (
 )
 from app.schemas.account import LoginResult, MfaVerifyRequest, PasskeyLoginRequest
 from app.schemas.auth import AuthConfigOut, LoginRequest, RegisterRequest, UserOut
-from app.services import crypto, recovery, totp
+from app.services import avatar, crypto, recovery, totp
 from app.services import webauthn as webauthn_svc
 from app.services.auth import (
     create_pending_login,
@@ -70,6 +70,12 @@ def _set_mfa_cookie(response: Response, token: str) -> None:
     )
 
 
+async def _user_out(db: DbSession, user: User) -> UserOut:
+    """UserOut with the avatar settings attached (materialising defaults on first access)."""
+    prefs = await avatar.preferences_for(db, user)
+    return UserOut.with_prefs(user, prefs, avatar.gravatar_hash(user.email))
+
+
 async def _sign_in(db: DbSession, user: User, request: Request, response: Response) -> UserOut:
     """Mint the real session. The single place a session is created."""
     session = await create_session(
@@ -80,7 +86,7 @@ async def _sign_in(db: DbSession, user: User, request: Request, response: Respon
     )
     _set_session_cookie(response, session.token)
     response.delete_cookie(MFA_COOKIE, path="/")
-    return UserOut.model_validate(user)
+    return await _user_out(db, user)
 
 
 @router.get("/config", response_model=AuthConfigOut)
@@ -227,8 +233,8 @@ async def logout(
 
 
 @router.get("/me", response_model=UserOut)
-async def me(user: CurrentUser) -> UserOut:
-    return UserOut.model_validate(user)
+async def me(user: CurrentUser, db: DbSession) -> UserOut:
+    return await _user_out(db, user)
 
 
 # ---- passwordless passkey sign-in --------------------------------------------
