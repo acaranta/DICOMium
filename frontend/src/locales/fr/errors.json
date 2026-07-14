@@ -1,0 +1,99 @@
+{
+  "network": "Erreur réseau",
+  "generic": {
+    "failed": "Une erreur est survenue"
+  },
+  "auth": {
+    "invalid_credentials": "Adresse e-mail ou mot de passe incorrect",
+    "account_disabled": "Ce compte est désactivé",
+    "not_authenticated": "Non authentifié",
+    "admin_required": "Accès administrateur requis",
+    "registration_disabled": "Les inscriptions sont fermées",
+    "email_taken": "Cette adresse e-mail est déjà enregistrée",
+    "mfa_expired": "Cette connexion a expiré — veuillez recommencer",
+    "mfa_too_many": "Trop de codes incorrects — veuillez vous reconnecter",
+    "mfa_not_enrolled": "Aucun second facteur n'est configuré",
+    "incorrect_code": "Code incorrect",
+    "code_reused": "Ce code a déjà été utilisé",
+    "code_length": "Un code comporte 6 chiffres",
+    "incorrect_password": "Mot de passe incorrect"
+  },
+  "passkey": {
+    "failed": "Cette clé d'accès n'a pas pu être utilisée",
+    "malformed": "Justificatif mal formé",
+    "bad_origin": "Impossible d'analyser l'origine de cette instance",
+    "registration_expired": "Cet enregistrement a expiré — veuillez réessayer",
+    "registration_failed": "Cette clé d'accès n'a pas pu être enregistrée",
+    "authentication_expired": "Cette tentative de connexion a expiré — veuillez réessayer",
+    "unknown_credential": "Cette clé d'accès n'est pas enregistrée ici",
+    "verification_failed": "Cette clé d'accès n'a pas pu être vérifiée",
+    "possibly_cloned": "Cette clé d'accès a peut-être été clonée et a été refusée. Supprimez-la et enregistrez-en une nouvelle.",
+    "not_found": "Clé d'accès introuvable",
+    "insecure_context": "Les clés d'accès exigent HTTPS. Servez DICOMium en HTTPS, ou utilisez localhost. La connexion par mot de passe fonctionne toujours.",
+    "no_origin": "Impossible de déterminer le domaine de cette instance. Définissez explicitement WEBAUTHN_RP_ID et WEBAUTHN_ORIGIN.",
+    "cancelled": "annulé",
+    "already_registered": "Cette clé d'accès est déjà enregistrée sur ce compte.",
+    "not_supported": "Cet appareil ne peut pas créer de clé d'accès.",
+    "browser_insecure": "Les clés d'accès exigent une connexion sécurisée. Cette page doit être servie en HTTPS (ou depuis localhost).",
+    "unusable": "Cette clé d'accès n'a pas pu être utilisée."
+  },
+  "totp": {
+    "already_enrolled": "Une application d'authentification est déjà configurée. Retirez-la avant d'en enrôler une nouvelle.",
+    "not_started": "Commencez d'abord la configuration",
+    "already_confirmed": "Cette application d'authentification est déjà confirmée",
+    "no_authenticator": "Les codes de secours servent à retrouver l'accès en cas de perte de l'application d'authentification. Configurez-en une d'abord."
+  },
+  "admin": {
+    "cannot_demote_self": "Vous ne pouvez pas vous rétrograder ni vous désactiver vous-même",
+    "last_admin": "Le dernier administrateur ne peut pas être rétrogradé",
+    "cannot_delete_self": "Vous ne pouvez pas vous supprimer vous-même",
+    "user_not_found": "Utilisateur introuvable"
+  },
+  "library": {
+    "study_not_found": "Examen introuvable",
+    "series_not_found": "Série introuvable",
+    "instance_not_found": "Image introuvable",
+    "no_thumbnail": "Pas de vignette",
+    "file_missing": "Le fichier stocké est manquant"
+  },
+  "upload": {
+    "no_files": "Aucun fichier n'a été envoyé",
+    "too_large": "L'envoi dépasse la limite de {{limitMb}} Mo",
+    "not_found": "Import introuvable",
+    "not_running": "Cette tâche n'est plus en cours"
+  },
+  "ingest": {
+    "nothing_uploaded": "Rien n'a été envoyé",
+    "no_dicom_found": "Aucun fichier DICOM trouvé dans l'envoi",
+    "nothing_imported": "Rien n'a pu être importé",
+    "cancelled": "Annulé",
+    "failed": "Échec de l'import",
+    "archive_unsafe": "L'archive contient un chemin dangereux et a été rejetée",
+    "archive_too_large": "L'archive dépasse la limite de taille une fois décompressée",
+    "archive_too_many": "L'archive contient trop de fichiers",
+    "archive_corrupt": "L'archive est corrompue ou illisible",
+    "archive_unreadable": "L'archive n'a pas pu être lue",
+    "completed": "Import terminé",
+    "completed_with_errors": "Importé avec des erreurs",
+    "errorType": {
+      "MissingUID": "Identifiant DICOM manquant",
+      "UnreadableDicom": "Fichier DICOM illisible",
+      "BadPath": "Chemin de fichier dangereux",
+      "IOError": "Impossible d'écrire sur le disque",
+      "DecodeError": "Impossible de décoder l'image"
+    }
+  },
+  "frame": {
+    "failed": "Cette image n'a pas pu être lue",
+    "out_of_range": "Cette image n'existe pas",
+    "no_pixel_data": "Cette image ne contient aucune donnée de pixels",
+    "undecodable": "Cette image n'a pas pu être décodée",
+    "malformed_list": "Liste d'images mal formée",
+    "none_requested": "Aucune image demandée",
+    "short": "Les données d'image stockées sont tronquées",
+    "transcode_disabled": "Cette image nécessite un transcodage, qui est désactivé"
+  },
+  "validation": {
+    "failed": "Veuillez vérifier les informations saisies"
+  }
+}

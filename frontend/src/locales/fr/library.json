@@ -1,0 +1,48 @@
+{
+  "title": "Examens",
+  "count_one": "{{count}} examen",
+  "count_many": "{{count}} examens",
+  "count_other": "{{count}} examens",
+  "search": "Patient, identifiant, description…",
+  "empty": "Aucun examen — importez-en un ci-dessus.",
+  "emptySearch": "Aucun examen ne correspond à cette recherche.",
+  "columns": {
+    "patient": "Patient",
+    "study": "Examen",
+    "date": "Date",
+    "modality": "Modalité",
+    "series": "Séries",
+    "images": "Images"
+  },
+  "delete": "Supprimer cet examen",
+  "deleteConfirm": "Supprimer cet examen et ses {{count}} images du disque ?\n\nCette action est irréversible.",
+  "patient": {
+    "unknown": "Inconnu"
+  },
+  "admin": {
+    "title": "Administration",
+    "stats": {
+      "users": "Utilisateurs",
+      "studies": "Examens",
+      "images": "Images",
+      "onDisk": "Sur le disque"
+    },
+    "accounts": "Comptes",
+    "columns": {
+      "email": "Adresse e-mail",
+      "slug": "Dossier de stockage",
+      "role": "Rôle",
+      "status": "État"
+    },
+    "you": "(vous)",
+    "roleAdmin": "Admin",
+    "roleUser": "Utilisateur",
+    "active": "Actif",
+    "disabled": "Désactivé",
+    "toggleAdmin": "Basculer le rôle administrateur",
+    "cannotChangeOwnRole": "Vous ne pouvez pas modifier votre propre rôle",
+    "cannotDeleteSelf": "Vous ne pouvez pas vous supprimer vous-même",
+    "deleteUser": "Supprimer cet utilisateur et tous ses examens",
+    "deleteUserConfirm": "Supprimer {{email}} ?\n\nCela supprime également du disque tous les examens qu'il a importés. Cette action est irréversible."
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "back": "Volver a la lista de estudios",
+  "tools": {
+    "windowLevel": {
+      "label": "Ventana/Nivel",
+      "hint": "Arrastre para ajustar el brillo y el contraste",
+      "key": "v"
+    },
+    "pan": {
+      "label": "Desplazar",
+      "hint": "Arrastre para mover la imagen",
+      "key": "d"
+    },
+    "zoom": {
+      "label": "Zoom",
+      "hint": "Arrastre para hacer zoom",
+      "key": "z"
+    },
+    "length": {
+      "label": "Longitud",
+      "hint": "Medir una distancia en mm",
+      "key": "l"
+    },
+    "angle": {
+      "label": "Ángulo",
+      "hint": "Medir un ángulo",
+      "key": "a"
+    },
+    "rectangleRoi": {
+      "label": "ROI rectangular",
+      "hint": "Estadísticas de la región (media, mín, máx, DE)",
+      "key": "r"
+    },
+    "ellipseRoi": {
+      "label": "ROI elíptica",
+      "hint": "Estadísticas de la región (media, mín, máx, DE)",
+      "key": "e"
+    },
+    "probe": {
+      "label": "Sonda",
+      "hint": "Leer el valor en un punto",
+      "key": "s"
+    },
+    "eraser": {
+      "label": "Borrar",
+      "hint": "Eliminar una medición",
+      "key": "x"
+    }
+  },
+  "toolbar": {
+    "presets": "Ventanas",
+    "presetsCtOnly": "Ventanas predefinidas",
+    "presetsDisabled": "Las ventanas predefinidas solo existen para TC",
+    "layout": "Distribución de las vistas",
+    "invert": "Invertir la escala de grises",
+    "rotate": "Girar 90°",
+    "flipH": "Voltear horizontalmente",
+    "flipV": "Voltear verticalmente",
+    "reset": "Restablecer la vista",
+    "screenshot": "Guardar como PNG",
+    "measurements": "Mediciones",
+    "tags": "Etiquetas DICOM"
+  },
+  "presets": {
+    "soft": "Partes blandas",
+    "lung": "Parénquima pulmonar",
+    "bone": "Hueso",
+    "brain": "Cerebro",
+    "abdomen": "Abdomen",
+    "liver": "Hígado",
+    "mediastinum": "Mediastino",
+    "angio": "Angio"
+  },
+  "overlay": {
+    "zoom": "Zoom"
+  },
+  "series": {
+    "title": "Series",
+    "dragHint": "{{name}} — arrastre sobre una vista",
+    "notViewable": "Esta serie no tiene imágenes visualizables (informe o registro de dosis)",
+    "mprCapable": "Se puede reconstruir en 3 planos (MPR)",
+    "fallbackName": "Serie"
+  },
+  "viewport": {
+    "dropHere": "Arrastre aquí una serie",
+    "releaseToLoad": "Suelte para cargar",
+    "loadFailed": "No se pudo cargar esta serie",
+    "noImages": "Esta serie no tiene imágenes visualizables",
+    "metadataFailed": "No se pudieron cargar los metadatos de la serie ({{status}})"
+  },
+  "mpr": {
+    "enter": "Reconstruir en 3 planos ({{count}} cortes)",
+    "leave": "Salir de MPR",
+    "needSeries": "Cargue primero una serie",
+    "notReconstructable": "Esta serie no es una pila 3D regular (pocos cortes, orientaciones mezcladas o espaciado irregular)",
+    "tooLarge": "Demasiado grande para reconstruir ({{count}} cortes)",
+    "backTo2d": "Volver a 2D",
+    "title": "Reconstrucción multiplanar",
+    "building": "Construyendo el volumen a partir de {{count}} cortes…",
+    "planes": {
+      "axial": "Axial",
+      "sagittal": "Sagital",
+      "coronal": "Coronal"
+    },
+    "summary": "{{name}} · {{count}} cortes separados {{spacing}} mm",
+    "summaryNoSpacing": "{{name}} · {{count}} cortes",
+    "excluded_one": "({{count}} imagen de referencia fuera de plano excluida)",
+    "excluded_many": "({{count}} imágenes de referencia fuera de plano excluidas)",
+    "excluded_other": "({{count}} imágenes de referencia fuera de plano excluidas)",
+    "hints": {
+      "referenceLine": "Arrastre una línea de referencia para desplazar los otros dos planos.",
+      "crosshair": "Arrastre el tirador central para mover la cruz.",
+      "mouse": "Arrastre con el botón derecho para hacer zoom, con el central para desplazar, y use la rueda para pasar cortes."
+    },
+    "notEnoughSlices": "No hay suficientes cortes en un mismo plano para reconstruir",
+    "failed": "No se pudo reconstruir esta serie"
+  },
+  "measurements": {
+    "title": "Mediciones",
+    "empty": "Todavía no hay mediciones. Elija Longitud, Ángulo, una ROI o la Sonda en la barra de herramientas y arrastre sobre la imagen.",
+    "delete": "Eliminar esta medición",
+    "tools": {
+      "Length": "Longitud",
+      "Angle": "Ángulo",
+      "RectangleROI": "ROI rect.",
+      "EllipticalROI": "ROI elípt.",
+      "Probe": "Sonda"
+    },
+    "stats": {
+      "length": "longitud",
+      "angle": "ángulo",
+      "mean": "media",
+      "SD": "DE",
+      "min": "mín",
+      "max": "máx",
+      "area": "área",
+      "value": "valor"
+    },
+    "obliqueUnsupported": "Área: plano oblicuo no admitido"
+  },
+  "tags": {
+    "title": "Etiquetas DICOM",
+    "filter": "Filtrar por etiqueta, nombre o valor",
+    "noSeries": "Cargue una serie para inspeccionar su cabecera.",
+    "noMatch": "No hay etiquetas que coincidan."
+  },
+  "screenshotFailed": "No se pudo guardar la imagen"
+}

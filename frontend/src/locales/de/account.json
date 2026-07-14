@@ -1,0 +1,84 @@
+{
+  "title": "Konto und Sicherheit",
+  "profile": {
+    "title": "Avatar",
+    "description": "Aus Ihren Initialen erzeugt. Wählen Sie eine Farbe und einen Stil, oder nutzen Sie Ihren Gravatar.",
+    "colour": "Farbe",
+    "style": "Stil",
+    "styles": {
+      "solid": "Einfarbig",
+      "ring": "Ring",
+      "gradient": "Verlauf",
+      "pattern": "Muster"
+    },
+    "gravatar": {
+      "label": "Stattdessen meinen Gravatar verwenden",
+      "warning": "Dabei wird ein Hash Ihrer E-Mail-Adresse an <1>gravatar.com</1> gesendet und Ihre IP-Adresse dort offengelegt. Ihre Aufnahmen verlassen diesen Server nie — dies hier schon. Ausgeschaltet stellt DICOMium überhaupt keine Anfragen an Dritte."
+    },
+    "failed": "Das hat nicht funktioniert"
+  },
+  "language": {
+    "title": "Sprache",
+    "description": "Die Sprache der Oberfläche. Messwerte und Datumsangaben richten sich ebenfalls danach.",
+    "auto": "Browsersprache verwenden"
+  },
+  "passkeys": {
+    "title": "Passkeys",
+    "description": "Melden Sie sich mit Fingerabdruck, Gesicht oder Geräte-PIN an — ohne Passwort, ohne Code. Ein Passkey ist bereits zweifaktorig: das Gerät in Ihrer Hand und die Biometrie, die es entsperrt.",
+    "add": "Passkey hinzufügen",
+    "waiting": "Warten auf Ihr Gerät…",
+    "nameLabel": "Diesen Passkey benennen",
+    "nameHint": "Damit Sie ihn später von Ihren anderen unterscheiden können.",
+    "rename": "Diesen Passkey umbenennen",
+    "remove": "Diesen Passkey entfernen",
+    "removeConfirm": "„{{name}}“ entfernen?",
+    "backedUp": "Mit einem Cloud-Schlüsselbund synchronisiert — er übersteht den Verlust dieses Geräts",
+    "added": "Hinzugefügt am {{date}}",
+    "lastUsed": "zuletzt verwendet am {{date}}",
+    "neverUsed": "nie verwendet",
+    "addFailed": "Dieser Passkey konnte nicht hinzugefügt werden",
+    "renameFailed": "Dieser Passkey konnte nicht umbenannt werden",
+    "unsupported": "Passkeys benötigen eine sichere Verbindung. Nutzen Sie HTTPS oder localhost.",
+    "unsupportedFallback": "Die Anmeldung per Passwort und die Authenticator-App funktionieren weiterhin.",
+    "devices": {
+      "android": "Android-Telefon",
+      "windows": "Windows-PC",
+      "linux": "Linux-PC",
+      "generic": "Dieses Gerät"
+    }
+  },
+  "totp": {
+    "title": "Authenticator-App",
+    "description": "Ein 6-stelliger Code aus einer App wie Aegis, 1Password oder Google Authenticator, der nach Ihrem Passwort abgefragt wird.",
+    "setUp": "Einrichten",
+    "enabled": "Aktiviert",
+    "turnOff": "Deaktivieren",
+    "turnOffConfirm": "Zwei-Faktor-Authentifizierung deaktivieren?",
+    "turnOffHint": "Ihre Wiederherstellungscodes werden dabei ebenfalls ungültig.",
+    "scanHint": "Scannen Sie dies mit Ihrer Authenticator-App und geben Sie dann den angezeigten Code ein.",
+    "manualHint": "Oder geben Sie diesen Schlüssel von Hand ein:",
+    "qrAlt": "QR-Code für Ihre Authenticator-App",
+    "codeLabel": "Code aus der App",
+    "confirm": "Bestätigen"
+  },
+  "recovery": {
+    "title": "Wiederherstellungscodes",
+    "description": "Einmal-Codes für die Anmeldung, wenn Ihre Authenticator-App nicht zur Hand ist.",
+    "remaining_one": "{{count}} Code übrig",
+    "remaining_other": "{{count}} Codes übrig",
+    "runningLow": "erzeugen Sie bald einen neuen Satz",
+    "generate": "Neue Codes erzeugen",
+    "generateConfirm": "Einen neuen Satz Wiederherstellungscodes erzeugen?",
+    "generateHint": "Ihre bisherigen Codes werden sofort ungültig.",
+    "saveTitle": "Speichern Sie Ihre Wiederherstellungscodes",
+    "saveBody": "Diese werden nur <1>einmal</1> angezeigt. Jeder funktioniert genau einmal. Wenn Sie Ihre Authenticator-App verlieren und keinen Code mehr haben, können Sie sich nicht mehr anmelden.",
+    "acknowledge": "Ich habe diese Codes sicher gespeichert",
+    "fileName": "dicomium-wiederherstellungscodes.txt",
+    "fileHeading": "DICOMium-Wiederherstellungscodes",
+    "fileBody": "Jeder Code funktioniert genau einmal. Bewahren Sie sie sicher und offline auf — sie sind der einzige Weg zurück, wenn Sie Ihre Authenticator-App verlieren."
+  },
+  "confirm": {
+    "password": "Bestätigen Sie Ihr Passwort",
+    "incorrect": "Falsches Passwort"
+  }
+}

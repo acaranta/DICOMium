@@ -1,0 +1,85 @@
+{
+  "title": "Compte et sécurité",
+  "profile": {
+    "title": "Avatar",
+    "description": "Généré à partir de vos initiales. Choisissez une couleur et un style, ou utilisez votre Gravatar.",
+    "colour": "Couleur",
+    "style": "Style",
+    "styles": {
+      "solid": "Uni",
+      "ring": "Anneau",
+      "gradient": "Dégradé",
+      "pattern": "Motif"
+    },
+    "gravatar": {
+      "label": "Utiliser plutôt mon Gravatar",
+      "warning": "Cela envoie une empreinte de votre adresse e-mail à <1>gravatar.com</1> et leur révèle votre adresse IP. Vos examens, eux, ne quittent jamais ce serveur — mais ceci, si. Désactivé, DICOMium n'effectue aucune requête vers un tiers."
+    },
+    "failed": "Cela n'a pas fonctionné"
+  },
+  "language": {
+    "title": "Langue",
+    "description": "La langue de l'interface. Les mesures et les dates la suivent également.",
+    "auto": "Suivre mon navigateur"
+  },
+  "passkeys": {
+    "title": "Clés d'accès",
+    "description": "Connectez-vous avec votre empreinte, votre visage ou le code de votre appareil — sans mot de passe ni code à saisir. Une clé d'accès est déjà à deux facteurs : l'appareil que vous détenez, et la biométrie qui le déverrouille.",
+    "add": "Ajouter une clé d'accès",
+    "waiting": "En attente de votre appareil…",
+    "nameLabel": "Nommez cette clé d'accès",
+    "nameHint": "Pour la distinguer des autres plus tard.",
+    "rename": "Renommer cette clé d'accès",
+    "remove": "Retirer cette clé d'accès",
+    "removeConfirm": "Retirer « {{name}} » ?",
+    "backedUp": "Synchronisée avec un trousseau cloud — elle survivra à la perte de cet appareil",
+    "added": "Ajoutée le {{date}}",
+    "lastUsed": "utilisée le {{date}}",
+    "neverUsed": "jamais utilisée",
+    "addFailed": "Impossible d'ajouter cette clé d'accès",
+    "renameFailed": "Impossible de renommer cette clé d'accès",
+    "unsupported": "Les clés d'accès exigent une connexion sécurisée. Servez le site en HTTPS, ou utilisez localhost.",
+    "unsupportedFallback": "La connexion par mot de passe et l'application d'authentification fonctionnent normalement.",
+    "devices": {
+      "android": "Téléphone Android",
+      "windows": "PC Windows",
+      "linux": "PC Linux",
+      "generic": "Cet appareil"
+    }
+  },
+  "totp": {
+    "title": "Application d'authentification",
+    "description": "Un code à 6 chiffres issu d'une application comme Aegis, 1Password ou Google Authenticator, demandé après votre mot de passe.",
+    "setUp": "Configurer",
+    "enabled": "Activée",
+    "turnOff": "Désactiver",
+    "turnOffConfirm": "Désactiver l'authentification à deux facteurs ?",
+    "turnOffHint": "Vos codes de secours seront révoqués en même temps.",
+    "scanHint": "Scannez ceci avec votre application d'authentification, puis saisissez le code affiché.",
+    "manualHint": "Ou saisissez cette clé à la main :",
+    "qrAlt": "QR code pour votre application d'authentification",
+    "codeLabel": "Code de l'application",
+    "confirm": "Confirmer"
+  },
+  "recovery": {
+    "title": "Codes de secours",
+    "description": "Des codes à usage unique pour vous connecter quand votre application d'authentification n'est pas à portée de main.",
+    "remaining_one": "{{count}} code restant",
+    "remaining_many": "{{count}} codes restants",
+    "remaining_other": "{{count}} codes restants",
+    "runningLow": "générez-en une nouvelle série bientôt",
+    "generate": "Générer de nouveaux codes",
+    "generateConfirm": "Générer une nouvelle série de codes de secours ?",
+    "generateHint": "Vos codes actuels cesseront immédiatement de fonctionner.",
+    "saveTitle": "Enregistrez vos codes de secours",
+    "saveBody": "Ils ne s'affichent qu'<1>une seule fois</1>. Chacun ne fonctionne qu'une fois. Si vous perdez votre application d'authentification et qu'il ne vous reste aucun code, vous ne pourrez plus vous connecter.",
+    "acknowledge": "J'ai enregistré ces codes en lieu sûr",
+    "fileName": "dicomium-codes-de-secours.txt",
+    "fileHeading": "Codes de secours DICOMium",
+    "fileBody": "Chaque code ne fonctionne qu'une fois. Conservez-les en lieu sûr et hors ligne — ils sont le seul moyen de revenir si vous perdez votre application d'authentification."
+  },
+  "confirm": {
+    "password": "Confirmez votre mot de passe",
+    "incorrect": "Mot de passe incorrect"
+  }
+}

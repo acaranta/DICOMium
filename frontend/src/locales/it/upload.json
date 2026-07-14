@@ -1,0 +1,37 @@
+{
+  "dropzone": {
+    "prompt": "Trascina qui un esame, oppure <1>sfoglia</1>",
+    "hint": "Un archivio ZIP o TAR di un CD/DVD masterizzato, una cartella o singoli file DICOM. L'estensione non serve — il server legge le intestazioni. I visualizzatori inclusi e i PDF vengono ignorati automaticamente.",
+    "uploading": "Caricamento… {{percent}} %",
+    "failed": "Caricamento non riuscito"
+  },
+  "job": {
+    "fallbackName": "Caricamento",
+    "andMore": "+{{count}} altri",
+    "progress": "{{processed}} / {{total}} file",
+    "phase": {
+      "pending": "In coda",
+      "receiving": "Ricezione",
+      "extracting": "Estrazione dell'archivio",
+      "scanning": "Ricerca dei file DICOM",
+      "importing": "Importazione",
+      "finalizing": "Creazione delle anteprime"
+    },
+    "result": {
+      "imported_one": "{{count}} immagine importata",
+      "imported_many": "{{count}} immagini importate",
+      "imported_other": "{{count}} immagini importate",
+      "duplicates_one": "{{count}} già presente",
+      "duplicates_many": "{{count}} già presenti",
+      "duplicates_other": "{{count}} già presenti",
+      "skipped_one": "{{count}} file non DICOM ignorato",
+      "skipped_many": "{{count}} file non DICOM ignorati",
+      "skipped_other": "{{count}} file non DICOM ignorati"
+    },
+    "errors_one": "{{count}} file non è stato importato",
+    "errors_many": "{{count}} file non sono stati importati",
+    "errors_other": "{{count}} file non sono stati importati",
+    "andMoreErrors": "…e altri {{count}}",
+    "cancelled": "Annullato"
+  }
+}

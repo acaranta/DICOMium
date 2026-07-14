@@ -1,15 +1,51 @@
 {
   "back": "Back to the study list",
   "tools": {
-    "windowLevel": { "label": "Window/Level", "hint": "Drag to adjust brightness & contrast", "key": "w" },
-    "pan": { "label": "Pan", "hint": "Drag to move the image", "key": "p" },
-    "zoom": { "label": "Zoom", "hint": "Drag to zoom", "key": "z" },
-    "length": { "label": "Length", "hint": "Measure a distance in mm", "key": "l" },
-    "angle": { "label": "Angle", "hint": "Measure an angle", "key": "a" },
-    "rectangleRoi": { "label": "Rectangle ROI", "hint": "Region statistics (mean, min, max, SD)", "key": "r" },
-    "ellipseRoi": { "label": "Ellipse ROI", "hint": "Region statistics (mean, min, max, SD)", "key": "e" },
-    "probe": { "label": "Probe", "hint": "Read the value at a point", "key": "b" },
-    "eraser": { "label": "Erase", "hint": "Delete a measurement", "key": "x" }
+    "windowLevel": {
+      "label": "Window/Level",
+      "hint": "Drag to adjust brightness & contrast",
+      "key": "w"
+    },
+    "pan": {
+      "label": "Pan",
+      "hint": "Drag to move the image",
+      "key": "p"
+    },
+    "zoom": {
+      "label": "Zoom",
+      "hint": "Drag to zoom",
+      "key": "z"
+    },
+    "length": {
+      "label": "Length",
+      "hint": "Measure a distance in mm",
+      "key": "l"
+    },
+    "angle": {
+      "label": "Angle",
+      "hint": "Measure an angle",
+      "key": "a"
+    },
+    "rectangleRoi": {
+      "label": "Rectangle ROI",
+      "hint": "Region statistics (mean, min, max, SD)",
+      "key": "r"
+    },
+    "ellipseRoi": {
+      "label": "Ellipse ROI",
+      "hint": "Region statistics (mean, min, max, SD)",
+      "key": "e"
+    },
+    "probe": {
+      "label": "Probe",
+      "hint": "Read the value at a point",
+      "key": "b"
+    },
+    "eraser": {
+      "label": "Erase",
+      "hint": "Delete a measurement",
+      "key": "x"
+    }
   },
   "toolbar": {
     "presets": "Presets",
@@ -98,7 +134,8 @@
       "max": "max",
       "area": "area",
       "value": "value"
-    }
+    },
+    "obliqueUnsupported": "Area: oblique not supported"
   },
   "tags": {
     "title": "DICOM tags",

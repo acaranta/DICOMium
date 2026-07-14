@@ -1,0 +1,148 @@
+{
+  "back": "Retour à la liste des examens",
+  "tools": {
+    "windowLevel": {
+      "label": "Fenêtrage",
+      "hint": "Faites glisser pour régler la luminosité et le contraste",
+      "key": "f"
+    },
+    "pan": {
+      "label": "Déplacer",
+      "hint": "Faites glisser pour déplacer l'image",
+      "key": "d"
+    },
+    "zoom": {
+      "label": "Zoom",
+      "hint": "Faites glisser pour zoomer",
+      "key": "z"
+    },
+    "length": {
+      "label": "Longueur",
+      "hint": "Mesurer une distance en mm",
+      "key": "l"
+    },
+    "angle": {
+      "label": "Angle",
+      "hint": "Mesurer un angle",
+      "key": "a"
+    },
+    "rectangleRoi": {
+      "label": "ROI rectangulaire",
+      "hint": "Statistiques de la région (moyenne, min, max, écart-type)",
+      "key": "r"
+    },
+    "ellipseRoi": {
+      "label": "ROI elliptique",
+      "hint": "Statistiques de la région (moyenne, min, max, écart-type)",
+      "key": "e"
+    },
+    "probe": {
+      "label": "Sonde",
+      "hint": "Lire la valeur en un point",
+      "key": "s"
+    },
+    "eraser": {
+      "label": "Effacer",
+      "hint": "Supprimer une mesure",
+      "key": "x"
+    }
+  },
+  "toolbar": {
+    "presets": "Fenêtres",
+    "presetsCtOnly": "Fenêtres prédéfinies",
+    "presetsDisabled": "Les fenêtres prédéfinies ne concernent que le scanner (CT)",
+    "layout": "Disposition des vues",
+    "invert": "Inverser les niveaux de gris",
+    "rotate": "Pivoter de 90°",
+    "flipH": "Miroir horizontal",
+    "flipV": "Miroir vertical",
+    "reset": "Réinitialiser la vue",
+    "screenshot": "Enregistrer en PNG",
+    "measurements": "Mesures",
+    "tags": "Balises DICOM"
+  },
+  "presets": {
+    "soft": "Parties molles",
+    "lung": "Parenchyme pulmonaire",
+    "bone": "Os",
+    "brain": "Cerveau",
+    "abdomen": "Abdomen",
+    "liver": "Foie",
+    "mediastinum": "Médiastin",
+    "angio": "Angio"
+  },
+  "overlay": {
+    "zoom": "Zoom"
+  },
+  "series": {
+    "title": "Séries",
+    "dragHint": "{{name}} — faites glisser sur une vue",
+    "notViewable": "Cette série ne contient aucune image affichable (compte rendu ou rapport de dose)",
+    "mprCapable": "Reconstructible dans les 3 plans (MPR)",
+    "fallbackName": "Série"
+  },
+  "viewport": {
+    "dropHere": "Faites glisser une série ici",
+    "releaseToLoad": "Relâchez pour charger",
+    "loadFailed": "Impossible de charger cette série",
+    "noImages": "Cette série ne contient aucune image affichable",
+    "metadataFailed": "Impossible de charger les métadonnées de la série ({{status}})"
+  },
+  "mpr": {
+    "enter": "Reconstruire dans les 3 plans ({{count}} coupes)",
+    "leave": "Quitter le mode MPR",
+    "needSeries": "Chargez d'abord une série",
+    "notReconstructable": "Cette série n'est pas une pile 3D régulière (trop peu de coupes, orientations mélangées ou espacement irrégulier)",
+    "tooLarge": "Trop volumineuse pour être reconstruite ({{count}} coupes)",
+    "backTo2d": "Retour en 2D",
+    "title": "Reconstruction multiplanaire",
+    "building": "Construction du volume à partir de {{count}} coupes…",
+    "planes": {
+      "axial": "Axial",
+      "sagittal": "Sagittal",
+      "coronal": "Coronal"
+    },
+    "summary": "{{name}} · {{count}} coupes espacées de {{spacing}} mm",
+    "summaryNoSpacing": "{{name}} · {{count}} coupes",
+    "excluded_one": "({{count}} image de référence hors plan exclue)",
+    "excluded_many": "({{count}} images de référence hors plan exclues)",
+    "excluded_other": "({{count}} images de référence hors plan exclues)",
+    "hints": {
+      "referenceLine": "Faites glisser une ligne de référence pour faire défiler les deux autres plans.",
+      "crosshair": "Faites glisser la poignée centrale pour déplacer le réticule.",
+      "mouse": "Clic droit pour zoomer, clic du milieu pour déplacer, molette pour faire défiler."
+    },
+    "notEnoughSlices": "Trop peu de coupes dans un même plan pour reconstruire",
+    "failed": "Cette série n'a pas pu être reconstruite"
+  },
+  "measurements": {
+    "title": "Mesures",
+    "empty": "Aucune mesure. Choisissez Longueur, Angle, une ROI ou la Sonde dans la barre d'outils, puis faites glisser sur l'image.",
+    "delete": "Supprimer cette mesure",
+    "tools": {
+      "Length": "Longueur",
+      "Angle": "Angle",
+      "RectangleROI": "ROI rect.",
+      "EllipticalROI": "ROI ellipt.",
+      "Probe": "Sonde"
+    },
+    "stats": {
+      "length": "longueur",
+      "angle": "angle",
+      "mean": "moyenne",
+      "SD": "écart-type",
+      "min": "min",
+      "max": "max",
+      "area": "surface",
+      "value": "valeur"
+    },
+    "obliqueUnsupported": "Surface : plan oblique non pris en charge"
+  },
+  "tags": {
+    "title": "Balises DICOM",
+    "filter": "Filtrer par balise, nom ou valeur",
+    "noSeries": "Chargez une série pour inspecter son en-tête.",
+    "noMatch": "Aucune balise correspondante."
+  },
+  "screenshotFailed": "Impossible d'enregistrer l'image"
+}

@@ -1,0 +1,147 @@
+{
+  "back": "Zurück zur Untersuchungsliste",
+  "tools": {
+    "windowLevel": {
+      "label": "Fensterung",
+      "hint": "Ziehen, um Helligkeit und Kontrast anzupassen",
+      "key": "f"
+    },
+    "pan": {
+      "label": "Verschieben",
+      "hint": "Ziehen, um das Bild zu verschieben",
+      "key": "v"
+    },
+    "zoom": {
+      "label": "Zoom",
+      "hint": "Ziehen, um zu zoomen",
+      "key": "z"
+    },
+    "length": {
+      "label": "Länge",
+      "hint": "Eine Strecke in mm messen",
+      "key": "l"
+    },
+    "angle": {
+      "label": "Winkel",
+      "hint": "Einen Winkel messen",
+      "key": "w"
+    },
+    "rectangleRoi": {
+      "label": "Rechteck-ROI",
+      "hint": "Regionsstatistik (Mittelwert, Min, Max, SD)",
+      "key": "r"
+    },
+    "ellipseRoi": {
+      "label": "Ellipsen-ROI",
+      "hint": "Regionsstatistik (Mittelwert, Min, Max, SD)",
+      "key": "e"
+    },
+    "probe": {
+      "label": "Punktwert",
+      "hint": "Den Wert an einem Punkt ablesen",
+      "key": "p"
+    },
+    "eraser": {
+      "label": "Löschen",
+      "hint": "Eine Messung entfernen",
+      "key": "x"
+    }
+  },
+  "toolbar": {
+    "presets": "Fenster",
+    "presetsCtOnly": "Fenster-Voreinstellungen",
+    "presetsDisabled": "Fenster-Voreinstellungen gibt es nur für CT",
+    "layout": "Anordnung der Ansichten",
+    "invert": "Graustufen invertieren",
+    "rotate": "Um 90° drehen",
+    "flipH": "Horizontal spiegeln",
+    "flipV": "Vertikal spiegeln",
+    "reset": "Ansicht zurücksetzen",
+    "screenshot": "Als PNG speichern",
+    "measurements": "Messungen",
+    "tags": "DICOM-Tags"
+  },
+  "presets": {
+    "soft": "Weichteile",
+    "lung": "Lunge",
+    "bone": "Knochen",
+    "brain": "Gehirn",
+    "abdomen": "Abdomen",
+    "liver": "Leber",
+    "mediastinum": "Mediastinum",
+    "angio": "Angio"
+  },
+  "overlay": {
+    "zoom": "Zoom"
+  },
+  "series": {
+    "title": "Serien",
+    "dragHint": "{{name}} — auf eine Ansicht ziehen",
+    "notViewable": "Diese Serie enthält keine darstellbaren Bilder (Befund oder Dosisbericht)",
+    "mprCapable": "In 3 Ebenen rekonstruierbar (MPR)",
+    "fallbackName": "Serie"
+  },
+  "viewport": {
+    "dropHere": "Eine Serie hierher ziehen",
+    "releaseToLoad": "Loslassen zum Laden",
+    "loadFailed": "Diese Serie konnte nicht geladen werden",
+    "noImages": "Diese Serie enthält keine darstellbaren Bilder",
+    "metadataFailed": "Die Metadaten der Serie konnten nicht geladen werden ({{status}})"
+  },
+  "mpr": {
+    "enter": "In 3 Ebenen rekonstruieren ({{count}} Schichten)",
+    "leave": "MPR verlassen",
+    "needSeries": "Laden Sie zuerst eine Serie",
+    "notReconstructable": "Diese Serie ist kein regelmäßiger 3D-Stapel (zu wenige Schichten, gemischte Orientierungen oder ungleichmäßige Abstände)",
+    "tooLarge": "Zu groß für eine Rekonstruktion ({{count}} Schichten)",
+    "backTo2d": "Zurück zu 2D",
+    "title": "Multiplanare Rekonstruktion",
+    "building": "Volumen wird aus {{count}} Schichten aufgebaut…",
+    "planes": {
+      "axial": "Axial",
+      "sagittal": "Sagittal",
+      "coronal": "Koronal"
+    },
+    "summary": "{{name}} · {{count}} Schichten mit {{spacing}} mm Abstand",
+    "summaryNoSpacing": "{{name}} · {{count}} Schichten",
+    "excluded_one": "({{count}} Referenzbild außerhalb der Ebene ausgeschlossen)",
+    "excluded_other": "({{count}} Referenzbilder außerhalb der Ebene ausgeschlossen)",
+    "hints": {
+      "referenceLine": "Ziehen Sie eine Referenzlinie, um die beiden anderen Ebenen zu durchblättern.",
+      "crosshair": "Ziehen Sie den mittleren Griff, um das Fadenkreuz zu bewegen.",
+      "mouse": "Rechte Maustaste zum Zoomen, mittlere zum Verschieben, Mausrad zum Blättern."
+    },
+    "notEnoughSlices": "Zu wenige Schichten in einer einzelnen Ebene für eine Rekonstruktion",
+    "failed": "Diese Serie konnte nicht rekonstruiert werden"
+  },
+  "measurements": {
+    "title": "Messungen",
+    "empty": "Noch keine Messungen. Wählen Sie Länge, Winkel, eine ROI oder Punktwert in der Werkzeugleiste und ziehen Sie auf dem Bild.",
+    "delete": "Diese Messung löschen",
+    "tools": {
+      "Length": "Länge",
+      "Angle": "Winkel",
+      "RectangleROI": "Rechteck-ROI",
+      "EllipticalROI": "Ellipsen-ROI",
+      "Probe": "Punktwert"
+    },
+    "stats": {
+      "length": "Länge",
+      "angle": "Winkel",
+      "mean": "Mittelwert",
+      "SD": "SD",
+      "min": "Min",
+      "max": "Max",
+      "area": "Fläche",
+      "value": "Wert"
+    },
+    "obliqueUnsupported": "Fläche: schräge Ebene nicht unterstützt"
+  },
+  "tags": {
+    "title": "DICOM-Tags",
+    "filter": "Nach Tag, Name oder Wert filtern",
+    "noSeries": "Laden Sie eine Serie, um ihren Header zu untersuchen.",
+    "noMatch": "Keine passenden Tags."
+  },
+  "screenshotFailed": "Das Bild konnte nicht gespeichert werden"
+}

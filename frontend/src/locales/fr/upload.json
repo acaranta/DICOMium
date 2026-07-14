@@ -1,0 +1,37 @@
+{
+  "dropzone": {
+    "prompt": "Déposez un examen ici, ou <1>parcourez</1>",
+    "hint": "Une archive ZIP ou TAR d'un CD/DVD gravé, un dossier, ou des fichiers DICOM isolés. L'extension importe peu — le serveur lit les en-têtes. Les visionneuses embarquées et les PDF sont ignorés automatiquement.",
+    "uploading": "Envoi… {{percent}} %",
+    "failed": "Échec de l'envoi"
+  },
+  "job": {
+    "fallbackName": "Import",
+    "andMore": "+{{count}} autres",
+    "progress": "{{processed}} / {{total}} fichiers",
+    "phase": {
+      "pending": "En file d'attente",
+      "receiving": "Réception",
+      "extracting": "Extraction de l'archive",
+      "scanning": "Recherche des fichiers DICOM",
+      "importing": "Import",
+      "finalizing": "Génération des vignettes"
+    },
+    "result": {
+      "imported_one": "{{count}} image importée",
+      "imported_many": "{{count}} images importées",
+      "imported_other": "{{count}} images importées",
+      "duplicates_one": "{{count}} déjà présente",
+      "duplicates_many": "{{count}} déjà présentes",
+      "duplicates_other": "{{count}} déjà présentes",
+      "skipped_one": "{{count}} fichier non-DICOM ignoré",
+      "skipped_many": "{{count}} fichiers non-DICOM ignorés",
+      "skipped_other": "{{count}} fichiers non-DICOM ignorés"
+    },
+    "errors_one": "{{count}} fichier n'a pas pu être importé",
+    "errors_many": "{{count}} fichiers n'ont pas pu être importés",
+    "errors_other": "{{count}} fichiers n'ont pas pu être importés",
+    "andMoreErrors": "…et {{count}} de plus",
+    "cancelled": "Annulé"
+  }
+}

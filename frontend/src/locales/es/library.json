@@ -1,0 +1,48 @@
+{
+  "title": "Estudios",
+  "count_one": "{{count}} estudio",
+  "count_many": "{{count}} estudios",
+  "count_other": "{{count}} estudios",
+  "search": "Paciente, identificador, descripción…",
+  "empty": "Todavía no hay estudios — suba uno arriba.",
+  "emptySearch": "Ningún estudio coincide con esa búsqueda.",
+  "columns": {
+    "patient": "Paciente",
+    "study": "Estudio",
+    "date": "Fecha",
+    "modality": "Modalidad",
+    "series": "Series",
+    "images": "Imágenes"
+  },
+  "delete": "Eliminar este estudio",
+  "deleteConfirm": "¿Eliminar del disco este estudio y sus {{count}} imágenes?\n\nEsta acción no se puede deshacer.",
+  "patient": {
+    "unknown": "Desconocido"
+  },
+  "admin": {
+    "title": "Administración",
+    "stats": {
+      "users": "Usuarios",
+      "studies": "Estudios",
+      "images": "Imágenes",
+      "onDisk": "En disco"
+    },
+    "accounts": "Cuentas",
+    "columns": {
+      "email": "Correo electrónico",
+      "slug": "Carpeta de almacenamiento",
+      "role": "Rol",
+      "status": "Estado"
+    },
+    "you": "(usted)",
+    "roleAdmin": "Admin",
+    "roleUser": "Usuario",
+    "active": "Activo",
+    "disabled": "Desactivado",
+    "toggleAdmin": "Cambiar el rol de administrador",
+    "cannotChangeOwnRole": "No puede cambiar su propio rol",
+    "cannotDeleteSelf": "No puede eliminarse a sí mismo",
+    "deleteUser": "Eliminar este usuario y todos sus estudios",
+    "deleteUserConfirm": "¿Eliminar a {{email}}?\n\nEsto también elimina del disco todos los estudios que haya subido. Esta acción no se puede deshacer."
+  }
+}

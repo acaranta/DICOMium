@@ -1,0 +1,99 @@
+{
+  "network": "Error de red",
+  "generic": {
+    "failed": "Algo ha salido mal"
+  },
+  "auth": {
+    "invalid_credentials": "Correo electrónico o contraseña incorrectos",
+    "account_disabled": "Esta cuenta está desactivada",
+    "not_authenticated": "No autenticado",
+    "admin_required": "Se requiere acceso de administrador",
+    "registration_disabled": "El registro está cerrado",
+    "email_taken": "Ese correo electrónico ya está registrado",
+    "mfa_expired": "Ese inicio de sesión ha caducado — vuelva a empezar",
+    "mfa_too_many": "Demasiados códigos incorrectos — vuelva a iniciar sesión",
+    "mfa_not_enrolled": "No hay ningún segundo factor configurado",
+    "incorrect_code": "Código incorrecto",
+    "code_reused": "Ese código ya se ha usado",
+    "code_length": "Un código tiene 6 dígitos",
+    "incorrect_password": "Contraseña incorrecta"
+  },
+  "passkey": {
+    "failed": "No se pudo usar esa clave de acceso",
+    "malformed": "Credencial mal formada",
+    "bad_origin": "No se pudo interpretar el origen de esta instancia",
+    "registration_expired": "Ese registro ha caducado — inténtelo de nuevo",
+    "registration_failed": "No se pudo registrar esa clave de acceso",
+    "authentication_expired": "Ese intento de inicio de sesión ha caducado — inténtelo de nuevo",
+    "unknown_credential": "Esa clave de acceso no está registrada aquí",
+    "verification_failed": "No se pudo verificar esa clave de acceso",
+    "possibly_cloned": "Esta clave de acceso podría haber sido clonada y se ha rechazado. Elimínela y registre una nueva.",
+    "not_found": "Clave de acceso no encontrada",
+    "insecure_context": "Las claves de acceso requieren HTTPS. Sirva DICOMium por HTTPS, o use localhost. El inicio de sesión con contraseña sigue funcionando.",
+    "no_origin": "No se pudo determinar el dominio de esta instancia. Defina WEBAUTHN_RP_ID y WEBAUTHN_ORIGIN de forma explícita.",
+    "cancelled": "cancelado",
+    "already_registered": "Esa clave de acceso ya está registrada en esta cuenta.",
+    "not_supported": "Este dispositivo no puede crear una clave de acceso.",
+    "browser_insecure": "Las claves de acceso necesitan una conexión segura. Esta página debe servirse por HTTPS (o ejecutarse en localhost).",
+    "unusable": "No se pudo usar la clave de acceso."
+  },
+  "totp": {
+    "already_enrolled": "Ya hay una aplicación de autenticación configurada. Quítela antes de registrar otra.",
+    "not_started": "Inicie primero la configuración",
+    "already_confirmed": "Esta aplicación de autenticación ya está confirmada",
+    "no_authenticator": "Los códigos de recuperación sirven para recuperar el acceso si pierde la aplicación de autenticación. Configure una primero."
+  },
+  "admin": {
+    "cannot_demote_self": "No puede degradarse ni desactivarse a sí mismo",
+    "last_admin": "No se puede degradar al último administrador",
+    "cannot_delete_self": "No puede eliminarse a sí mismo",
+    "user_not_found": "Usuario no encontrado"
+  },
+  "library": {
+    "study_not_found": "Estudio no encontrado",
+    "series_not_found": "Serie no encontrada",
+    "instance_not_found": "Imagen no encontrada",
+    "no_thumbnail": "Sin miniatura",
+    "file_missing": "Falta el archivo almacenado"
+  },
+  "upload": {
+    "no_files": "No se ha subido ningún archivo",
+    "too_large": "La subida supera el límite de {{limitMb}} MB",
+    "not_found": "Subida no encontrada",
+    "not_running": "Esa tarea ya no está en curso"
+  },
+  "ingest": {
+    "nothing_uploaded": "No se ha subido nada",
+    "no_dicom_found": "No se han encontrado archivos DICOM en la subida",
+    "nothing_imported": "No se ha podido importar nada",
+    "cancelled": "Cancelado",
+    "failed": "Error en la importación",
+    "archive_unsafe": "El archivo contiene una ruta insegura y se ha rechazado",
+    "archive_too_large": "El archivo supera el límite de tamaño al descomprimirse",
+    "archive_too_many": "El archivo contiene demasiados ficheros",
+    "archive_corrupt": "El archivo está dañado o no se puede leer",
+    "archive_unreadable": "No se ha podido leer el archivo",
+    "completed": "Importación completada",
+    "completed_with_errors": "Importado con errores",
+    "errorType": {
+      "MissingUID": "Falta el identificador DICOM",
+      "UnreadableDicom": "Archivo DICOM ilegible",
+      "BadPath": "Ruta de archivo insegura",
+      "IOError": "No se ha podido escribir en el disco",
+      "DecodeError": "No se ha podido decodificar la imagen"
+    }
+  },
+  "frame": {
+    "failed": "No se ha podido leer esa imagen",
+    "out_of_range": "Ese fotograma no existe",
+    "no_pixel_data": "Esta imagen no tiene datos de píxeles",
+    "undecodable": "No se ha podido decodificar esta imagen",
+    "malformed_list": "Lista de fotogramas mal formada",
+    "none_requested": "No se ha solicitado ningún fotograma",
+    "short": "Los datos de imagen almacenados están truncados",
+    "transcode_disabled": "Esta imagen necesita transcodificación, que está desactivada"
+  },
+  "validation": {
+    "failed": "Revise los datos que ha introducido"
+  }
+}

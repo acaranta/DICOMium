@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "DICOMium",
+    "tagline": "Medizinische Bildgebung · privat · selbst gehostet",
+    "description": "Ein privater, selbst gehosteter Betrachter für medizinische Bildgebung im Browser."
+  },
+  "action": {
+    "cancel": "Abbrechen",
+    "done": "Fertig",
+    "continue": "Weiter",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "remove": "Entfernen",
+    "back": "Zurück",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "download": "Herunterladen",
+    "browse": "durchsuchen",
+    "clearAll": "Alle entfernen"
+  },
+  "menu": {
+    "open": "Kontomenü",
+    "accountSecurity": "Konto und Sicherheit",
+    "administration": "Verwaltung",
+    "signOut": "Abmelden",
+    "language": "Sprache",
+    "roleAdmin": "Administrator",
+    "roleUser": "Benutzer"
+  },
+  "language": {
+    "auto": "Browsersprache verwenden"
+  },
+  "state": {
+    "loading": "Wird geladen…",
+    "never": "nie"
+  }
+}

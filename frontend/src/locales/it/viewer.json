@@ -1,0 +1,148 @@
+{
+  "back": "Torna all'elenco degli esami",
+  "tools": {
+    "windowLevel": {
+      "label": "Finestra/Livello",
+      "hint": "Trascina per regolare luminosità e contrasto",
+      "key": "f"
+    },
+    "pan": {
+      "label": "Muovi",
+      "hint": "Trascina per spostare l'immagine",
+      "key": "m"
+    },
+    "zoom": {
+      "label": "Zoom",
+      "hint": "Trascina per ingrandire",
+      "key": "z"
+    },
+    "length": {
+      "label": "Lunghezza",
+      "hint": "Misura una distanza in mm",
+      "key": "l"
+    },
+    "angle": {
+      "label": "Angolo",
+      "hint": "Misura un angolo",
+      "key": "a"
+    },
+    "rectangleRoi": {
+      "label": "ROI rettangolare",
+      "hint": "Statistiche della regione (media, min, max, DS)",
+      "key": "r"
+    },
+    "ellipseRoi": {
+      "label": "ROI ellittica",
+      "hint": "Statistiche della regione (media, min, max, DS)",
+      "key": "e"
+    },
+    "probe": {
+      "label": "Sonda",
+      "hint": "Leggi il valore in un punto",
+      "key": "s"
+    },
+    "eraser": {
+      "label": "Cancella",
+      "hint": "Elimina una misura",
+      "key": "x"
+    }
+  },
+  "toolbar": {
+    "presets": "Finestre",
+    "presetsCtOnly": "Finestre predefinite",
+    "presetsDisabled": "Le finestre predefinite esistono solo per la TC",
+    "layout": "Disposizione delle viste",
+    "invert": "Inverti la scala di grigi",
+    "rotate": "Ruota di 90°",
+    "flipH": "Rispecchia orizzontalmente",
+    "flipV": "Rispecchia verticalmente",
+    "reset": "Reimposta la vista",
+    "screenshot": "Salva come PNG",
+    "measurements": "Misure",
+    "tags": "Tag DICOM"
+  },
+  "presets": {
+    "soft": "Parti molli",
+    "lung": "Parenchima polmonare",
+    "bone": "Osso",
+    "brain": "Encefalo",
+    "abdomen": "Addome",
+    "liver": "Fegato",
+    "mediastinum": "Mediastino",
+    "angio": "Angio"
+  },
+  "overlay": {
+    "zoom": "Zoom"
+  },
+  "series": {
+    "title": "Serie",
+    "dragHint": "{{name}} — trascina su una vista",
+    "notViewable": "Questa serie non contiene immagini visualizzabili (referto o rapporto di dose)",
+    "mprCapable": "Ricostruibile nei 3 piani (MPR)",
+    "fallbackName": "Serie"
+  },
+  "viewport": {
+    "dropHere": "Trascina qui una serie",
+    "releaseToLoad": "Rilascia per caricare",
+    "loadFailed": "Impossibile caricare questa serie",
+    "noImages": "Questa serie non contiene immagini visualizzabili",
+    "metadataFailed": "Impossibile caricare i metadati della serie ({{status}})"
+  },
+  "mpr": {
+    "enter": "Ricostruisci nei 3 piani ({{count}} strati)",
+    "leave": "Esci dalla MPR",
+    "needSeries": "Carica prima una serie",
+    "notReconstructable": "Questa serie non è una pila 3D regolare (troppi pochi strati, orientamenti misti o spaziatura irregolare)",
+    "tooLarge": "Troppo grande per essere ricostruita ({{count}} strati)",
+    "backTo2d": "Torna al 2D",
+    "title": "Ricostruzione multiplanare",
+    "building": "Costruzione del volume da {{count}} strati…",
+    "planes": {
+      "axial": "Assiale",
+      "sagittal": "Sagittale",
+      "coronal": "Coronale"
+    },
+    "summary": "{{name}} · {{count}} strati distanziati di {{spacing}} mm",
+    "summaryNoSpacing": "{{name}} · {{count}} strati",
+    "excluded_one": "({{count}} immagine di riferimento fuori piano esclusa)",
+    "excluded_many": "({{count}} immagini di riferimento fuori piano escluse)",
+    "excluded_other": "({{count}} immagini di riferimento fuori piano escluse)",
+    "hints": {
+      "referenceLine": "Trascina una linea di riferimento per scorrere gli altri due piani.",
+      "crosshair": "Trascina la maniglia centrale per spostare il mirino.",
+      "mouse": "Trascina col tasto destro per ingrandire, col tasto centrale per spostare, usa la rotella per scorrere."
+    },
+    "notEnoughSlices": "Strati insufficienti su un singolo piano per la ricostruzione",
+    "failed": "Non è stato possibile ricostruire questa serie"
+  },
+  "measurements": {
+    "title": "Misure",
+    "empty": "Nessuna misura. Scegli Lunghezza, Angolo, una ROI o la Sonda nella barra degli strumenti e trascina sull'immagine.",
+    "delete": "Elimina questa misura",
+    "tools": {
+      "Length": "Lunghezza",
+      "Angle": "Angolo",
+      "RectangleROI": "ROI rett.",
+      "EllipticalROI": "ROI ellitt.",
+      "Probe": "Sonda"
+    },
+    "stats": {
+      "length": "lunghezza",
+      "angle": "angolo",
+      "mean": "media",
+      "SD": "DS",
+      "min": "min",
+      "max": "max",
+      "area": "area",
+      "value": "valore"
+    },
+    "obliqueUnsupported": "Area: piano obliquo non supportato"
+  },
+  "tags": {
+    "title": "Tag DICOM",
+    "filter": "Filtra per tag, nome o valore",
+    "noSeries": "Carica una serie per esaminarne l'intestazione.",
+    "noMatch": "Nessun tag corrispondente."
+  },
+  "screenshotFailed": "Impossibile salvare l'immagine"
+}

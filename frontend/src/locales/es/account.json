@@ -1,0 +1,85 @@
+{
+  "title": "Cuenta y seguridad",
+  "profile": {
+    "title": "Avatar",
+    "description": "Generado a partir de sus iniciales. Elija un color y un estilo, o use su Gravatar.",
+    "colour": "Color",
+    "style": "Estilo",
+    "styles": {
+      "solid": "Liso",
+      "ring": "Anillo",
+      "gradient": "Degradado",
+      "pattern": "Trama"
+    },
+    "gravatar": {
+      "label": "Usar mi Gravatar en su lugar",
+      "warning": "Esto envía un hash de su dirección de correo a <1>gravatar.com</1> y les revela su dirección IP. Sus imágenes nunca salen de este servidor — pero esto sí. Desactivado, DICOMium no hace ninguna petición a terceros."
+    },
+    "failed": "Eso no ha funcionado"
+  },
+  "language": {
+    "title": "Idioma",
+    "description": "El idioma de la interfaz. Las mediciones y las fechas también lo siguen.",
+    "auto": "Seguir mi navegador"
+  },
+  "passkeys": {
+    "title": "Claves de acceso",
+    "description": "Inicie sesión con su huella, su cara o el PIN del dispositivo — sin contraseña ni código. Una clave de acceso ya son dos factores: el dispositivo que tiene en la mano y la biometría que lo desbloquea.",
+    "add": "Añadir una clave de acceso",
+    "waiting": "Esperando su dispositivo…",
+    "nameLabel": "Ponga nombre a esta clave de acceso",
+    "nameHint": "Para distinguirla más adelante de las demás.",
+    "rename": "Renombrar esta clave de acceso",
+    "remove": "Quitar esta clave de acceso",
+    "removeConfirm": "¿Quitar «{{name}}»?",
+    "backedUp": "Sincronizada con un llavero en la nube — sobrevivirá a la pérdida de este dispositivo",
+    "added": "Añadida el {{date}}",
+    "lastUsed": "usada por última vez el {{date}}",
+    "neverUsed": "nunca usada",
+    "addFailed": "No se pudo añadir esa clave de acceso",
+    "renameFailed": "No se pudo renombrar esa clave de acceso",
+    "unsupported": "Las claves de acceso necesitan una conexión segura. Sirva esto por HTTPS, o use localhost.",
+    "unsupportedFallback": "El inicio de sesión con contraseña y la aplicación de autenticación siguen funcionando con normalidad.",
+    "devices": {
+      "android": "Teléfono Android",
+      "windows": "PC con Windows",
+      "linux": "PC con Linux",
+      "generic": "Este dispositivo"
+    }
+  },
+  "totp": {
+    "title": "Aplicación de autenticación",
+    "description": "Un código de 6 dígitos de una aplicación como Aegis, 1Password o Google Authenticator, que se pide después de su contraseña.",
+    "setUp": "Configurar",
+    "enabled": "Activada",
+    "turnOff": "Desactivar",
+    "turnOffConfirm": "¿Desactivar la autenticación en dos pasos?",
+    "turnOffHint": "Sus códigos de recuperación se revocarán al mismo tiempo.",
+    "scanHint": "Escanee esto con su aplicación de autenticación y luego introduzca el código que muestre.",
+    "manualHint": "O introduzca esta clave a mano:",
+    "qrAlt": "Código QR para su aplicación de autenticación",
+    "codeLabel": "Código de la aplicación",
+    "confirm": "Confirmar"
+  },
+  "recovery": {
+    "title": "Códigos de recuperación",
+    "description": "Códigos de un solo uso para iniciar sesión cuando no tenga a mano su aplicación de autenticación.",
+    "remaining_one": "Queda {{count}} código",
+    "remaining_many": "Quedan {{count}} códigos",
+    "remaining_other": "Quedan {{count}} códigos",
+    "runningLow": "genere pronto un conjunto nuevo",
+    "generate": "Generar códigos nuevos",
+    "generateConfirm": "¿Generar un conjunto nuevo de códigos de recuperación?",
+    "generateHint": "Sus códigos actuales dejarán de funcionar de inmediato.",
+    "saveTitle": "Guarde sus códigos de recuperación",
+    "saveBody": "Se muestran <1>una sola vez</1>. Cada uno funciona una única vez. Si pierde su aplicación de autenticación y no le queda ningún código, no podrá iniciar sesión.",
+    "acknowledge": "He guardado estos códigos en un lugar seguro",
+    "fileName": "dicomium-codigos-de-recuperacion.txt",
+    "fileHeading": "Códigos de recuperación de DICOMium",
+    "fileBody": "Cada código funciona una sola vez. Guárdelos en un lugar seguro y sin conexión — son la única forma de volver a entrar si pierde su aplicación de autenticación."
+  },
+  "confirm": {
+    "password": "Confirme su contraseña",
+    "incorrect": "Contraseña incorrecta"
+  }
+}

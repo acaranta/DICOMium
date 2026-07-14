@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "DICOMium",
+    "tagline": "Imagen médica · privada · autoalojada",
+    "description": "Un visor de imagen médica privado y autoalojado, en el navegador."
+  },
+  "action": {
+    "cancel": "Cancelar",
+    "done": "Hecho",
+    "continue": "Continuar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "remove": "Quitar",
+    "back": "Volver",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "download": "Descargar",
+    "browse": "explorar",
+    "clearAll": "Borrar todo"
+  },
+  "menu": {
+    "open": "Menú de la cuenta",
+    "accountSecurity": "Cuenta y seguridad",
+    "administration": "Administración",
+    "signOut": "Cerrar sesión",
+    "language": "Idioma",
+    "roleAdmin": "Administrador",
+    "roleUser": "Usuario"
+  },
+  "language": {
+    "auto": "Seguir mi navegador"
+  },
+  "state": {
+    "loading": "Cargando…",
+    "never": "nunca"
+  }
+}

@@ -14,6 +14,7 @@
 import { Enums, ToolGroupManager } from '@cornerstonejs/tools'
 import { CrosshairsTool } from '@cornerstonejs/tools'
 import { RENDERING_ENGINE_ID } from './init'
+import { ANNOTATION_TEXT_CONFIG } from './annotationText'
 import { ANNOTATION_TOOLS, TOOL_NAMES, type ToolId } from './tools'
 
 const { MouseBindings } = Enums
@@ -50,7 +51,11 @@ export function createStackToolGroup() {
   // of them to the primary button. Passive (not disabled) keeps existing annotations
   // rendered and editable while a different tool is selected.
   group.addTool(TOOL_NAMES.windowLevel)
-  for (const id of ANNOTATION_TOOLS) group.addTool(TOOL_NAMES[id])
+  // The text config is what keeps the labels drawn ON the image in the user's language;
+  // without it Cornerstone burns its own English "Area: … Mean: …" onto the scan.
+  for (const id of ANNOTATION_TOOLS) {
+    group.addTool(TOOL_NAMES[id], ANNOTATION_TEXT_CONFIG[TOOL_NAMES[id]])
+  }
   group.addTool(TOOL_NAMES.eraser)
 
   setActiveTool(STACK_TOOL_GROUP, 'windowLevel')
@@ -64,7 +69,11 @@ export function createMprToolGroup() {
 
   addBaseBindings(group)
   group.addTool(TOOL_NAMES.windowLevel)
-  for (const id of ANNOTATION_TOOLS) group.addTool(TOOL_NAMES[id])
+  // The text config is what keeps the labels drawn ON the image in the user's language;
+  // without it Cornerstone burns its own English "Area: … Mean: …" onto the scan.
+  for (const id of ANNOTATION_TOOLS) {
+    group.addTool(TOOL_NAMES[id], ANNOTATION_TEXT_CONFIG[TOOL_NAMES[id]])
+  }
   group.addTool(TOOL_NAMES.eraser)
 
   group.addTool(CrosshairsTool.toolName, {

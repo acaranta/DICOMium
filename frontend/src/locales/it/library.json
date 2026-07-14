@@ -1,0 +1,48 @@
+{
+  "title": "Esami",
+  "count_one": "{{count}} esame",
+  "count_many": "{{count}} esami",
+  "count_other": "{{count}} esami",
+  "search": "Paziente, identificativo, descrizione…",
+  "empty": "Nessun esame — caricane uno qui sopra.",
+  "emptySearch": "Nessun esame corrisponde a questa ricerca.",
+  "columns": {
+    "patient": "Paziente",
+    "study": "Esame",
+    "date": "Data",
+    "modality": "Modalità",
+    "series": "Serie",
+    "images": "Immagini"
+  },
+  "delete": "Elimina questo esame",
+  "deleteConfirm": "Eliminare dal disco questo esame e tutte le sue {{count}} immagini?\n\nQuesta azione è irreversibile.",
+  "patient": {
+    "unknown": "Sconosciuto"
+  },
+  "admin": {
+    "title": "Amministrazione",
+    "stats": {
+      "users": "Utenti",
+      "studies": "Esami",
+      "images": "Immagini",
+      "onDisk": "Su disco"
+    },
+    "accounts": "Account",
+    "columns": {
+      "email": "Indirizzo e-mail",
+      "slug": "Cartella di archiviazione",
+      "role": "Ruolo",
+      "status": "Stato"
+    },
+    "you": "(tu)",
+    "roleAdmin": "Admin",
+    "roleUser": "Utente",
+    "active": "Attivo",
+    "disabled": "Disattivato",
+    "toggleAdmin": "Attiva o disattiva il ruolo di amministratore",
+    "cannotChangeOwnRole": "Non puoi modificare il tuo stesso ruolo",
+    "cannotDeleteSelf": "Non puoi eliminare te stesso",
+    "deleteUser": "Elimina questo utente e tutti i suoi esami",
+    "deleteUserConfirm": "Eliminare {{email}}?\n\nQuesto elimina dal disco anche tutti gli esami che ha caricato. Questa azione è irreversibile."
+  }
+}

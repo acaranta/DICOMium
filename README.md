@@ -118,6 +118,26 @@ opt-in sits next to it, **off by default**: turning it on sends a hash of your e
 gravatar.com and reveals your IP to them. It's the one exception to "no data leaving your
 machine" at the top of this page — everything else genuinely makes zero third-party requests.
 
+**Languages** — English, French, German, Spanish and Italian, switchable from the user menu.
+It follows your browser until you choose, and the choice is stored on your account, so it
+survives a reload and follows you to another device.
+
+This is more than swapped strings. Numbers and dates go through `Intl`, so a length reads
+**`57,3 mm`** in French and **`57.3 mm`** in English — a decimal separator misread in a
+*measurement* is a real error, not a cosmetic one. The labels drawn onto the image are
+translated too, not just the panel beside them. Each language picks its own keyboard
+shortcuts, because `W` for *Window* means nothing once the tool is called *Fenêtrage*. And the
+window presets use the term a radiologist in that language actually says — French says
+*Parenchyme pulmonaire*, not a literal *Poumon*.
+
+Some things are deliberately **not** translated, and translating them would be worse than
+leaving them alone: modality codes (`CT`, `MR`, `SR`) and DICOM tag keywords are the standard's
+own identifiers; `HU` is an eponym and is `HU` in every language; `mm`, `mm²` and `°` are SI.
+
+> The clinical vocabulary was chosen carefully but has **not been reviewed by a native-speaking
+> radiologist**. If a preset or a measurement label reads wrong to you in your language, that is
+> worth an issue — see [the note on who wrote this](#who-actually-wrote-this).
+
 ## Roadmap
 
 Nothing below is promised on a date. It is an honest list of what is missing, roughly in the
@@ -127,8 +147,6 @@ order it is likely to be worth doing. Contributions and opinions on the ordering
 
 Small, visible gaps you notice within a few minutes of using it.
 
-- **Translations.** Every string is currently hardcoded English. French first, since that is
-  what the discs around here are printed in.
 - **Cine playback.** Multi-frame loops already load and scroll; they just have no play button
   yet.
 - **Touch and a responsive layout.** Today it assumes a mouse and a wide screen. Tablets are
@@ -137,6 +155,10 @@ Small, visible gaps you notice within a few minutes of using it.
   on CT — so MR and ultrasound get a greyed-out button and nothing else.
 - **Pagination in the study list.** The API already supports it; the interface does not, so a
   large library quietly stops at 100 studies.
+- **More languages, and a native review of the five that exist.** The machinery is done —
+  a new language is a directory of JSON under `frontend/src/locales/` and one line in
+  `lib/i18n.ts`. What it cannot supply is a radiologist who reads scans in that language and
+  can say whether the window presets are named the way they are named in the clinic.
 
 ### Getting your data back out
 
@@ -331,6 +353,29 @@ If port 8000 is taken, run the backend elsewhere and point the proxy at it:
 cd backend && uv run pytest      # tests
 cd frontend && npm run typecheck
 ```
+
+The schema is under Alembic. Changing a model means adding a migration
+(`uv run alembic revision --autogenerate -m "…"`) — and **check what it generates**: for a new
+column on a populated table it will happily emit `nullable=False` with no default, which fails
+on every database that already has rows in it. A database from before Alembic existed is
+adopted automatically on boot: it gets stamped at the baseline, then migrated forward.
+
+### Adding a language
+
+Copy `frontend/src/locales/en/` to a new two-letter directory, translate the JSON, and add the
+code to `LANGUAGES` and `LANGUAGE_NAMES` in [`lib/i18n.ts`](frontend/src/lib/i18n.ts) plus
+`INTL_LOCALE` in [`lib/format.ts`](frontend/src/lib/format.ts) (which maps a UI language to the
+regional locale `Intl` should use — `en` means `en-GB` here, not `en-US`). The backend accepts
+whatever is listed in `LANGUAGES` in `app/models/preferences.py`, so add it there too.
+
+Three things are worth getting right rather than translating literally:
+
+- **`viewer.json` → `presets`** are radiological terms, not words. Use what a radiologist in
+  that language says in the clinic.
+- **`viewer.json` → `tools.*.key`** are keyboard shortcuts. Pick a mnemonic that fits the
+  translated name, and keep the nine distinct.
+- **Units are not translated.** `HU`, `mm`, `mm²`, `°` stay as they are, and so do the modality
+  codes and DICOM tag keywords.
 
 ## A note on the tests
 

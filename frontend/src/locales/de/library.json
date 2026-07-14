@@ -1,0 +1,47 @@
+{
+  "title": "Untersuchungen",
+  "count_one": "{{count}} Untersuchung",
+  "count_other": "{{count}} Untersuchungen",
+  "search": "Patient, ID, Beschreibung…",
+  "empty": "Noch keine Untersuchungen — laden Sie oben eine hoch.",
+  "emptySearch": "Keine Untersuchung passt zu dieser Suche.",
+  "columns": {
+    "patient": "Patient",
+    "study": "Untersuchung",
+    "date": "Datum",
+    "modality": "Modalität",
+    "series": "Serien",
+    "images": "Bilder"
+  },
+  "delete": "Diese Untersuchung löschen",
+  "deleteConfirm": "Diese Untersuchung und alle {{count}} zugehörigen Bilder von der Festplatte löschen?\n\nDies kann nicht rückgängig gemacht werden.",
+  "patient": {
+    "unknown": "Unbekannt"
+  },
+  "admin": {
+    "title": "Verwaltung",
+    "stats": {
+      "users": "Benutzer",
+      "studies": "Untersuchungen",
+      "images": "Bilder",
+      "onDisk": "Auf der Festplatte"
+    },
+    "accounts": "Konten",
+    "columns": {
+      "email": "E-Mail-Adresse",
+      "slug": "Speicherordner",
+      "role": "Rolle",
+      "status": "Status"
+    },
+    "you": "(Sie)",
+    "roleAdmin": "Admin",
+    "roleUser": "Benutzer",
+    "active": "Aktiv",
+    "disabled": "Deaktiviert",
+    "toggleAdmin": "Administratorrolle umschalten",
+    "cannotChangeOwnRole": "Sie können Ihre eigene Rolle nicht ändern",
+    "cannotDeleteSelf": "Sie können sich nicht selbst löschen",
+    "deleteUser": "Diesen Benutzer und alle seine Untersuchungen löschen",
+    "deleteUserConfirm": "{{email}} löschen?\n\nDies löscht auch alle von diesem Benutzer hochgeladenen Untersuchungen von der Festplatte. Dies kann nicht rückgängig gemacht werden."
+  }
+}

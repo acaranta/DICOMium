@@ -1,0 +1,99 @@
+{
+  "network": "Errore di rete",
+  "generic": {
+    "failed": "Qualcosa è andato storto"
+  },
+  "auth": {
+    "invalid_credentials": "Indirizzo e-mail o password errati",
+    "account_disabled": "Questo account è disattivato",
+    "not_authenticated": "Non autenticato",
+    "admin_required": "È richiesto l'accesso da amministratore",
+    "registration_disabled": "Le registrazioni sono chiuse",
+    "email_taken": "Questo indirizzo e-mail è già registrato",
+    "mfa_expired": "Questo accesso è scaduto — ricomincia",
+    "mfa_too_many": "Troppi codici errati — effettua di nuovo l'accesso",
+    "mfa_not_enrolled": "Non è configurato alcun secondo fattore",
+    "incorrect_code": "Codice errato",
+    "code_reused": "Questo codice è già stato usato",
+    "code_length": "Un codice è composto da 6 cifre",
+    "incorrect_password": "Password errata"
+  },
+  "passkey": {
+    "failed": "Non è stato possibile usare questa passkey",
+    "malformed": "Credenziale malformata",
+    "bad_origin": "Impossibile interpretare l'origine di questa istanza",
+    "registration_expired": "Questa registrazione è scaduta — riprova",
+    "registration_failed": "Non è stato possibile registrare questa passkey",
+    "authentication_expired": "Questo tentativo di accesso è scaduto — riprova",
+    "unknown_credential": "Questa passkey non è registrata qui",
+    "verification_failed": "Non è stato possibile verificare questa passkey",
+    "possibly_cloned": "Questa passkey potrebbe essere stata clonata ed è stata rifiutata. Eliminala e registrane una nuova.",
+    "not_found": "Passkey non trovata",
+    "insecure_context": "Le passkey richiedono HTTPS. Servi DICOMium in HTTPS, oppure usa localhost. L'accesso con password continua a funzionare.",
+    "no_origin": "Impossibile determinare il dominio di questa istanza. Imposta esplicitamente WEBAUTHN_RP_ID e WEBAUTHN_ORIGIN.",
+    "cancelled": "annullato",
+    "already_registered": "Questa passkey è già registrata su questo account.",
+    "not_supported": "Questo dispositivo non può creare una passkey.",
+    "browser_insecure": "Le passkey richiedono una connessione sicura. Questa pagina deve essere servita in HTTPS (o eseguita su localhost).",
+    "unusable": "Non è stato possibile usare la passkey."
+  },
+  "totp": {
+    "already_enrolled": "Un'app di autenticazione è già configurata. Rimuovila prima di registrarne una nuova.",
+    "not_started": "Avvia prima la configurazione",
+    "already_confirmed": "Questa app di autenticazione è già confermata",
+    "no_authenticator": "I codici di recupero servono a rientrare se perdi l'app di autenticazione. Configurane una prima."
+  },
+  "admin": {
+    "cannot_demote_self": "Non puoi retrocedere né disattivare te stesso",
+    "last_admin": "L'ultimo amministratore non può essere retrocesso",
+    "cannot_delete_self": "Non puoi eliminare te stesso",
+    "user_not_found": "Utente non trovato"
+  },
+  "library": {
+    "study_not_found": "Esame non trovato",
+    "series_not_found": "Serie non trovata",
+    "instance_not_found": "Immagine non trovata",
+    "no_thumbnail": "Nessuna anteprima",
+    "file_missing": "Il file archiviato è mancante"
+  },
+  "upload": {
+    "no_files": "Non è stato caricato alcun file",
+    "too_large": "Il caricamento supera il limite di {{limitMb}} MB",
+    "not_found": "Caricamento non trovato",
+    "not_running": "Questa operazione non è più in corso"
+  },
+  "ingest": {
+    "nothing_uploaded": "Non è stato caricato nulla",
+    "no_dicom_found": "Nessun file DICOM trovato nel caricamento",
+    "nothing_imported": "Non è stato possibile importare nulla",
+    "cancelled": "Annullato",
+    "failed": "Importazione non riuscita",
+    "archive_unsafe": "L'archivio contiene un percorso non sicuro ed è stato rifiutato",
+    "archive_too_large": "Una volta decompresso, l'archivio supera il limite di dimensione",
+    "archive_too_many": "L'archivio contiene troppi file",
+    "archive_corrupt": "L'archivio è danneggiato o illeggibile",
+    "archive_unreadable": "Non è stato possibile leggere l'archivio",
+    "completed": "Importazione completata",
+    "completed_with_errors": "Importato con errori",
+    "errorType": {
+      "MissingUID": "Identificativo DICOM mancante",
+      "UnreadableDicom": "File DICOM illeggibile",
+      "BadPath": "Percorso di file non sicuro",
+      "IOError": "Impossibile scrivere su disco",
+      "DecodeError": "Impossibile decodificare l'immagine"
+    }
+  },
+  "frame": {
+    "failed": "Non è stato possibile leggere questa immagine",
+    "out_of_range": "Questo fotogramma non esiste",
+    "no_pixel_data": "Questa immagine non contiene dati dei pixel",
+    "undecodable": "Non è stato possibile decodificare questa immagine",
+    "malformed_list": "Elenco dei fotogrammi malformato",
+    "none_requested": "Nessun fotogramma richiesto",
+    "short": "I dati immagine archiviati sono troncati",
+    "transcode_disabled": "Questa immagine richiede una transcodifica, che è disattivata"
+  },
+  "validation": {
+    "failed": "Controlla i dati che hai inserito"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "dropzone": {
+    "prompt": "Suelte aquí un estudio, o <1>explore</1>",
+    "hint": "Un ZIP o TAR de un CD/DVD grabado, una carpeta o archivos DICOM sueltos. No hace falta extensión — el servidor lee las cabeceras. Los visores incluidos y los PDF se ignoran automáticamente.",
+    "uploading": "Subiendo… {{percent}} %",
+    "failed": "Error al subir"
+  },
+  "job": {
+    "fallbackName": "Subida",
+    "andMore": "+{{count}} más",
+    "progress": "{{processed}} / {{total}} archivos",
+    "phase": {
+      "pending": "En cola",
+      "receiving": "Recibiendo",
+      "extracting": "Extrayendo el archivo",
+      "scanning": "Buscando archivos DICOM",
+      "importing": "Importando",
+      "finalizing": "Generando miniaturas"
+    },
+    "result": {
+      "imported_one": "{{count}} imagen importada",
+      "imported_many": "{{count}} imágenes importadas",
+      "imported_other": "{{count}} imágenes importadas",
+      "duplicates_one": "{{count}} ya presente",
+      "duplicates_many": "{{count}} ya presentes",
+      "duplicates_other": "{{count}} ya presentes",
+      "skipped_one": "{{count}} archivo no DICOM ignorado",
+      "skipped_many": "{{count}} archivos no DICOM ignorados",
+      "skipped_other": "{{count}} archivos no DICOM ignorados"
+    },
+    "errors_one": "No se pudo importar {{count}} archivo",
+    "errors_many": "No se pudieron importar {{count}} archivos",
+    "errors_other": "No se pudieron importar {{count}} archivos",
+    "andMoreErrors": "…y {{count}} más",
+    "cancelled": "Cancelado"
+  }
+}

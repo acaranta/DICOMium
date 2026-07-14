@@ -35,6 +35,8 @@ import {
   CrosshairsTool,
 } from '@cornerstonejs/tools'
 
+import { repaintAnnotationsOnLanguageChange } from './annotationText'
+
 export const RENDERING_ENGINE_ID = 'dicomium-engine'
 
 // A 512x512x400 16-bit CT is ~200 MB as a typed array, and the streaming loader holds
@@ -88,6 +90,11 @@ export function csInit(): Promise<void> {
     }
 
     cache.setMaxCacheSize(CACHE_BYTES)
+
+    // Existing measurements must be relabelled when the language changes; Cornerstone will not
+    // rebuild their text on its own.
+    repaintAnnotationsOnLanguageChange()
+
     initialized = true
   })()
 

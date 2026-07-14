@@ -1,0 +1,33 @@
+{
+  "dropzone": {
+    "prompt": "Untersuchung hierher ziehen oder <1>durchsuchen</1>",
+    "hint": "Ein ZIP- oder TAR-Archiv einer gebrannten CD/DVD, ein Ordner oder einzelne DICOM-Dateien. Eine Dateiendung ist nicht nötig — der Server liest die Header. Mitgelieferte Betrachter und PDFs werden automatisch ignoriert.",
+    "uploading": "Wird hochgeladen… {{percent}} %",
+    "failed": "Hochladen fehlgeschlagen"
+  },
+  "job": {
+    "fallbackName": "Upload",
+    "andMore": "+{{count}} weitere",
+    "progress": "{{processed}} / {{total}} Dateien",
+    "phase": {
+      "pending": "In der Warteschlange",
+      "receiving": "Wird empfangen",
+      "extracting": "Archiv wird entpackt",
+      "scanning": "DICOM-Dateien werden gesucht",
+      "importing": "Wird importiert",
+      "finalizing": "Vorschaubilder werden erstellt"
+    },
+    "result": {
+      "imported_one": "{{count}} Bild importiert",
+      "imported_other": "{{count}} Bilder importiert",
+      "duplicates_one": "{{count}} bereits vorhanden",
+      "duplicates_other": "{{count}} bereits vorhanden",
+      "skipped_one": "{{count}} Nicht-DICOM-Datei ignoriert",
+      "skipped_other": "{{count}} Nicht-DICOM-Dateien ignoriert"
+    },
+    "errors_one": "{{count}} Datei konnte nicht importiert werden",
+    "errors_other": "{{count}} Dateien konnten nicht importiert werden",
+    "andMoreErrors": "…und {{count}} weitere",
+    "cancelled": "Abgebrochen"
+  }
+}

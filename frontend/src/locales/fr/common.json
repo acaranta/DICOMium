@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "DICOMium",
+    "tagline": "Imagerie médicale · privée · auto-hébergée",
+    "description": "Une visionneuse d'imagerie médicale privée et auto-hébergée, dans le navigateur."
+  },
+  "action": {
+    "cancel": "Annuler",
+    "done": "Terminé",
+    "continue": "Continuer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "remove": "Retirer",
+    "back": "Retour",
+    "copy": "Copier",
+    "copied": "Copié",
+    "download": "Télécharger",
+    "browse": "parcourir",
+    "clearAll": "Tout effacer"
+  },
+  "menu": {
+    "open": "Menu du compte",
+    "accountSecurity": "Compte et sécurité",
+    "administration": "Administration",
+    "signOut": "Se déconnecter",
+    "language": "Langue",
+    "roleAdmin": "Administrateur",
+    "roleUser": "Utilisateur"
+  },
+  "language": {
+    "auto": "Suivre mon navigateur"
+  },
+  "state": {
+    "loading": "Chargement…",
+    "never": "jamais"
+  }
+}

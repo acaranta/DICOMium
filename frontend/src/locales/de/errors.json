@@ -1,0 +1,99 @@
+{
+  "network": "Netzwerkfehler",
+  "generic": {
+    "failed": "Etwas ist schiefgelaufen"
+  },
+  "auth": {
+    "invalid_credentials": "E-Mail-Adresse oder Passwort ist falsch",
+    "account_disabled": "Dieses Konto ist deaktiviert",
+    "not_authenticated": "Nicht authentifiziert",
+    "admin_required": "Administratorrechte erforderlich",
+    "registration_disabled": "Die Registrierung ist geschlossen",
+    "email_taken": "Diese E-Mail-Adresse ist bereits registriert",
+    "mfa_expired": "Diese Anmeldung ist abgelaufen — bitte beginnen Sie neu",
+    "mfa_too_many": "Zu viele falsche Codes — bitte melden Sie sich erneut an",
+    "mfa_not_enrolled": "Es ist kein zweiter Faktor eingerichtet",
+    "incorrect_code": "Falscher Code",
+    "code_reused": "Dieser Code wurde bereits verwendet",
+    "code_length": "Ein Code besteht aus 6 Ziffern",
+    "incorrect_password": "Falsches Passwort"
+  },
+  "passkey": {
+    "failed": "Dieser Passkey konnte nicht verwendet werden",
+    "malformed": "Fehlerhafter Berechtigungsnachweis",
+    "bad_origin": "Der Ursprung dieser Instanz konnte nicht ausgewertet werden",
+    "registration_expired": "Diese Registrierung ist abgelaufen — bitte versuchen Sie es erneut",
+    "registration_failed": "Dieser Passkey konnte nicht registriert werden",
+    "authentication_expired": "Dieser Anmeldeversuch ist abgelaufen — bitte versuchen Sie es erneut",
+    "unknown_credential": "Dieser Passkey ist hier nicht registriert",
+    "verification_failed": "Dieser Passkey konnte nicht überprüft werden",
+    "possibly_cloned": "Dieser Passkey wurde möglicherweise geklont und daher abgelehnt. Löschen Sie ihn und registrieren Sie einen neuen.",
+    "not_found": "Passkey nicht gefunden",
+    "insecure_context": "Passkeys benötigen HTTPS. Betreiben Sie DICOMium über HTTPS oder nutzen Sie localhost. Die Anmeldung per Passwort funktioniert weiterhin.",
+    "no_origin": "Die Domain dieser Instanz konnte nicht ermittelt werden. Setzen Sie WEBAUTHN_RP_ID und WEBAUTHN_ORIGIN ausdrücklich.",
+    "cancelled": "abgebrochen",
+    "already_registered": "Dieser Passkey ist für dieses Konto bereits registriert.",
+    "not_supported": "Dieses Gerät kann keinen Passkey erstellen.",
+    "browser_insecure": "Passkeys benötigen eine sichere Verbindung. Diese Seite muss über HTTPS ausgeliefert werden (oder über localhost laufen).",
+    "unusable": "Der Passkey konnte nicht verwendet werden."
+  },
+  "totp": {
+    "already_enrolled": "Es ist bereits eine Authenticator-App eingerichtet. Entfernen Sie sie, um eine neue einzurichten.",
+    "not_started": "Beginnen Sie zuerst die Einrichtung",
+    "already_confirmed": "Diese Authenticator-App ist bereits bestätigt",
+    "no_authenticator": "Wiederherstellungscodes dienen dazu, den Zugang bei Verlust der Authenticator-App zurückzuerlangen. Richten Sie zuerst eine ein."
+  },
+  "admin": {
+    "cannot_demote_self": "Sie können sich nicht selbst herabstufen oder deaktivieren",
+    "last_admin": "Der letzte Administrator kann nicht herabgestuft werden",
+    "cannot_delete_self": "Sie können sich nicht selbst löschen",
+    "user_not_found": "Benutzer nicht gefunden"
+  },
+  "library": {
+    "study_not_found": "Untersuchung nicht gefunden",
+    "series_not_found": "Serie nicht gefunden",
+    "instance_not_found": "Bild nicht gefunden",
+    "no_thumbnail": "Kein Vorschaubild",
+    "file_missing": "Die gespeicherte Datei fehlt"
+  },
+  "upload": {
+    "no_files": "Es wurden keine Dateien hochgeladen",
+    "too_large": "Der Upload überschreitet das Limit von {{limitMb}} MB",
+    "not_found": "Upload nicht gefunden",
+    "not_running": "Dieser Vorgang läuft nicht mehr"
+  },
+  "ingest": {
+    "nothing_uploaded": "Es wurde nichts hochgeladen",
+    "no_dicom_found": "Im Upload wurden keine DICOM-Dateien gefunden",
+    "nothing_imported": "Es konnte nichts importiert werden",
+    "cancelled": "Abgebrochen",
+    "failed": "Import fehlgeschlagen",
+    "archive_unsafe": "Das Archiv enthält einen unsicheren Pfad und wurde abgelehnt",
+    "archive_too_large": "Das Archiv überschreitet entpackt das Größenlimit",
+    "archive_too_many": "Das Archiv enthält zu viele Dateien",
+    "archive_corrupt": "Das Archiv ist beschädigt oder nicht lesbar",
+    "archive_unreadable": "Das Archiv konnte nicht gelesen werden",
+    "completed": "Import abgeschlossen",
+    "completed_with_errors": "Mit Fehlern importiert",
+    "errorType": {
+      "MissingUID": "Fehlende DICOM-Kennung",
+      "UnreadableDicom": "Nicht lesbare DICOM-Datei",
+      "BadPath": "Unsicherer Dateipfad",
+      "IOError": "Konnte nicht auf die Festplatte geschrieben werden",
+      "DecodeError": "Das Bild konnte nicht dekodiert werden"
+    }
+  },
+  "frame": {
+    "failed": "Dieses Bild konnte nicht gelesen werden",
+    "out_of_range": "Dieses Einzelbild existiert nicht",
+    "no_pixel_data": "Dieses Bild enthält keine Pixeldaten",
+    "undecodable": "Dieses Bild konnte nicht dekodiert werden",
+    "malformed_list": "Fehlerhafte Bildliste",
+    "none_requested": "Keine Einzelbilder angefordert",
+    "short": "Die gespeicherten Bilddaten sind unvollständig",
+    "transcode_disabled": "Dieses Bild erfordert eine Transkodierung, die deaktiviert ist"
+  },
+  "validation": {
+    "failed": "Bitte überprüfen Sie Ihre Eingaben"
+  }
+}
