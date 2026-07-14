@@ -40,6 +40,10 @@ AVATAR_STYLES: tuple[str, ...] = (
 DEFAULT_COLOR = "cyan"
 DEFAULT_STYLE = "solid"
 
+# The languages the interface is translated into. A user's stored value must be one of these,
+# or NULL for "follow the browser".
+LANGUAGES: tuple[str, ...] = ("en", "fr", "de", "es", "it")
+
 
 class UserPreference(Base, TimestampMixin):
     __tablename__ = "user_preferences"
@@ -51,6 +55,11 @@ class UserPreference(Base, TimestampMixin):
 
     avatar_style: Mapped[str] = mapped_column(String(16), default=DEFAULT_STYLE)
     avatar_color: Mapped[str] = mapped_column(String(16), default=DEFAULT_COLOR)
+
+    # NULL means "follow the browser" — an explicit state, not a missing one. Defaulting to
+    # "en" would silently pin a user who never chose a language, so that later changing their
+    # browser's language would have no effect.
+    language: Mapped[str | None] = mapped_column(String(8), default=None)
 
     # Off by default, and it must stay that way. Turning this on makes the browser send a hash
     # of the user's email to gravatar.com and hands them the user's IP — which is in direct

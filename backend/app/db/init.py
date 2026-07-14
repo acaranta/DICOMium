@@ -7,8 +7,8 @@ import logging
 from sqlalchemy import func, select
 
 from app.config import get_settings
-from app.db.base import Base
 from app.db.engine import get_engine, get_sessionmaker
+from app.db.migrate import run_migrations
 from app.models import User  # noqa: F401 - registers every table on Base.metadata
 from app.services.auth import hash_password, sweep_expired_sessions
 from app.services.slug import user_slug
@@ -23,9 +23,14 @@ async def init_db() -> None:
     for directory in (settings.data_dir, settings.thumbs_dir, settings.dicom_root, settings.staging_root):
         directory.mkdir(parents=True, exist_ok=True)
 
-    engine = get_engine()
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # Alembic, not create_all. create_all creates new TABLES but never adds COLUMNS to existing
+    # ones, so any schema change after the first release silently did nothing on a live
+    # database — and then blew up at the first SELECT.
+    #
+    # Blocking, but this runs once at boot before anything serves a request, and the DDL is
+    # milliseconds on SQLite.
+    run_migrations()
+    get_engine()  # now safe to open the async engine against the migrated file
 
     async with get_sessionmaker()() as db:
         removed = await sweep_expired_sessions(db)
