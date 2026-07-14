@@ -1,14 +1,50 @@
 // Typed fetch client. Every request carries the session cookie; the SPA and the API are
 // same-origin (nginx in prod, the Vite proxy in dev), so nothing else is needed.
 
+import i18n from './i18n'
+
 export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    /** The backend's catalogue key, when it sent one. Empty for a plain-text error. */
+    public code = '',
   ) {
     super(message)
     this.name = 'ApiError'
   }
+}
+
+/**
+ * The message to show for a failed response.
+ *
+ * The backend sends `{code, message, params}`. We translate the code and interpolate the params,
+ * because the sentence around a number is a different shape in every language. If the code is one
+ * we do not know — an older client against a newer server — we fall back to the backend's English
+ * rather than printing a raw key at the user.
+ */
+function describe(body: unknown, fallback: string): { message: string; code: string } {
+  const detail = (body as { detail?: unknown })?.detail
+
+  if (detail && typeof detail === 'object' && 'code' in detail) {
+    const { code, message, params } = detail as {
+      code: string
+      message?: string
+      params?: Record<string, unknown>
+    }
+    const english = message ?? fallback
+    return {
+      code,
+      message: i18n.t(code, { ns: 'errors', defaultValue: english, ...params }),
+    }
+  }
+
+  // A plain string, or FastAPI's list of {loc, msg} from a route we have not coded yet.
+  if (typeof detail === 'string') return { message: detail, code: '' }
+  if (Array.isArray(detail)) {
+    return { message: detail.map((d: { msg?: string }) => d.msg).join(', '), code: '' }
+  }
+  return { message: fallback, code: '' }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -24,16 +60,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   })
 
   if (!res.ok) {
-    let detail = res.statusText
+    let body: unknown = null
     try {
-      const body = await res.json()
-      if (typeof body?.detail === 'string') detail = body.detail
-      // FastAPI validation errors arrive as a list of {loc, msg}.
-      else if (Array.isArray(body?.detail)) detail = body.detail.map((d: any) => d.msg).join(', ')
+      body = await res.json()
     } catch {
-      /* not JSON; keep the status text */
+      /* not JSON; describe() falls back to the status text */
     }
-    throw new ApiError(res.status, detail)
+    const { message, code } = describe(body, res.statusText)
+    throw new ApiError(res.status, message, code)
   }
 
   if (res.status === 204) return undefined as T
@@ -66,16 +100,17 @@ export const api = {
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(JSON.parse(xhr.responseText) as T)
         } else {
-          let detail = xhr.statusText
+          let body: unknown = null
           try {
-            detail = JSON.parse(xhr.responseText).detail ?? detail
+            body = JSON.parse(xhr.responseText)
           } catch {
             /* keep status text */
           }
-          reject(new ApiError(xhr.status, detail))
+          const { message, code } = describe(body, xhr.statusText)
+          reject(new ApiError(xhr.status, message, code))
         }
       }
-      xhr.onerror = () => reject(new ApiError(0, 'Network error'))
+      xhr.onerror = () => reject(new ApiError(0, i18n.t('network', { ns: 'errors' })))
       xhr.send(form)
     }),
 }
@@ -199,7 +234,10 @@ export interface UploadError {
 export interface UploadJob {
   id: string
   status: string
+  /** English, from the server. The fallback when `message_code` is unknown or absent. */
   message: string
+  /** Catalogue key for `message`. Empty on jobs that finished before codes existed. */
+  message_code: string
   is_terminal: boolean
   progress: number
   total_files: number

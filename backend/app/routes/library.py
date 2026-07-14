@@ -5,10 +5,11 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 from fastapi.responses import FileResponse
 from sqlalchemy import or_, select
 
+from app.errors import AppError
 from app.config import get_settings
 from app.dependencies import CurrentUser, DbSession
 from app.models import Instance, Series, Study
@@ -102,14 +103,14 @@ async def series_thumbnail(series_uid: str, user: CurrentUser, db: DbSession) ->
     )
     series = result.scalar_one_or_none()
     if series is None or not series.thumbnail_path:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No thumbnail")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.no_thumbnail", "No thumbnail")
 
     settings = get_settings()
     path = settings.data_dir / series.thumbnail_path
 
     # thumbnail_path is ours, but re-check it stays inside data_dir.
     if not path.resolve().is_relative_to(settings.thumbs_dir.resolve()) or not path.is_file():
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No thumbnail")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.no_thumbnail", "No thumbnail")
 
     return FileResponse(
         path,
@@ -127,7 +128,9 @@ async def instance_tags(sop_uid: str, user: CurrentUser, db: DbSession):
     )
     instance = result.scalar_one_or_none()
     if instance is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such instance")
+        raise AppError(
+            status.HTTP_404_NOT_FOUND, "library.instance_not_found", "No such instance"
+        )
     return [TagOut(**row) for row in flatten_tags(instance.metadata_json)]
 
 
@@ -141,7 +144,7 @@ async def series_instances(series_uid: str, user: CurrentUser, db: DbSession) ->
     )
     series = result.scalar_one_or_none()
     if series is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such series")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.series_not_found", "No such series")
 
     rows = await db.execute(
         select(Instance)
@@ -172,5 +175,5 @@ async def _owned_study(db, user_id: int, study_uid: str) -> Study:
     )
     study = result.scalar_one_or_none()
     if study is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such study")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.study_not_found", "No such study")
     return study

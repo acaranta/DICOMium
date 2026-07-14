@@ -15,10 +15,11 @@ import logging
 from pathlib import Path
 
 import anyio
-from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 
+from app.errors import AppError
 from app.config import get_settings
 from app.dependencies import CurrentUser, DbSession
 from app.models import Instance, Series, Study
@@ -39,7 +40,7 @@ async def _owned_study(db, user_id: int, study_uid: str) -> Study:
     )
     study = result.scalar_one_or_none()
     if study is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such study")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.study_not_found", "No such study")
     return study
 
 
@@ -53,7 +54,7 @@ async def _owned_series(db, user_id: int, study: Study, series_uid: str) -> Seri
     )
     series = result.scalar_one_or_none()
     if series is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such series")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.series_not_found", "No such series")
     return series
 
 
@@ -67,7 +68,9 @@ async def _owned_instance(db, user_id: int, series: Series, sop_uid: str) -> Ins
     )
     instance = result.scalar_one_or_none()
     if instance is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such instance")
+        raise AppError(
+            status.HTTP_404_NOT_FOUND, "library.instance_not_found", "No such instance"
+        )
     return instance
 
 
@@ -79,10 +82,14 @@ def _instance_file(instance: Instance, user_slug: str) -> Path:
         path = storage.ensure_within(settings.dicom_root, user_slug, Path(instance.file_path))
     except storage.PathEscapeError:
         log.error("instance %s has an out-of-root path: %s", instance.id, instance.file_path)
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such instance") from None
+        raise AppError(
+            status.HTTP_404_NOT_FOUND, "library.instance_not_found", "No such instance"
+        ) from None
 
     if not path.is_file():
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "The stored file is missing")
+        raise AppError(
+            status.HTTP_404_NOT_FOUND, "library.file_missing", "The stored file is missing"
+        )
     return path
 
 
@@ -149,9 +156,11 @@ async def retrieve_frames(
     try:
         numbers = [int(n) for n in frame_list.split(",") if n.strip()]
     except ValueError:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Malformed frame list") from None
+        raise AppError(
+            status.HTTP_400_BAD_REQUEST, "frame.malformed_list", "Malformed frame list"
+        ) from None
     if not numbers:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No frames requested")
+        raise AppError(status.HTTP_400_BAD_REQUEST, "frame.none_requested", "No frames requested")
 
     settings = get_settings()
     try:
@@ -159,7 +168,7 @@ async def retrieve_frames(
             frames_svc.get_frames, path, numbers, settings.dicomweb_transcode
         )
     except frames_svc.FrameError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+        raise AppError.of(status.HTTP_400_BAD_REQUEST, exc) from exc
 
     first = data[0]
     boundary = multipart.make_boundary()

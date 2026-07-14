@@ -9,9 +9,10 @@ standard requires and what real DICOMweb clients expect.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi import APIRouter, Request, Response, status
 from sqlalchemy import select
 
+from app.errors import AppError
 from app.dependencies import CurrentUser, DbSession
 from app.models import Instance, Series, Study
 from app.services import dicom_json
@@ -39,7 +40,7 @@ async def _owned_study(db, user_id: int, study_uid: str) -> Study:
     )
     study = result.scalar_one_or_none()
     if study is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such study")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.study_not_found", "No such study")
     return study
 
 
@@ -53,7 +54,7 @@ async def _owned_series(db, user_id: int, study: Study, series_uid: str) -> Seri
     )
     series = result.scalar_one_or_none()
     if series is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such series")
+        raise AppError(status.HTTP_404_NOT_FOUND, "library.series_not_found", "No such series")
     return series
 
 

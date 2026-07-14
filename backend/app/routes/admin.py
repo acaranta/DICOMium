@@ -5,10 +5,11 @@ from __future__ import annotations
 import logging
 import shutil
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
+from app.errors import AppError
 from app.config import get_settings
 from app.dependencies import AdminUser, DbSession
 from app.models import Instance, Study, User
@@ -41,18 +42,26 @@ async def list_users(_admin: AdminUser, db: DbSession):
 async def patch_user(user_id: int, body: UserPatch, admin: AdminUser, db: DbSession):
     user = await db.get(User, user_id)
     if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such user")
+        raise AppError(status.HTTP_404_NOT_FOUND, "admin.user_not_found", "No such user")
 
     # Do not let an admin lock themselves out, or strip the last admin.
     if user.id == admin.id and (body.is_active is False or body.is_admin is False):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "You cannot demote or disable yourself")
+        raise AppError(
+            status.HTTP_400_BAD_REQUEST,
+            "admin.cannot_demote_self",
+            "You cannot demote or disable yourself",
+        )
 
     if body.is_admin is False:
         admins = (
             await db.execute(select(func.count(User.id)).where(User.is_admin.is_(True)))
         ).scalar_one()
         if admins <= 1:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "The last admin cannot be demoted")
+            raise AppError(
+                status.HTTP_400_BAD_REQUEST,
+                "admin.last_admin",
+                "The last admin cannot be demoted",
+            )
 
     if body.is_active is not None:
         user.is_active = body.is_active
@@ -68,9 +77,11 @@ async def patch_user(user_id: int, body: UserPatch, admin: AdminUser, db: DbSess
 async def delete_user(user_id: int, admin: AdminUser, db: DbSession) -> None:
     user = await db.get(User, user_id)
     if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such user")
+        raise AppError(status.HTTP_404_NOT_FOUND, "admin.user_not_found", "No such user")
     if user.id == admin.id:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "You cannot delete yourself")
+        raise AppError(
+            status.HTTP_400_BAD_REQUEST, "admin.cannot_delete_self", "You cannot delete yourself"
+        )
 
     settings = get_settings()
     slug = user.slug

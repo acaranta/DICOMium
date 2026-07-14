@@ -6,9 +6,10 @@ import logging
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, HTTPException, Request, Response, status
+from fastapi import APIRouter, Cookie, Request, Response, status
 from sqlalchemy import func, select
 
+from app.errors import AppError
 from app.config import get_settings
 from app.dependencies import CurrentUser, DbSession
 from app.models import (
@@ -107,12 +108,16 @@ async def register(body: RegisterRequest, request: Request, response: Response, 
     # A zero-user instance is always claimable, so deploying with registration off
     # cannot brick a fresh install.
     if not settings.registration_enabled and count > 0:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Registration is disabled")
+        raise AppError(
+            status.HTTP_403_FORBIDDEN, "auth.registration_disabled", "Registration is disabled"
+        )
 
     email = body.email.lower().strip()
     existing = await db.execute(select(User).where(User.email == email))
     if existing.scalar_one_or_none() is not None:
-        raise HTTPException(status.HTTP_409_CONFLICT, "That email is already registered")
+        raise AppError(
+            status.HTTP_409_CONFLICT, "auth.email_taken", "That email is already registered"
+        )
 
     taken = set((await db.execute(select(User.slug))).scalars().all())
     user = User(
@@ -138,9 +143,13 @@ async def login(body: LoginRequest, request: Request, response: Response, db: Db
 
     # Same error for "no such user" and "wrong password" — do not leak which.
     if user is None or not verify_password(body.password, user.password_hash):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid email or password")
+        raise AppError(
+            status.HTTP_401_UNAUTHORIZED, "auth.invalid_credentials", "Invalid email or password"
+        )
     if not user.is_active:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "This account is disabled")
+        raise AppError(
+            status.HTTP_403_FORBIDDEN, "auth.account_disabled", "This account is disabled"
+        )
 
     # The password was right, but it is not enough. Hand back only the short-lived MFA
     # cookie — no session exists yet, so nothing is reachable until the code lands.
@@ -164,19 +173,25 @@ async def login_mfa(
     pending = await resolve_pending_login(db, dicomium_mfa)
     if pending is None:
         response.delete_cookie(MFA_COOKIE, path="/")
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED, "That sign-in has expired — please start again"
+        raise AppError(
+            status.HTTP_401_UNAUTHORIZED,
+            "auth.mfa_expired",
+            "That sign-in has expired — please start again",
         )
 
     user = await db.get(User, pending.user_id)
     if user is None or not user.is_active:
         await destroy_pending_login(db, dicomium_mfa)
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "This account is disabled")
+        raise AppError(
+            status.HTTP_403_FORBIDDEN, "auth.account_disabled", "This account is disabled"
+        )
 
     credential = await _totp_row(db, user.id)
     if credential is None:
         await destroy_pending_login(db, dicomium_mfa)
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No second factor is enrolled")
+        raise AppError(
+            status.HTTP_400_BAD_REQUEST, "auth.mfa_not_enrolled", "No second factor is enrolled"
+        )
 
     code = body.code.strip()
 
@@ -191,22 +206,23 @@ async def login_mfa(
             await db.commit()
             await destroy_pending_login(db, dicomium_mfa)
             return LoginResult(user=await _sign_in(db, user, request, response))
-        reason = outcome.reason
+        reason, reason_code = outcome.reason, outcome.reason_code
     else:
         if await recovery.consume(db, user, code):
             await destroy_pending_login(db, dicomium_mfa)
             log.info("%s signed in with a recovery code", user.email)
             return LoginResult(user=await _sign_in(db, user, request, response))
-        reason = "Incorrect code"
+        reason, reason_code = "Incorrect code", "auth.incorrect_code"
 
     attempts = await record_failed_mfa(db, pending)
     if attempts >= 5:
         response.delete_cookie(MFA_COOKIE, path="/")
-        raise HTTPException(
+        raise AppError(
             status.HTTP_429_TOO_MANY_REQUESTS,
+            "auth.mfa_too_many",
             "Too many incorrect codes — please sign in again",
         )
-    raise HTTPException(status.HTTP_401_UNAUTHORIZED, reason)
+    raise AppError(status.HTTP_401_UNAUTHORIZED, reason_code, reason)
 
 
 async def _totp_row(db: DbSession, user_id: int) -> TotpCredential | None:
@@ -251,7 +267,7 @@ async def passkey_login_begin(request: Request, db: DbSession) -> Response:
     try:
         options = await webauthn_svc.begin_authentication(db, webauthn_svc.effective_origin(request))
     except webauthn_svc.WebAuthnError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+        raise AppError.of(status.HTTP_400_BAD_REQUEST, exc) from exc
 
     # options_to_json already returns a JSON string; re-encoding it would double it.
     return Response(content=options, media_type="application/json")
@@ -266,7 +282,7 @@ async def passkey_login_complete(
             db, body.credential, webauthn_svc.effective_origin(request)
         )
     except webauthn_svc.WebAuthnError as exc:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, str(exc)) from exc
+        raise AppError.of(status.HTTP_401_UNAUTHORIZED, exc) from exc
 
     log.info("%s signed in with a passkey", user.email)
     return LoginResult(user=await _sign_in(db, user, request, response))

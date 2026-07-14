@@ -13,9 +13,10 @@ import logging
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, File, UploadFile, status
 from sqlalchemy import select
 
+from app.errors import AppError
 from app.config import get_settings
 from app.db.engine import get_sessionmaker
 from app.dependencies import CurrentUser, DbSession
@@ -34,7 +35,7 @@ CHUNK = 1 << 20  # 1 MiB
 @router.post("", response_model=UploadJobOut, status_code=status.HTTP_202_ACCEPTED)
 async def create_upload(user: CurrentUser, db: DbSession, files: list[UploadFile] = File(...)):
     if not files:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No files were uploaded")
+        raise AppError(status.HTTP_400_BAD_REQUEST, "upload.no_files", "No files were uploaded")
 
     settings = get_settings()
     job_id = str(uuid.uuid4())
@@ -59,9 +60,11 @@ async def create_upload(user: CurrentUser, db: DbSession, files: list[UploadFile
                 if total > max_bytes:
                     fh.close()
                     _cleanup(settings.staging_root / job_id)
-                    raise HTTPException(
+                    raise AppError(
                         status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        "upload.too_large",
                         f"Upload exceeds the {settings.max_upload_mb} MB limit",
+                        limitMb=settings.max_upload_mb,
                     )
                 fh.write(chunk)
         await upload.close()
@@ -106,7 +109,9 @@ async def get_upload(job_id: str, user: CurrentUser, db: DbSession):
 async def cancel_upload(job_id: str, user: CurrentUser, db: DbSession):
     job = await _owned(db, job_id, user.id)
     if not jobs.request_cancel(job_id):
-        raise HTTPException(status.HTTP_409_CONFLICT, "That job is no longer running")
+        raise AppError(
+            status.HTTP_409_CONFLICT, "upload.not_running", "That job is no longer running"
+        )
     await db.refresh(job)
     return UploadJobOut.from_row(job)
 
@@ -126,7 +131,7 @@ async def _owned(db, job_id: str, user_id: int) -> UploadJob:
     )
     job = result.scalar_one_or_none()
     if job is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such upload")
+        raise AppError(status.HTTP_404_NOT_FOUND, "upload.not_found", "No such upload")
     return job
 
 

@@ -85,10 +85,10 @@ async def run_ingest(
         except archive.ArchiveError as exc:
             # Archive-level guards (zip-slip, bombs, corruption) fail the whole job.
             log.warning("ingest %s rejected: %s", job_id, exc)
-            await _finish(db, job, JobStatus.FAILED, str(exc))
+            await _finish(db, job, JobStatus.FAILED, str(exc), exc.code)
         except Exception as exc:  # noqa: BLE001
             log.exception("ingest %s crashed", job_id)
-            await _finish(db, job, JobStatus.FAILED, f"Import failed: {exc}")
+            await _finish(db, job, JobStatus.FAILED, f"Import failed: {exc}", "ingest.failed")
         finally:
             await anyio.to_thread.run_sync(lambda: shutil.rmtree(staging, ignore_errors=True))
             jobs.clear(job_id)
@@ -105,7 +105,9 @@ async def _pipeline(db: AsyncSession, job: _Job, staging: Path) -> None:
 
     received = sorted(incoming.iterdir()) if incoming.exists() else []
     if not received:
-        await _finish(db, job, JobStatus.FAILED, "Nothing was uploaded")
+        await _finish(
+            db, job, JobStatus.FAILED, "Nothing was uploaded", "ingest.nothing_uploaded"
+        )
         return
 
     for item in received:
@@ -123,7 +125,7 @@ async def _pipeline(db: AsyncSession, job: _Job, staging: Path) -> None:
             )
 
     if _cancelled(job):
-        await _finish(db, job, JobStatus.CANCELLED, "Cancelled")
+        await _finish(db, job, JobStatus.CANCELLED, "Cancelled", "ingest.cancelled")
         return
 
     # ---- Scan ----------------------------------------------------------------
@@ -132,7 +134,13 @@ async def _pipeline(db: AsyncSession, job: _Job, staging: Path) -> None:
 
     job.counters.skipped = scan.skipped
     if not scan.dicom_files:
-        await _finish(db, job, JobStatus.FAILED, "No DICOM files found in the upload")
+        await _finish(
+            db,
+            job,
+            JobStatus.FAILED,
+            "No DICOM files found in the upload",
+            "ingest.no_dicom_found",
+        )
         return
 
     note = f"Found {len(scan.dicom_files)} DICOM files"
@@ -146,7 +154,7 @@ async def _pipeline(db: AsyncSession, job: _Job, staging: Path) -> None:
     for path in scan.dicom_files:
         if _cancelled(job):
             await _flush(db, job)
-            await _finish(db, job, JobStatus.CANCELLED, "Cancelled")
+            await _finish(db, job, JobStatus.CANCELLED, "Cancelled", "ingest.cancelled")
             return
 
         await _import_one(db, job, path)
@@ -164,21 +172,25 @@ async def _pipeline(db: AsyncSession, job: _Job, staging: Path) -> None:
 
     counters = job.counters
     if counters.imported == 0 and counters.duplicates == 0:
-        await _finish(db, job, JobStatus.FAILED, "Nothing could be imported")
+        await _finish(
+            db, job, JobStatus.FAILED, "Nothing could be imported", "ingest.nothing_imported"
+        )
     elif counters.errors > 0:
         await _finish(
             db,
             job,
             JobStatus.COMPLETED_WITH_ERRORS,
             f"Imported {counters.imported} files; {counters.errors} could not be imported",
+            "ingest.completed_with_errors",
         )
     else:
-        parts = [f"Imported {counters.imported} files"]
-        if counters.duplicates:
-            parts.append(f"{counters.duplicates} already present")
-        if counters.skipped:
-            parts.append(f"{counters.skipped} non-DICOM files ignored")
-        await _finish(db, job, JobStatus.COMPLETED, "; ".join(parts))
+        await _finish(
+            db,
+            job,
+            JobStatus.COMPLETED,
+            f"Imported {counters.imported} files",
+            "ingest.completed",
+        )
 
 
 async def _import_one(db: AsyncSession, job: _Job, path: Path) -> None:
@@ -489,13 +501,16 @@ async def _update(db: AsyncSession, job: _Job, **fields) -> None:
     await db.commit()
 
 
-async def _finish(db: AsyncSession, job: _Job, status: JobStatus, message: str) -> None:
+async def _finish(
+    db: AsyncSession, job: _Job, status: JobStatus, message: str, code: str = ""
+) -> None:
     await _flush(db, job)
     row = await db.get(UploadJob, job.id)
     if row is None:
         return
     row.status = status.value
     row.message = message[:512]
+    row.message_code = code[:64]
     row.finished_at = datetime.now(UTC).replace(tzinfo=None)
     await db.commit()
     log.info("ingest %s finished: %s (%s)", job.id, status.value, message)

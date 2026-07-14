@@ -43,7 +43,11 @@ class UploadJob(Base, TimestampMixin):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
 
     status: Mapped[str] = mapped_column(String(32), default=JobStatus.PENDING.value)
+    #: English, for logs and for API consumers that do not translate.
     message: Mapped[str] = mapped_column(String(512), default="")
+    #: The catalogue key for `message`, so the browser can say it in the user's language.
+    #: Empty on old rows written before codes existed — the client falls back to `message`.
+    message_code: Mapped[str] = mapped_column(String(64), default="")
 
     source_names: Mapped[str] = mapped_column(Text, default="[]")  # JSON list
     bytes_received: Mapped[int] = mapped_column(Integer, default=0)

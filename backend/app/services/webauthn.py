@@ -36,17 +36,22 @@ from webauthn.helpers.structs import (
 )
 
 from app.config import get_settings
+from app.errors import CodedError
 from app.models import CHALLENGE_TTL_MINUTES, ChallengePurpose, Passkey, User, WebAuthnChallenge
 
 log = logging.getLogger(__name__)
 
 
-class WebAuthnError(RuntimeError):
+class WebAuthnError(CodedError):
     """Anything that should be reported to the user rather than 500'd."""
+
+    default_code = "passkey.failed"
 
 
 class InsecureContextError(WebAuthnError):
     """The origin is not HTTPS or localhost, so the browser will refuse regardless."""
+
+    default_code = "passkey.insecure_context"
 
 
 @dataclass(frozen=True)
@@ -106,19 +111,26 @@ def resolve_rp(origin_header: str | None) -> RelyingParty:
     if not origin_header:
         raise WebAuthnError(
             "Could not determine this instance's domain. "
-            "Set WEBAUTHN_RP_ID and WEBAUTHN_ORIGIN explicitly."
+            "Set WEBAUTHN_RP_ID and WEBAUTHN_ORIGIN explicitly.",
+            code="passkey.no_origin",
         )
 
     parsed = urlparse(origin_header)
     hostname = parsed.hostname or ""
     if not parsed.scheme or not hostname:
-        raise WebAuthnError(f"Could not parse the origin {origin_header!r}")
+        raise WebAuthnError(
+            f"Could not parse the origin {origin_header!r}",
+            code="passkey.bad_origin",
+            origin=origin_header,
+        )
 
     if not _is_secure_origin(parsed.scheme, hostname):
         raise InsecureContextError(
             f"Passkeys require HTTPS. This instance is being served over "
             f"{parsed.scheme}:// at {hostname}, where browsers refuse WebAuthn. "
-            "Serve it over HTTPS, or use localhost. Password sign-in still works."
+            "Serve it over HTTPS, or use localhost. Password sign-in still works.",
+            scheme=parsed.scheme,
+            hostname=hostname,
         )
 
     # The RP ID is the bare domain — no scheme, no port.
@@ -226,10 +238,13 @@ async def finish_registration(
     try:
         challenge = _challenge_from(credential)
     except (KeyError, ValueError) as exc:
-        raise WebAuthnError("Malformed credential") from exc
+        raise WebAuthnError("Malformed credential", code="passkey.malformed") from exc
 
     if not await _consume_challenge(db, challenge, ChallengePurpose.REGISTER):
-        raise WebAuthnError("That registration has expired — please try again")
+        raise WebAuthnError(
+            "That registration has expired — please try again",
+            code="passkey.registration_expired",
+        )
 
     try:
         verified = verify_registration_response(
@@ -240,7 +255,10 @@ async def finish_registration(
         )
     except InvalidRegistrationResponse as exc:
         log.warning("passkey registration rejected for %s: %s", user.email, exc)
-        raise WebAuthnError(f"That passkey could not be registered: {exc}") from exc
+        raise WebAuthnError(
+            f"That passkey could not be registered: {exc}",
+            code="passkey.registration_failed",
+        ) from exc
 
     transports = credential.get("response", {}).get("transports") or []
 
@@ -291,15 +309,20 @@ async def finish_authentication(
         challenge = _challenge_from(credential)
         raw_id = _b64url_decode(credential["rawId"])
     except (KeyError, ValueError) as exc:
-        raise WebAuthnError("Malformed credential") from exc
+        raise WebAuthnError("Malformed credential", code="passkey.malformed") from exc
 
     if not await _consume_challenge(db, challenge, ChallengePurpose.AUTHENTICATE):
-        raise WebAuthnError("That sign-in attempt has expired — please try again")
+        raise WebAuthnError(
+            "That sign-in attempt has expired — please try again",
+            code="passkey.authentication_expired",
+        )
 
     result = await db.execute(select(Passkey).where(Passkey.credential_id == raw_id))
     passkey = result.scalar_one_or_none()
     if passkey is None:
-        raise WebAuthnError("That passkey is not registered here")
+        raise WebAuthnError(
+            "That passkey is not registered here", code="passkey.unknown_credential"
+        )
 
     try:
         verified = verify_authentication_response(
@@ -312,7 +335,9 @@ async def finish_authentication(
         )
     except InvalidAuthenticationResponse as exc:
         log.warning("passkey authentication rejected: %s", exc)
-        raise WebAuthnError("That passkey could not be verified") from exc
+        raise WebAuthnError(
+            "That passkey could not be verified", code="passkey.verification_failed"
+        ) from exc
 
     # Clone detection. Only meaningful when BOTH counters are non-zero: many authenticators
     # (iCloud Keychain among them) always report 0, and rejecting on that would lock out
@@ -325,7 +350,8 @@ async def finish_authentication(
             )
             raise WebAuthnError(
                 "This passkey may have been cloned and has been refused. "
-                "Delete it and register a new one."
+                "Delete it and register a new one.",
+                code="passkey.possibly_cloned",
             )
 
     passkey.sign_count = verified.new_sign_count
@@ -334,7 +360,7 @@ async def finish_authentication(
     user = await db.get(User, passkey.user_id)
     if user is None or not user.is_active:
         await db.commit()
-        raise WebAuthnError("This account is disabled")
+        raise WebAuthnError("This account is disabled", code="auth.account_disabled")
 
     await db.commit()
     return user

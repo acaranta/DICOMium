@@ -21,7 +21,10 @@ class UploadErrorOut(BaseModel):
 class UploadJobOut(BaseModel):
     id: str
     status: str
+    #: English. Kept for API consumers and as the client's fallback.
     message: str
+    #: The catalogue key for `message`. Empty on jobs finished before codes existed.
+    message_code: str
     is_terminal: bool
 
     progress: float  # 0..1
@@ -57,6 +60,7 @@ class UploadJobOut(BaseModel):
             id=row.id,
             status=row.status,
             message=row.message,
+            message_code=row.message_code,
             is_terminal=terminal,
             progress=progress,
             total_files=row.total_files,

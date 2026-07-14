@@ -10,6 +10,8 @@ A test that only exercises a *fresh* database would pass while shipping exactly 
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from sqlalchemy import create_engine, inspect, text
 
@@ -32,6 +34,19 @@ def _tables(db_path) -> set[str]:
         return set(inspect(engine).get_table_names())
     finally:
         engine.dispose()
+
+
+def _head() -> str:
+    """The newest revision, read from the scripts themselves.
+
+    Hardcoding "0002" here would mean every future migration breaks these tests for no reason.
+    What they actually assert is "the database ends up at head", not any particular number.
+    """
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    config = Config(str(Path(__file__).resolve().parent.parent.parent / "alembic.ini"))
+    return ScriptDirectory.from_config(config).get_current_head()
 
 
 def _revision(db_path) -> str | None:
@@ -59,8 +74,13 @@ def _build_pre_alembic_database(db_path) -> None:
     Base.metadata.create_all(engine)
 
     with engine.begin() as conn:
-        # The models now carry `language`; a database from before that migration did not.
-        conn.execute(text("ALTER TABLE user_preferences DROP COLUMN language"))
+        # create_all() builds TODAY's schema, but this fixture has to look like a database from
+        # before Alembic existed — i.e. the 0001 baseline. So every column added by a later
+        # migration is dropped back off. Add a migration, add its column here, or the migration
+        # will meet a column that already exists and the adoption test will fail loudly (which is
+        # the point: it is the same failure a real user's database would hit).
+        conn.execute(text("ALTER TABLE user_preferences DROP COLUMN language"))  # 0002
+        conn.execute(text("ALTER TABLE upload_jobs DROP COLUMN message_code"))  # 0003
         conn.execute(
             text(
                 "INSERT INTO users (email, password_hash, slug, is_admin, is_active, created_at)"
@@ -98,7 +118,7 @@ class TestAdoptingAPreAlembicDatabase:
         run_migrations()
 
         # Stamped, then upgraded — not rebuilt.
-        assert _revision(db_path) == "0002"
+        assert _revision(db_path) == _head()
         assert "language" in _columns(db_path, "user_preferences")
 
         # The point of the whole exercise: the exams are still there.
@@ -123,7 +143,7 @@ class TestAdoptingAPreAlembicDatabase:
         run_migrations()
         run_migrations()  # every subsequent boot
 
-        assert _revision(db_path) == "0002"
+        assert _revision(db_path) == _head()
         engine = create_engine(f"sqlite:///{db_path}")
         with engine.connect() as conn:
             assert conn.execute(text("SELECT COUNT(*) FROM studies")).scalar_one() == 1
@@ -139,7 +159,7 @@ class TestFreshDatabase:
         tables = _tables(db_path)
         for expected in ("users", "studies", "series", "instances", "user_preferences"):
             assert expected in tables
-        assert _revision(db_path) == "0002"
+        assert _revision(db_path) == _head()
         assert "language" in _columns(db_path, "user_preferences")
 
     def test_a_fresh_database_is_never_stamped_at_the_baseline(self, db_path):

@@ -130,7 +130,7 @@ class TestTotpGate:
         await client.post("/api/auth/login", json={"email": EMAIL, "password": PASSWORD})
         replay = await client.post("/api/auth/login/mfa", json={"code": code})
         assert replay.status_code == 401
-        assert "already been used" in replay.json()["detail"]
+        assert replay.json()["detail"]["code"] == "auth.code_reused"
 
     async def test_enrolment_burns_its_own_code(self, client, db):
         """The code used to confirm the QR cannot then be used to log in.
@@ -152,7 +152,7 @@ class TestTotpGate:
 
         reuse = await client.post("/api/auth/login/mfa", json={"code": setup_code})
         assert reuse.status_code == 401
-        assert "already been used" in reuse.json()["detail"]
+        assert reuse.json()["detail"]["code"] == "auth.code_reused"
 
     async def test_the_mfa_step_needs_the_pending_cookie(self, client, db):
         await register(client)
@@ -163,7 +163,7 @@ class TestTotpGate:
         # A valid code with no pending login is worthless: the password was never shown.
         res = await client.post("/api/auth/login/mfa", json={"code": fresh_code(secret)})
         assert res.status_code == 401
-        assert "expired" in res.json()["detail"]
+        assert res.json()["detail"]["code"] == "auth.mfa_expired"
 
     async def test_brute_force_is_capped(self, client, db):
         await register(client)

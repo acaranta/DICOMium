@@ -22,6 +22,8 @@ from pydicom import dcmread
 from pydicom.encaps import get_frame
 from pydicom.uid import UID
 
+from app.errors import CodedError
+
 log = logging.getLogger(__name__)
 
 EXPLICIT_VR_LE = "1.2.840.10008.1.2.1"
@@ -53,8 +55,8 @@ CORNERSTONE_NATIVE: dict[str, str] = {
 UNCOMPRESSED = {IMPLICIT_VR_LE, EXPLICIT_VR_LE, "1.2.840.10008.1.2.1.99", "1.2.840.10008.1.2.2"}
 
 
-class FrameError(RuntimeError):
-    pass
+class FrameError(CodedError):
+    default_code = "frame.failed"
 
 
 @dataclass
@@ -83,7 +85,12 @@ def get_frames(path: Path, frame_numbers: list[int], mode: str = "auto") -> list
     total = int(getattr(ds, "NumberOfFrames", 1) or 1)
     for n in frame_numbers:
         if n < 1 or n > total:
-            raise FrameError(f"frame {n} out of range (1..{total})")
+            raise FrameError(
+                f"frame {n} out of range (1..{total})",
+                code="frame.out_of_range",
+                frame=n,
+                total=total,
+            )
 
     native = transfer_syntax in CORNERSTONE_NATIVE
     passthrough = native and mode != "always"
@@ -94,7 +101,11 @@ def get_frames(path: Path, frame_numbers: list[int], mode: str = "auto") -> list
         ]
 
     if mode == "never" and not native:
-        raise FrameError(f"transfer syntax {transfer_syntax} needs transcoding but it is disabled")
+        raise FrameError(
+            f"transfer syntax {transfer_syntax} needs transcoding but it is disabled",
+            code="frame.transcode_disabled",
+            transferSyntax=transfer_syntax,
+        )
 
     return [_transcode(ds, n) for n in frame_numbers]
 
@@ -104,7 +115,7 @@ def _passthrough(ds, transfer_syntax: str, frame_number: int, total: int) -> Fra
     media_type = CORNERSTONE_NATIVE[transfer_syntax]
     pixel_data = ds.get("PixelData", None)
     if pixel_data is None:
-        raise FrameError("instance has no PixelData")
+        raise FrameError("instance has no PixelData", code="frame.no_pixel_data")
 
     if transfer_syntax in UNCOMPRESSED:
         # One flat buffer: slice out the frame.
@@ -118,7 +129,8 @@ def _passthrough(ds, transfer_syntax: str, frame_number: int, total: int) -> Fra
         payload = bytes(pixel_data[start : start + frame_bytes])
         if len(payload) != frame_bytes:
             raise FrameError(
-                f"short frame: expected {frame_bytes} bytes, got {len(payload)}"
+                f"short frame: expected {frame_bytes} bytes, got {len(payload)}",
+                code="frame.short",
             )
     else:
         # Encapsulated: pull the frame's compressed fragment(s).
@@ -134,7 +146,9 @@ def _transcode(ds, frame_number: int) -> FrameData:
     try:
         arr = ds.pixel_array
     except Exception as exc:  # noqa: BLE001
-        raise FrameError(f"cannot decode pixel data: {exc}") from exc
+        raise FrameError(
+            f"cannot decode pixel data: {exc}", code="frame.undecodable"
+        ) from exc
 
     total = int(getattr(ds, "NumberOfFrames", 1) or 1)
     if total > 1:

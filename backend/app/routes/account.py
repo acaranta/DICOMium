@@ -11,9 +11,10 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi import APIRouter, Request, Response, status
 from sqlalchemy import delete, select
 
+from app.errors import AppError
 from app.dependencies import CurrentUser, DbSession
 from app.models import (
     AVATAR_COLORS,
@@ -46,7 +47,9 @@ router = APIRouter(prefix="/api/account", tags=["account"])
 
 def _require_password(user: User, password: str) -> None:
     if not verify_password(password, user.password_hash):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Incorrect password")
+        raise AppError(
+            status.HTTP_401_UNAUTHORIZED, "auth.incorrect_password", "Incorrect password"
+        )
 
 
 def _now() -> datetime:
@@ -135,7 +138,7 @@ async def passkey_register_begin(user: CurrentUser, db: DbSession, request: Requ
     try:
         options = await webauthn_svc.begin_registration(db, user, webauthn_svc.effective_origin(request))
     except webauthn_svc.WebAuthnError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+        raise AppError.of(status.HTTP_400_BAD_REQUEST, exc) from exc
     return Response(content=options, media_type="application/json")
 
 
@@ -148,7 +151,7 @@ async def passkey_register_complete(
             db, user, body.credential, webauthn_svc.effective_origin(request), body.nickname
         )
     except webauthn_svc.WebAuthnError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+        raise AppError.of(status.HTTP_400_BAD_REQUEST, exc) from exc
     return PasskeyOut.from_row(passkey)
 
 
@@ -183,7 +186,7 @@ async def _owned_passkey(db: DbSession, passkey_id: int, user_id: int) -> Passke
     )
     passkey = result.scalar_one_or_none()
     if passkey is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such passkey")
+        raise AppError(status.HTTP_404_NOT_FOUND, "passkey.not_found", "No such passkey")
     return passkey
 
 
@@ -198,8 +201,9 @@ async def totp_begin(user: CurrentUser, db: DbSession):
     scanned it by entering a live code, so an abandoned setup cannot lock them out.
     """
     if await totp_enabled(db, user.id):
-        raise HTTPException(
+        raise AppError(
             status.HTTP_409_CONFLICT,
+            "totp.already_enrolled",
             "An authenticator is already set up. Remove it first to enrol a new one.",
         )
 
@@ -228,14 +232,18 @@ async def totp_confirm(body: TotpConfirmRequest, user: CurrentUser, db: DbSessio
     result = await db.execute(select(TotpCredential).where(TotpCredential.user_id == user.id))
     credential = result.scalar_one_or_none()
     if credential is None:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Start the setup first")
+        raise AppError(status.HTTP_400_BAD_REQUEST, "totp.not_started", "Start the setup first")
     if credential.confirmed_at is not None:
-        raise HTTPException(status.HTTP_409_CONFLICT, "This authenticator is already confirmed")
+        raise AppError(
+            status.HTTP_409_CONFLICT,
+            "totp.already_confirmed",
+            "This authenticator is already confirmed",
+        )
 
     secret = crypto.decrypt(credential.secret_encrypted)
     outcome = totp.verify(secret, body.code, credential.last_counter)
     if not outcome.ok:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, outcome.reason)
+        raise AppError(status.HTTP_401_UNAUTHORIZED, outcome.reason_code, outcome.reason)
 
     credential.confirmed_at = _now()
     credential.last_counter = outcome.counter
@@ -269,8 +277,9 @@ async def regenerate_recovery_codes(
     _require_password(user, body.password)
 
     if not await totp_enabled(db, user.id):
-        raise HTTPException(
+        raise AppError(
             status.HTTP_400_BAD_REQUEST,
+            "totp.no_authenticator",
             "Recovery codes exist to recover an authenticator. Set one up first.",
         )
 

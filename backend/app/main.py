@@ -5,7 +5,10 @@ from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.db.engine import dispose_engine
@@ -45,6 +48,28 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_request: Request, exc: RequestValidationError) -> JSONResponse:
+    """Give Pydantic's 422 the same shape as an AppError.
+
+    Pydantic composes its messages ("field required", "value is not a valid email address")
+    internally, so no catalogue of ours can reach them. Rather than show the user a machine's
+    English, we collapse the lot to a single translatable code and keep the raw errors in a
+    field the UI ignores but a developer can read.
+    """
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        content={
+            "detail": {
+                "code": "validation.failed",
+                "message": "Please check the details you entered",
+                "params": {},
+                "errors": jsonable_encoder(exc.errors()),
+            }
+        },
+    )
+
 
 app.include_router(health.router)
 app.include_router(auth.router)

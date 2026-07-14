@@ -62,7 +62,10 @@ def counter_now(at: float | None = None) -> int:
 class TotpResult:
     ok: bool
     counter: int = 0
+    #: English, for logs and for clients that cannot translate.
     reason: str = ""
+    #: The catalogue key for `reason`, so the browser can say it in the user's language.
+    reason_code: str = ""
 
 
 def verify(secret: str, code: str, last_counter: int, at: float | None = None) -> TotpResult:
@@ -75,7 +78,7 @@ def verify(secret: str, code: str, last_counter: int, at: float | None = None) -
     """
     code = (code or "").strip().replace(" ", "")
     if not code.isdigit() or len(code) != DIGITS:
-        return TotpResult(False, reason="A code is 6 digits")
+        return TotpResult(False, reason="A code is 6 digits", reason_code="auth.code_length")
 
     now = at if at is not None else time.time()
     totp = pyotp.TOTP(secret, digits=DIGITS, interval=PERIOD)
@@ -89,7 +92,11 @@ def verify(secret: str, code: str, last_counter: int, at: float | None = None) -
 
         counter = counter_now(step_time)
         if counter <= last_counter:
-            return TotpResult(False, reason="That code has already been used")
+            return TotpResult(
+                False,
+                reason="That code has already been used",
+                reason_code="auth.code_reused",
+            )
         return TotpResult(True, counter=counter)
 
-    return TotpResult(False, reason="Incorrect code")
+    return TotpResult(False, reason="Incorrect code", reason_code="auth.incorrect_code")

@@ -16,6 +16,8 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.errors import CodedError
+
 log = logging.getLogger(__name__)
 
 ZIP_MAGIC = b"PK\x03\x04"
@@ -26,8 +28,10 @@ TAR_MAGIC_OFFSET = 257
 TAR_MAGIC = b"ustar"
 
 
-class ArchiveError(RuntimeError):
+class ArchiveError(CodedError):
     """The archive is unsafe or unreadable. Fails the whole job."""
+
+    default_code = "ingest.archive_corrupt"
 
 
 @dataclass
@@ -42,7 +46,11 @@ def detect(path: Path) -> str:
         with path.open("rb") as fh:
             head = fh.read(512)
     except OSError as exc:
-        raise ArchiveError(f"cannot read {path.name}: {exc}") from exc
+        raise ArchiveError(
+            f"cannot read {path.name}: {exc}",
+            code="ingest.archive_unreadable",
+            name=path.name,
+        ) from exc
 
     if head.startswith(ZIP_MAGIC):
         return "zip"
@@ -99,14 +107,18 @@ def _extract_zip(src: Path, dest: Path, max_bytes: int, max_members: int) -> Ext
             members = zf.infolist()
             if len(members) > max_members:
                 raise ArchiveError(
-                    f"archive has {len(members)} members, over the {max_members} limit"
+                    f"archive has {len(members)} members, over the {max_members} limit",
+                    code="ingest.archive_too_many",
+                    max=max_members,
                 )
 
             declared = sum(m.file_size for m in members)
             if declared > max_bytes:
                 raise ArchiveError(
                     f"archive expands to {declared // 1_048_576} MiB, "
-                    f"over the {max_bytes // 1_048_576} MiB limit"
+                    f"over the {max_bytes // 1_048_576} MiB limit",
+                    code="ingest.archive_too_large",
+                    limitMib=max_bytes // 1_048_576,
                 )
 
             for member in members:
@@ -114,11 +126,17 @@ def _extract_zip(src: Path, dest: Path, max_bytes: int, max_members: int) -> Ext
                     continue
                 target = _safe_target(dest, member.filename)
                 if target is None:
-                    raise ArchiveError(f"unsafe path in archive: {member.filename!r}")
+                    raise ArchiveError(
+                        f"unsafe path in archive: {member.filename!r}",
+                        code="ingest.archive_unsafe",
+                    )
 
                 total += member.file_size
                 if total > max_bytes:
-                    raise ArchiveError("archive exceeded the uncompressed size limit while reading")
+                    raise ArchiveError(
+                        "archive exceeded the uncompressed size limit while reading",
+                        code="ingest.archive_too_large",
+                    )
 
                 target.parent.mkdir(parents=True, exist_ok=True)
                 with zf.open(member) as fsrc, target.open("wb") as fdst:
@@ -126,7 +144,7 @@ def _extract_zip(src: Path, dest: Path, max_bytes: int, max_members: int) -> Ext
                         fdst.write(chunk)
                 written += 1
     except zipfile.BadZipFile as exc:
-        raise ArchiveError(f"corrupt zip: {exc}") from exc
+        raise ArchiveError(f"corrupt zip: {exc}", code="ingest.archive_corrupt") from exc
 
     return ExtractResult(written, total)
 
@@ -137,7 +155,11 @@ def _extract_tar(src: Path, dest: Path, max_bytes: int, max_members: int) -> Ext
         with tarfile.open(src, "r:*") as tf:
             for count, member in enumerate(tf):
                 if count >= max_members:
-                    raise ArchiveError(f"archive has over {max_members} members")
+                    raise ArchiveError(
+                        f"archive has over {max_members} members",
+                        code="ingest.archive_too_many",
+                        max=max_members,
+                    )
 
                 # Skip symlinks, hardlinks, devices, fifos — only regular files.
                 if not member.isfile():
@@ -145,12 +167,17 @@ def _extract_tar(src: Path, dest: Path, max_bytes: int, max_members: int) -> Ext
 
                 target = _safe_target(dest, member.name)
                 if target is None:
-                    raise ArchiveError(f"unsafe path in archive: {member.name!r}")
+                    raise ArchiveError(
+                        f"unsafe path in archive: {member.name!r}",
+                        code="ingest.archive_unsafe",
+                    )
 
                 total += member.size
                 if total > max_bytes:
                     raise ArchiveError(
-                        f"archive expands past the {max_bytes // 1_048_576} MiB limit"
+                        f"archive expands past the {max_bytes // 1_048_576} MiB limit",
+                        code="ingest.archive_too_large",
+                        limitMib=max_bytes // 1_048_576,
                     )
 
                 fsrc = tf.extractfile(member)
@@ -162,6 +189,6 @@ def _extract_tar(src: Path, dest: Path, max_bytes: int, max_members: int) -> Ext
                         fdst.write(chunk)
                 written += 1
     except tarfile.TarError as exc:
-        raise ArchiveError(f"corrupt tar: {exc}") from exc
+        raise ArchiveError(f"corrupt tar: {exc}", code="ingest.archive_corrupt") from exc
 
     return ExtractResult(written, total)

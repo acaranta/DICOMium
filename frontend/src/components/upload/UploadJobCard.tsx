@@ -86,10 +86,10 @@ export default function UploadJobCard({
           <p className="mt-0.5 text-2xs text-ink-dim">
             {running
               ? t(`job.phase.${job.status}`, { defaultValue: job.status })
-              : // A failed job carries a reason from the server; a successful one is summarised
-                // from its counts.
+              : // A failed job carries a coded reason from the server, translated here; a
+                // successful one is summarised from its counts.
                 failed
-                ? job.message
+                ? t(job.message_code, { ns: 'errors', defaultValue: job.message })
                 : summary.join(' · ')}
           </p>
 
