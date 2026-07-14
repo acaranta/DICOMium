@@ -1,8 +1,8 @@
 {
   "title": "Examens",
-  "count_one": "{{count}} examen",
-  "count_many": "{{count}} examens",
-  "count_other": "{{count}} examens",
+  "count_one": "{{formatted}} examen",
+  "count_many": "{{formatted}} examens",
+  "count_other": "{{formatted}} examens",
   "search": "Patient, identifiant, description…",
   "empty": "Aucun examen — importez-en un ci-dessus.",
   "emptySearch": "Aucun examen ne correspond à cette recherche.",
@@ -18,6 +18,11 @@
   "deleteConfirm": "Supprimer cet examen et ses {{count}} images du disque ?\n\nCette action est irréversible.",
   "patient": {
     "unknown": "Inconnu"
+  },
+  "pagination": {
+    "prev": "Précédent",
+    "next": "Suivant",
+    "range": "{{from}}–{{to}} sur {{total}}"
   },
   "admin": {
     "title": "Administration",

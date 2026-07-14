@@ -1,8 +1,8 @@
 {
   "title": "Estudios",
-  "count_one": "{{count}} estudio",
-  "count_many": "{{count}} estudios",
-  "count_other": "{{count}} estudios",
+  "count_one": "{{formatted}} estudio",
+  "count_many": "{{formatted}} estudios",
+  "count_other": "{{formatted}} estudios",
   "search": "Paciente, identificador, descripción…",
   "empty": "Todavía no hay estudios — suba uno arriba.",
   "emptySearch": "Ningún estudio coincide con esa búsqueda.",
@@ -18,6 +18,11 @@
   "deleteConfirm": "¿Eliminar del disco este estudio y sus {{count}} imágenes?\n\nEsta acción no se puede deshacer.",
   "patient": {
     "unknown": "Desconocido"
+  },
+  "pagination": {
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "range": "{{from}}–{{to}} de {{total}}"
   },
   "admin": {
     "title": "Administración",

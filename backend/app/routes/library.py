@@ -5,15 +5,15 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 from fastapi.responses import FileResponse
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 
 from app.errors import AppError
 from app.config import get_settings
 from app.dependencies import CurrentUser, DbSession
 from app.models import Instance, Series, Study
-from app.schemas.library import SeriesOut, StudyDetailOut, StudyOut, TagOut
+from app.schemas.library import SeriesOut, StudyDetailOut, StudyOut, StudyPageOut, TagOut
 from app.services import storage
 from app.services.dicom_json import flatten_tags
 
@@ -21,18 +21,20 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["library"])
 
 
-@router.get("/studies", response_model=list[StudyOut])
-async def list_studies(
-    user: CurrentUser,
-    db: DbSession,
-    q: str | None = None,
-    modality: str | None = None,
-    date_from: str | None = None,
-    date_to: str | None = None,
-    limit: int = 100,
-    offset: int = 0,
+def _matching(
+    user_id: int,
+    q: str | None,
+    modality: str | None,
+    date_from: str | None,
+    date_to: str | None,
 ):
-    query = select(Study).where(Study.user_id == user.id)
+    """The WHERE clause, built once.
+
+    The page and its total MUST filter identically — a count that disagrees with the rows it is
+    counting is the classic pagination bug, and it shows up as a Next button that leads nowhere.
+    Building the predicate in one place is what makes them provably the same.
+    """
+    query = select(Study).where(Study.user_id == user_id)
 
     if q:
         term = f"%{q}%"
@@ -51,11 +53,45 @@ async def list_studies(
     if date_to:
         query = query.where(Study.study_date <= date_to)
 
-    query = query.order_by(Study.study_date.desc(), Study.id.desc())
-    query = query.limit(min(limit, 500)).offset(offset)
+    return query
 
-    result = await db.execute(query)
-    return [StudyOut.from_row(s) for s in result.scalars().all()]
+
+@router.get("/studies", response_model=StudyPageOut)
+async def list_studies(
+    user: CurrentUser,
+    db: DbSession,
+    q: str | None = None,
+    modality: str | None = None,
+    date_from: str | None = None,
+    date_to: str | None = None,
+    # Bounded deliberately. As a bare `int` this accepted limit=-1, which SQLite reads as
+    # "no limit" — one request could pull an entire library into memory.
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """One page of the user's studies, plus the total that matches the filters.
+
+    The total is what lets the UI say "1–50 of 3 420" honestly. Without it the interface can only
+    count the rows it was handed, which silently reads as "you have 100 exams".
+    """
+    matching = _matching(user.id, q, modality, date_from, date_to)
+
+    # `study_date DESC, id DESC` is a TOTAL order: the id tiebreaker is what stops two studies
+    # recorded on the same day from swapping places between page 1 and page 2, which would show
+    # one twice and skip the other.
+    page = (
+        matching.order_by(Study.study_date.desc(), Study.id.desc()).limit(limit).offset(offset)
+    )
+
+    rows = (await db.execute(page)).scalars().all()
+    total = await db.scalar(select(func.count()).select_from(matching.subquery())) or 0
+
+    return StudyPageOut(
+        items=[StudyOut.from_row(s) for s in rows],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/studies/{study_uid}", response_model=StudyDetailOut)

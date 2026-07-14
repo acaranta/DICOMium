@@ -1,27 +1,54 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
-import { api, type Study, type UploadJob } from '../lib/api'
+import { keepPreviousData, useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import { api, type StudyPage, type UploadJob } from '../lib/api'
 import { formatAge, formatPersonName, modalityColor } from '../lib/dicom'
-import { formatDicomDate } from '../lib/format'
+import { formatDicomDate, formatInteger } from '../lib/format'
+import { useDebounced } from '../lib/useDebounced'
 import AppShell from '../components/layout/AppShell'
+import Pagination from '../components/library/Pagination'
 import UploadDropzone from '../components/upload/UploadDropzone'
 import UploadJobCard from '../components/upload/UploadJobCard'
 import { IconSearch, IconSpinner, IconTrash } from '../components/ui/Icons'
+
+const PAGE_SIZE = 50
 
 export default function LibraryPage() {
   const { t } = useTranslation('library')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
+  const [offset, setOffset] = useState(0)
   const [jobIds, setJobIds] = useState<string[]>([])
 
-  const { data: studies, isLoading } = useQuery({
-    queryKey: ['studies', search],
-    queryFn: () =>
-      api.get<Study[]>(`/api/studies${search ? `?q=${encodeURIComponent(search)}` : ''}`),
+  const term = useDebounced(search)
+
+  // Searching from page 7 must land on page 1 of the results, not on an empty page 7 of them.
+  useEffect(() => setOffset(0), [term])
+
+  const { data: page, isLoading } = useQuery({
+    queryKey: ['studies', term, offset],
+    queryFn: () => {
+      const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) })
+      if (term) params.set('q', term)
+      return api.get<StudyPage>(`/api/studies?${params}`)
+    },
+    // Hold the current page on screen while the next one loads, rather than blanking the table
+    // and bouncing the scroll position on every click of Next.
+    placeholderData: keepPreviousData,
   })
+
+  const studies = page?.items
+  const total = page?.total ?? 0
+
+  // Deleting the last row of the last page leaves us pointing past the end. The server answers
+  // honestly with an empty page and the real total, so step back rather than show a blank table.
+  useEffect(() => {
+    if (page && offset > 0 && page.items.length === 0) {
+      setOffset(Math.max(0, offset - PAGE_SIZE))
+    }
+  }, [page, offset])
 
   const remove = useMutation({
     mutationFn: (uid: string) => api.delete(`/api/studies/${uid}`),
@@ -34,8 +61,12 @@ export default function LibraryPage() {
         <div className="mb-6 flex items-baseline justify-between">
           <div>
             <h1 className="text-base font-medium text-ink">{t('title')}</h1>
+            {/* The total from the server, not `studies.length` — that only ever knew about the
+                rows on this page, which is how a library of 3 000 exams reported "100".
+                `count` picks the plural; `formatted` is what gets shown, so the number reads the
+                same here as it does in the pager below. */}
             <p className="mt-0.5 text-xs text-ink-dim">
-              {studies ? t('count', { count: studies.length }) : ' '}
+              {page ? t('count', { count: total, formatted: formatInteger(total) }) : ' '}
             </p>
           </div>
 
@@ -73,7 +104,7 @@ export default function LibraryPage() {
         ) : !studies?.length ? (
           <div className="rounded border border-line bg-panel py-16 text-center">
             <p className="text-xs text-ink-dim">
-              {search ? t('emptySearch') : t('empty')}
+              {term ? t('emptySearch') : t('empty')}
             </p>
           </div>
         ) : (
@@ -170,6 +201,15 @@ export default function LibraryPage() {
             </table>
           </div>
         )}
+
+        {studies?.length ? (
+          <Pagination
+            offset={offset}
+            limit={PAGE_SIZE}
+            total={total}
+            onChange={setOffset}
+          />
+        ) : null}
       </div>
     </AppShell>
   )

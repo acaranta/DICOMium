@@ -88,7 +88,14 @@ async def search_studies(
     if ModalitiesInStudy:
         query = query.where(Study.modalities.like(f"%{ModalitiesInStudy}%"))
 
-    query = query.order_by(Study.study_date.desc()).limit(min(limit, 500)).offset(offset)
+    # The `id` tiebreaker makes this a total order. Ordering on `study_date` alone leaves studies
+    # recorded on the same day free to swap places between one page and the next, which shows one
+    # of them twice and skips the other.
+    query = (
+        query.order_by(Study.study_date.desc(), Study.id.desc())
+        .limit(min(limit, 500))
+        .offset(offset)
+    )
     studies = (await db.execute(query)).scalars().all()
 
     base = _base_url(request)

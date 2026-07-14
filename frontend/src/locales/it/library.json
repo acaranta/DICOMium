@@ -1,8 +1,8 @@
 {
   "title": "Esami",
-  "count_one": "{{count}} esame",
-  "count_many": "{{count}} esami",
-  "count_other": "{{count}} esami",
+  "count_one": "{{formatted}} esame",
+  "count_many": "{{formatted}} esami",
+  "count_other": "{{formatted}} esami",
   "search": "Paziente, identificativo, descrizione…",
   "empty": "Nessun esame — caricane uno qui sopra.",
   "emptySearch": "Nessun esame corrisponde a questa ricerca.",
@@ -18,6 +18,11 @@
   "deleteConfirm": "Eliminare dal disco questo esame e tutte le sue {{count}} immagini?\n\nQuesta azione è irreversibile.",
   "patient": {
     "unknown": "Sconosciuto"
+  },
+  "pagination": {
+    "prev": "Precedente",
+    "next": "Successivo",
+    "range": "{{from}}–{{to}} di {{total}}"
   },
   "admin": {
     "title": "Amministrazione",

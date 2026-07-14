@@ -224,6 +224,15 @@ export interface StudyDetail extends Study {
   series: Series[]
 }
 
+/** One page of studies. `total` is what makes the count honest — see StudyPageOut on the server. */
+export interface StudyPage {
+  items: Study[]
+  /** Studies matching the current filters, not the size of the whole library. */
+  total: number
+  limit: number
+  offset: number
+}
+
 export interface UploadError {
   path: string
   stage: string

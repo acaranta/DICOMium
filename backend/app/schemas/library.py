@@ -81,6 +81,21 @@ class StudyOut(BaseModel):
         )
 
 
+class StudyPageOut(BaseModel):
+    """One page of studies, and how many there are in total.
+
+    The total is the whole reason this is an envelope rather than a bare list. Without it the
+    interface can only count the rows it was given, which is how a library of 3 000 exams came
+    to describe itself as 100.
+    """
+
+    items: list[StudyOut]
+    #: Studies matching the current filters — NOT the size of the whole library.
+    total: int
+    limit: int
+    offset: int
+
+
 class StudyDetailOut(StudyOut):
     series: list[SeriesOut]
 

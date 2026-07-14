@@ -1,7 +1,7 @@
 {
   "title": "Untersuchungen",
-  "count_one": "{{count}} Untersuchung",
-  "count_other": "{{count}} Untersuchungen",
+  "count_one": "{{formatted}} Untersuchung",
+  "count_other": "{{formatted}} Untersuchungen",
   "search": "Patient, ID, Beschreibung…",
   "empty": "Noch keine Untersuchungen — laden Sie oben eine hoch.",
   "emptySearch": "Keine Untersuchung passt zu dieser Suche.",
@@ -17,6 +17,11 @@
   "deleteConfirm": "Diese Untersuchung und alle {{count}} zugehörigen Bilder von der Festplatte löschen?\n\nDies kann nicht rückgängig gemacht werden.",
   "patient": {
     "unknown": "Unbekannt"
+  },
+  "pagination": {
+    "prev": "Zurück",
+    "next": "Weiter",
+    "range": "{{from}}–{{to}} von {{total}}"
   },
   "admin": {
     "title": "Verwaltung",
