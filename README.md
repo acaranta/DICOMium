@@ -101,12 +101,22 @@ Each user sees only their own exams, and every API path is scoped to them.
 - **Passkeys.** Fingerprint, face or device PIN — and that's the whole sign-in. No email,
   no password, no code. A passkey is *already* two factors (the device you hold, and the
   biometric that unlocks it), so it deliberately does not then ask for a TOTP code as well.
+  Each one gets a name — suggested from your device ("iPhone", "Windows PC"…) when you add
+  it, yours to edit, and renameable later by clicking it on `/account`.
 - **Authenticator app (TOTP).** A 6-digit code after your password, with **10 one-time
   recovery codes** for when your phone isn't to hand.
 
 > Browsers only permit passkeys in a secure context: **HTTPS, or `localhost`**. They will
 > not work over plain HTTP on a LAN address — the UI says so rather than failing silently.
 > Password and TOTP work everywhere.
+
+**Profile** — the header carries a user menu now: your avatar, email, role, and quick links
+to Account & security and, for admins, Administration. Avatars are initials on a coloured
+circle — 8 colours × 4 styles, picked on `/account` — and an untouched account still gets a
+stable one, derived from a hash of your email, so nothing looks unconfigured. A Gravatar
+opt-in sits next to it, **off by default**: turning it on sends a hash of your email to
+gravatar.com and reveals your IP to them. It's the one exception to "no data leaving your
+machine" at the top of this page — everything else genuinely makes zero third-party requests.
 
 ## Roadmap
 
